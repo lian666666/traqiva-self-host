@@ -43,6 +43,54 @@ beforeEach(() => { db = new SqliteDatabase(); env = { DB: db }; pending = []; })
 afterEach(async () => { await Promise.allSettled(pending); db.raw.close(); vi.unstubAllGlobals(); });
 
 describe('real SQL authentication and tenant authorization', () => {
+  it('distinguishes unknown cache counts from measured zero and totals only cache-covered input for cache ratios', async () => {
+    const account = await register();
+    const overview = async () => (await (await request(`/api/overview?project=${account.project.id}`, { cookie: account.cookie })).json() as any).stats;
+    expect(await overview()).toMatchObject({ cache_available_requests: 0, cache_covered_input_tokens: 0 });
+    const ingest = (records: unknown[]) => request('/api/traces/import', { method: 'POST', cookie: account.cookie, body: { project_id: account.project.id, records } });
+    expect((await ingest([{ model: 'cache-unreported', input_tokens: 900, output_tokens: 1 }])).status).toBe(201);
+    expect(await overview()).toMatchObject({ requests: 1, input_tokens: 900, cached_tokens: 0, cache_available_requests: 0, cache_covered_input_tokens: 0 });
+    expect((await ingest([{ model: 'cache-zero', input_tokens: 100, output_tokens: 1, cached_tokens: 0 }])).status).toBe(201);
+    expect(await overview()).toMatchObject({ requests: 2, input_tokens: 1000, cached_tokens: 0, cache_available_requests: 1, cache_covered_input_tokens: 100 });
+    expect((await ingest([{ model: 'cache-reported', input_tokens: 200, output_tokens: 1, cached_tokens: 60 }])).status).toBe(201);
+    const mixed = await overview();
+    expect(mixed).toMatchObject({ requests: 3, input_tokens: 1200, cached_tokens: 60, cache_available_requests: 2, cache_covered_input_tokens: 300 });
+    expect(mixed.cached_tokens / mixed.cache_covered_input_tokens).toBe(0.2);
+  });
+  it('uses the same current-instant window for overview totals, compression, timeline, models and recent requests', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-10-20T12:34:56.000Z'));
+    try {
+      const account = await register(), from = '2026-10-14T00:00:00.000Z', at = '2026-10-20T12:34:56.000Z';
+      const future = ['2026-10-20T12:34:56.001Z', '2026-10-21T00:00:00.000Z'];
+      const imported = await request('/api/traces/import', { method: 'POST', cookie: account.cookie, body: { project_id: account.project.id, records: [
+        { model: 'measured-zero', created_at: from, input_tokens: 0, output_tokens: 0, cached_tokens: 0, cost_usd: 0, latency_ms: 0 },
+        { model: 'unpriced', created_at: at, input_tokens: 10, output_tokens: 2, cached_tokens: 3, latency_ms: 10 },
+        ...future.map((created_at, index) => ({ model: `future-${index}`, created_at, status: 'error', input_tokens: 9000, output_tokens: 1000, cached_tokens: 100, cost_usd: 100, latency_ms: 1000, original_tokens: 100, optimized_tokens: 1, compressed: true })),
+        { model: 'too-old', created_at: '2026-10-13T23:59:59.999Z', input_tokens: 9000, output_tokens: 1000, cost_usd: 100 },
+      ] } });
+      expect(imported.status).toBe(201);
+      for (const created_at of [from, ...future]) {
+        const response = await request('/api/compression-events', { method: 'POST', cookie: account.cookie, body: { project_id: account.project.id, algorithm: 'synthetic-window-fixture', source: 'test', input_bytes: 100, output_bytes: 60, original_tokens_estimate: 25, optimized_tokens_estimate: 15 } });
+        expect(response.status).toBe(201);
+        const { event } = await response.json() as any;
+        db.raw.prepare('UPDATE compression_events SET created_at=? WHERE id=?').run(created_at, event.id);
+      }
+      const response = await request(`/api/overview?project=${account.project.id}&days=7`, { cookie: account.cookie });
+      expect(response.status).toBe(200);
+      const overview = await response.json() as any;
+      expect(overview.stats).toMatchObject({ requests: 2, input_tokens: 10, output_tokens: 2, cached_tokens: 3, estimated_cost_usd: 0, errors: 0, avg_latency_ms: 5, usage_available_requests: 2, priced_requests: 1, saved_tokens: null, compression_events: 1, compression_estimated_saved_tokens: 10 });
+      expect(overview.series).toHaveLength(7);
+      expect(overview.series[0]).toEqual({ date: '2026-10-14', requests: 1, tokens: 0, cost: 0 });
+      expect(overview.series[6]).toEqual({ date: '2026-10-20', requests: 1, tokens: 12, cost: null });
+      expect(overview.series.reduce((sum: number, day: any) => sum + day.requests, 0)).toBe(2);
+      expect(overview.models).toEqual(expect.arrayContaining([{ model: 'measured-zero', requests: 1, tokens: 0, cost: 0 }, { model: 'unpriced', requests: 1, tokens: 12, cost: null }]));
+      expect(overview.models).toHaveLength(2);
+      expect(overview.traces.map((trace: any) => trace.model)).toEqual(['unpriced', 'measured-zero']);
+      expect(db.raw.prepare('SELECT COUNT(*) AS count FROM traces').get()).toEqual({ count: 5 });
+      expect(db.raw.prepare('SELECT COUNT(*) AS count FROM compression_events').get()).toEqual({ count: 3 });
+    } finally { vi.useRealTimers(); }
+  });
   it('keeps estimated local compression events separate from real provider requests', async () => {
     const account = await register(), key = await keyFor(account.cookie, account.project.id);
     const response = await request('/api/compression-events', { method: 'POST', key: key.key, body: { algorithm: 'native-log', source: 'native', input_bytes: 4000, output_bytes: 2800, original_tokens_estimate: 1000, optimized_tokens_estimate: 700 } });

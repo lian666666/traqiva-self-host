@@ -161,17 +161,17 @@ app.patch('/api/projects/:id', async c => {
   return c.json({ project: { ...principal.project, name } });
 });
 async function overview(env: Env, projectId: string, days: number) {
-  const from = new Date(Date.now() - (days - 1) * 86400_000).toISOString().slice(0, 10);
-  const stats = (await dbOne(env, `SELECT COUNT(*) AS requests,COALESCE(SUM(input_tokens),0) AS input_tokens,COALESCE(SUM(output_tokens),0) AS output_tokens,COALESCE(SUM(cached_tokens),0) AS cached_tokens,SUM(cost_usd) AS estimated_cost_usd,SUM(CASE WHEN status='error' THEN 1 ELSE 0 END) AS errors,AVG(latency_ms) AS avg_latency_ms,SUM(saved_tokens) AS saved_tokens,SUM(CASE WHEN token_basis='unavailable' THEN 0 ELSE 1 END) AS usage_available_requests,COUNT(cost_usd) AS priced_requests FROM traces WHERE project_id=? AND created_at>=?`, projectId, from))!;
+  const to = now(), from = new Date(Date.parse(to) - (days - 1) * 86400_000).toISOString().slice(0, 10);
+  const stats = (await dbOne(env, `SELECT COUNT(*) AS requests,COALESCE(SUM(input_tokens),0) AS input_tokens,COALESCE(SUM(output_tokens),0) AS output_tokens,COALESCE(SUM(cached_tokens),0) AS cached_tokens,COUNT(CASE WHEN input_tokens IS NOT NULL AND cached_tokens IS NOT NULL THEN 1 END) AS cache_available_requests,COALESCE(SUM(CASE WHEN input_tokens IS NOT NULL AND cached_tokens IS NOT NULL THEN input_tokens END),0) AS cache_covered_input_tokens,SUM(cost_usd) AS estimated_cost_usd,SUM(CASE WHEN status='error' THEN 1 ELSE 0 END) AS errors,AVG(latency_ms) AS avg_latency_ms,SUM(saved_tokens) AS saved_tokens,SUM(CASE WHEN token_basis='unavailable' THEN 0 ELSE 1 END) AS usage_available_requests,COUNT(cost_usd) AS priced_requests FROM traces WHERE project_id=? AND created_at>=? AND created_at<=?`, projectId, from, to))!;
   stats.errors ??= 0; stats.avg_latency_ms ??= 0; stats.usage_available_requests ??= 0;
   stats.saved_tokens_basis = stats.saved_tokens === null ? 'unavailable' : 'client_estimate';
-  const compression = (await dbOne(env, 'SELECT COUNT(*) AS events,SUM(estimated_saved_tokens) AS estimated_saved_tokens FROM compression_events WHERE project_id=? AND created_at>=?', projectId, from))!;
+  const compression = (await dbOne(env, 'SELECT COUNT(*) AS events,SUM(estimated_saved_tokens) AS estimated_saved_tokens FROM compression_events WHERE project_id=? AND created_at>=? AND created_at<=?', projectId, from, to))!;
   stats.compression_events = compression.events;
   stats.compression_estimated_saved_tokens = compression.estimated_saved_tokens;
-  const rows = await dbAll(env, 'SELECT substr(created_at,1,10) AS date,COUNT(*) AS requests,COALESCE(SUM(input_tokens+output_tokens),0) AS tokens,SUM(cost_usd) AS cost FROM traces WHERE project_id=? AND created_at>=? GROUP BY substr(created_at,1,10) ORDER BY date', projectId, from);
+  const rows = await dbAll(env, 'SELECT substr(created_at,1,10) AS date,COUNT(*) AS requests,COALESCE(SUM(input_tokens+output_tokens),0) AS tokens,SUM(cost_usd) AS cost FROM traces WHERE project_id=? AND created_at>=? AND created_at<=? GROUP BY substr(created_at,1,10) ORDER BY date', projectId, from, to);
   const series = Array.from({ length: days }, (_, index) => { const date = new Date(Date.parse(`${from}T00:00:00Z`) + index * 86400_000).toISOString().slice(0, 10); return rows.find(row => row.date === date) ?? { date, requests: 0, tokens: 0, cost: null }; });
-  const models = await dbAll(env, 'SELECT model,COUNT(*) AS requests,COALESCE(SUM(input_tokens+output_tokens),0) AS tokens,SUM(cost_usd) AS cost FROM traces WHERE project_id=? AND created_at>=? GROUP BY model ORDER BY requests DESC LIMIT 30', projectId, from);
-  const traces = (await dbAll(env, `SELECT ${traceFields} FROM traces WHERE project_id=? AND created_at>=? ORDER BY created_at DESC LIMIT 10`, projectId, from)).map(publicTrace);
+  const models = await dbAll(env, 'SELECT model,COUNT(*) AS requests,COALESCE(SUM(input_tokens+output_tokens),0) AS tokens,SUM(cost_usd) AS cost FROM traces WHERE project_id=? AND created_at>=? AND created_at<=? GROUP BY model ORDER BY requests DESC LIMIT 30', projectId, from, to);
+  const traces = (await dbAll(env, `SELECT ${traceFields} FROM traces WHERE project_id=? AND created_at>=? AND created_at<=? ORDER BY created_at DESC LIMIT 10`, projectId, from, to)).map(publicTrace);
   return { stats, series, models, traces };
 }
 app.get('/api/overview', async c => {

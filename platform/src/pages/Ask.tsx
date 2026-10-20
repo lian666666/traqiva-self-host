@@ -1,4 +1,5 @@
 import { useState,type FormEvent } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { ArrowRight, ChevronDown, FileText, KeyRound, MessageCircle, Plus, ShieldCheck, SlidersHorizontal, X } from 'lucide-react';
 import { api,json,useApp } from '../api';
 import { ErrorNotice,Spinner } from '../ui';
@@ -8,7 +9,8 @@ type Message={role:'user'|'assistant';content:string;sources?:unknown[];method?:
 type AskResponse={answer:string;sources:unknown[];method:'rules'|'llm';provider_called:boolean;provider?:string;model?:string};
 export default function Ask(){
   const {project}=useApp();
-  const [messages,setMessages]=useState<Message[]>([]),[question,setQuestion]=useState(''),[busy,setBusy]=useState(false),[error,setError]=useState('');
+  const [searchParams]=useSearchParams();
+  const [messages,setMessages]=useState<Message[]>([]),[question,setQuestion]=useState(()=>searchParams.get('question')?.slice(0,2000)||''),[busy,setBusy]=useState(false),[error,setError]=useState('');
   const [mode,setMode]=useState<AskMode>('statistics'),[provider,setProvider]=useState<Provider>('openai'),[model,setModel]=useState(''),[apiKey,setApiKey]=useState(''),[settingsOpen,setSettingsOpen]=useState(false);
   const aiReady=mode!=='ai'||!!apiKey.trim()&&!!model.trim();
   function changeMode(next:AskMode){setMode(next);setError('');if(next==='ai')setSettingsOpen(true);else{setSettingsOpen(false);setApiKey('');}}

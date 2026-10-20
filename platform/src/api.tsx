@@ -22,9 +22,11 @@ export function AppProvider({children}:{children:ReactNode}){
 }
 export function useApp(){const value=useContext(AppContext);if(!value)throw new Error('App provider missing');return value;}
 export function useResource<T>(path:string|null,initial:T){
-  const [data,setData]=useState<T>(initial),[loading,setLoading]=useState(!!path),[error,setError]=useState(''),[revision,setRevision]=useState(0);
-  useEffect(()=>{let active=true;if(!path){setData(initial);setLoading(false);return;}setLoading(true);setError('');api<T>(path).then(value=>{if(active)setData(value);}).catch(e=>{if(active)setError(e.message);}).finally(()=>{if(active)setLoading(false);});return()=>{active=false;};},[path,revision]);
-  return {data,loading,error,refresh:()=>setRevision(v=>v+1)};
+  const [state,setState]=useState({path,data:initial,loading:!!path,error:''}),[revision,setRevision]=useState(0);
+  useEffect(()=>{let active=true;if(!path){setState({path,data:initial,loading:false,error:''});return;}setState({path,data:initial,loading:true,error:''});api<T>(path).then(value=>{if(active)setState({path,data:value,loading:false,error:''});}).catch(e=>{if(active)setState({path,data:initial,loading:false,error:e.message});});return()=>{active=false;};},[path,revision]);
+  // A changed scope must never expose the previous project's or period's response.
+  const current=state.path===path?state:{path,data:initial,loading:!!path,error:''};
+  return {data:current.data,loading:current.loading,error:current.error,refresh:()=>setRevision(v=>v+1)};
 }
 export const number=(value:number|null|undefined)=>value==null?'—':new Intl.NumberFormat('en',{notation:value>=100000?'compact':'standard',maximumFractionDigits:1}).format(value);
 export const money=(value:number|null|undefined)=>value==null?'—':new Intl.NumberFormat('en',{style:'currency',currency:'USD',minimumFractionDigits:2,maximumFractionDigits:value>0&&value<0.01?5:2}).format(value);
