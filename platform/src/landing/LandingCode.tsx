@@ -1,0 +1,4 @@
+import { useEffect,useState } from 'react';
+import { Check,Copy } from 'lucide-react';
+import { useApp } from '../api';
+export default function LandingCode({code,label}:{code:string;label:string}){const {notify}=useApp();const [copied,setCopied]=useState(false);useEffect(()=>{if(!copied)return;const timer=setTimeout(()=>setCopied(false),3000);return()=>clearTimeout(timer);},[copied]);async function copy(){try{await navigator.clipboard.writeText(code);setCopied(true);notify('Example copied. Review it before running.');}catch{setCopied(false);notify('Clipboard unavailable. Select and copy the example.');}}return <div className="landing-code"><header><span><i/><i/><i/></span><strong>{label}</strong><button onClick={()=>void copy()} aria-label={`Copy ${label}`}>{copied?<Check size={14}/>:<Copy size={14}/>}<span>{copied?'Copied':'Copy'}</span></button></header><pre tabIndex={0}>{code}</pre></div>;}

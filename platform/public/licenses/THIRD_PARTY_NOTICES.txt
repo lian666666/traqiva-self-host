@@ -1,6 +1,6 @@
 # Third-party source and research notices
 
-The independent Traqiva Node CLI uses Node.js built-in modules and has no npm runtime dependencies. Its npm tarball does not bundle native binaries. Separately downloadable native engine and proxy integrate the Apache-2.0 Caveman v4.0.1 local runtime as described below. Full notices for the front end/server's actual bundled dependencies, including Inter and Lucide, are generated at [/licenses/BUNDLED_DEPENDENCIES.txt](/licenses/BUNDLED_DEPENDENCIES.txt).
+The independent Traqiva Node CLI uses Node.js built-in modules and has no npm runtime dependencies. Its npm tarball does not bundle native binaries. Separately downloadable native engine and proxy integrate the Apache-2.0 Caveman v4.0.1 local runtime as described below. Full notices for the front end/server's actual bundled dependencies, including Geist Sans, Geist Mono (SIL Open Font License 1.1) and Lucide, are generated at [/licenses/BUNDLED_DEPENDENCIES.txt](/licenses/BUNDLED_DEPENDENCIES.txt).
 
 The `caveman/` directory preserves the public upstream LICENSE, LICENSE-MIT, NOTICE, LICENSING and TRADEMARKS files consulted during source research. The native runtime subtree preserves an additional copy alongside the source.
 
