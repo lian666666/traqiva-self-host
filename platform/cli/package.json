@@ -1,0 +1,14 @@
+{
+  "name": "traqiva-cli-local",
+  "version": "0.1.0",
+  "description": "Traqiva trace client, native compression MCP and explicit local coding-agent proxy launcher.",
+  "type": "module",
+  "license": "Apache-2.0",
+  "engines": { "node": ">=22.13" },
+  "bin": { "traqiva": "bin/traqiva.mjs" },
+  "files": ["bin", "lib", "README.md", "LICENSE", "NOTICE"],
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "check": "node --check bin/traqiva.mjs && node --check lib/client.mjs && node --check lib/mcp.mjs && node --check lib/proxy.mjs && node --check lib/native.mjs && node --check lib/operations.mjs && node --check lib/agent.mjs && node --check lib/proxy-native.mjs"
+  }
+}

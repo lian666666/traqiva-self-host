@@ -1,0 +1,14 @@
+platform/node_modules/
+platform/dist/
+platform/.wrangler/
+platform/.traqiva/
+platform/runtime/build/
+platform/.dev.vars*
+platform/.env*
+!platform/.env.example
+platform/wrangler.self-host.jsonc
+platform/.self-host-state.json
+platform/cli/*.tgz
+*.db
+*.db-*
+*.sqlite*

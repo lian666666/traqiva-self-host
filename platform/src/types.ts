@@ -1,0 +1,17 @@
+export type User = { id: string; name: string; email: string; google_linked?: boolean };
+export type Workspace = { id: string; name: string; retention_days: number; mode: 'observe'|'optimize'; autopilot: 'off'|'suggest'; monthly_budget: number };
+export type Project = { id: string; name: string; created_at?: string };
+export type SetupGoal='coding'|'observe';
+export type SetupState={stage:'goals'|'project'|'connect'|'complete';goals:SetupGoal[];project_id:string|null};
+export type ConsentState={version:string;accepted:boolean;accepted_at:string|null};
+export type ConnectionStatus={connected:boolean;method:'project_key'|'traffic'|'compression'|null;last_activity_at:string|null};
+export type Session = { user: User|null; workspace: Workspace|null; projects: Project[]; activeProject: Project|null;setup?:SetupState|null;terms?:ConsentState|null };
+export type Trace = { id:string; project_id?:string; model:string; provider:string; status:number|string; input_tokens:number|null; output_tokens:number|null; cached_tokens:number|null; latency_ms:number; cost_usd:number|null; input_bytes:number; output_bytes:number; original_tokens:number|null; optimized_tokens:number|null; token_basis:string; saved_tokens:number|null; created_at:string; source:string; compressed:boolean };
+export type Stats = { requests:number; input_tokens:number; output_tokens:number; cached_tokens:number; estimated_cost_usd:number|null; errors:number; avg_latency_ms:number; saved_tokens:number|null; usage_available_requests?:number; priced_requests?:number; saved_tokens_basis?:string; compression_events?:number; compression_estimated_saved_tokens?:number|null };
+export type Overview = { stats:Stats; series:{date:string;requests:number;tokens:number;cost:number|null}[]; models:{model:string;requests:number;tokens:number;cost:number|null}[]; traces:Trace[] };
+export type ApiKey = { id:string; name:string; prefix?:string; key_prefix?:string; created_at:string; last_used_at?:string; revoked_at?:string };
+export type Improvement = { id:string; title:string; description?:string; evidence?:string; recommendation?:string; status:string; potential_tokens?:number; estimated_savings?:number; created_at:string; kind?:string };
+export type EvalCase = { input:string; expected:string; actual:string };
+export type EvalSuite = { id:string; name:string; cases:EvalCase[]; created_at:string };
+export type EvalRun = { id:string; suite_id:string; passed:number; total:number; score?:number; created_at:string; results?:{passed:boolean;input:string;expected:string;actual:string}[] };
+export const emptyOverview:Overview={stats:{requests:0,input_tokens:0,output_tokens:0,cached_tokens:0,estimated_cost_usd:null,errors:0,avg_latency_ms:0,saved_tokens:null},series:[],models:[],traces:[]};

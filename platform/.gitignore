@@ -1,0 +1,17 @@
+node_modules/
+dist/
+.wrangler/
+.traqiva/
+runtime/build/
+*.db
+*.db-shm
+*.db-wal
+*.sqlite*
+.dev.vars*
+.env*
+!.env.example
+playwright-report/
+test-results/
+cli/*.tgz
+wrangler.self-host.jsonc
+.self-host-state.json

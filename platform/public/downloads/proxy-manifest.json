@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "version": "0.1.0-traqiva",
+  "source_revision": "d0be14f2dc92a99d12e717465d6908723ab9bfdb",
+  "wrapper_sha256": "07828627e54bd0f009794d685094367e6a96191d3e1650068276db2a09a76f5d",
+  "go_version": "go version go1.27.3 windows/amd64",
+  "cgo": false,
+  "code_languages": [
+    "Go"
+  ],
+  "evidence_basis": "inferred",
+  "notices": {
+    "file": "proxy-notices.json",
+    "sha256": "f0911472d7378ccaa26e20ecd0a5a2f3392f1d5c6a9ede392cd6fb8f83656ddb"
+  },
+  "artifacts": {
+    "win32-x64": {
+      "file": "traqiva-proxy-0.1.0-windows-amd64.exe.gz",
+      "sha256": "5a7ce575513045aadeae581dd16fdf247c23924f02f63a117f73068e0976f6d7",
+      "binary_sha256": "7f90248b8f6656b77bc9ce57aaa80c00c93d754aebcc7a3f31af7c66bedb1a72",
+      "size": 13950237,
+      "binary_size": 39277568,
+      "executed_on_build_host": true
+    },
+    "linux-x64": {
+      "file": "traqiva-proxy-0.1.0-linux-amd64.gz",
+      "sha256": "9c8ae4c8158d17c72377e5e50970ff2327f903b3fac66b23522fbf6d7601ea09",
+      "binary_sha256": "1441909c5fb16049063d2b9e56cac53123e8026a564bfc9d340ed3fe4f329e76",
+      "size": 13737299,
+      "binary_size": 37867680,
+      "executed_on_build_host": false
+    },
+    "darwin-arm64": {
+      "file": "traqiva-proxy-0.1.0-darwin-arm64.gz",
+      "sha256": "209539ee356d011cee7f86c73a1333f6c4f587bf8e4ca30a93c65c9d19b80f80",
+      "binary_sha256": "382d8fd67611874a1c923ac74f1aa545dd80a0f526f9f983c5432c064c4e7e09",
+      "size": 13783050,
+      "binary_size": 39249522,
+      "executed_on_build_host": false
+    }
+  }
+}

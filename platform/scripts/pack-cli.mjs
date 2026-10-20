@@ -1,0 +1,12 @@
+import { mkdir, copyFile } from 'node:fs/promises';
+import { execFileSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
+const root = fileURLToPath(new URL('../', import.meta.url));
+const target = new URL('../public/downloads/', import.meta.url);
+await mkdir(target, { recursive: true });
+const npmCli = process.env.npm_execpath;
+if (!npmCli) throw new Error('Run through npm run pack:cli');
+const output = execFileSync(process.execPath, [npmCli, 'pack', '--json'], { cwd: root + 'cli', encoding: 'utf8' });
+const filename = JSON.parse(output)[0].filename;
+await copyFile(new URL('../cli/' + filename, import.meta.url), new URL('traqiva-cli-0.1.0.tgz', target));
+console.log('Prepared public/downloads/traqiva-cli-0.1.0.tgz');

@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "version": "0.1.0",
+  "source_revision": "d0be14f2dc92a99d12e717465d6908723ab9bfdb",
+  "wrapper_sha256": "77cb22aaa16d467b6f7eb7bd05e912770e3adff61eb7f86c681807c2a0ad2c3b",
+  "go_version": "go version go1.27.3 windows/amd64",
+  "cgo": false,
+  "code_languages": [
+    "Go"
+  ],
+  "evidence_basis": "inferred",
+  "notices": {
+    "file": "engine-notices.json",
+    "sha256": "7035ae7d454fa7f100b5393bbcf5519983f883bf2083cef3e41572972ec68339"
+  },
+  "artifacts": {
+    "win32-x64": {
+      "file": "traqiva-engine-0.1.0-windows-amd64.exe.gz",
+      "sha256": "b4bce658b2b3b2e01c63f9d7fc2d480cc2505ca1febab03c4a7d0de40ea1f09b",
+      "binary_sha256": "ebe530595cb2151e8d828c718775e2e5334a850c3cb77fa23c34822dc1bed6e1",
+      "size": 7003216,
+      "binary_size": 21761536,
+      "executed_on_build_host": true
+    },
+    "linux-x64": {
+      "file": "traqiva-engine-0.1.0-linux-amd64.gz",
+      "sha256": "95ede343f7e6adbfdc1732918ceea96493f5d8ed4cc0e37eb8fb40f6653402b3",
+      "binary_sha256": "4dd9d68f731ba070eddc40b502b2db96cee554d36a2f3b4525079e81d1b8bd9c",
+      "size": 6965992,
+      "binary_size": 20828320,
+      "executed_on_build_host": false
+    },
+    "darwin-arm64": {
+      "file": "traqiva-engine-0.1.0-darwin-arm64.gz",
+      "sha256": "75fc52d23d82495699f86c0ef7569c84dfe541bd99ffc5595ae2e0be312c9768",
+      "binary_sha256": "75921159083017375499b802171aa967d1cbb024ff2f913997a6a0c1c2ba9b16",
+      "size": 7330696,
+      "binary_size": 22961938,
+      "executed_on_build_host": false
+    }
+  }
+}

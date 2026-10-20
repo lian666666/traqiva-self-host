@@ -1,0 +1,11 @@
+Traqiva CLI
+Copyright 2026 Traqiva contributors.
+
+The files in this package are an independent implementation of the Traqiva
+project client, local API-key bridge, native launcher and MCP tools. Native
+runtime binaries are separate explicit downloads, built from Apache-2.0
+Caveman v4.0.1 source with notices. No commercial Cloud server, brand assets
+or unpublished code is included in this npm package.
+
+This package is licensed under the Apache License, Version 2.0.
+It uses only Node.js built-in libraries and has no npm runtime dependencies.

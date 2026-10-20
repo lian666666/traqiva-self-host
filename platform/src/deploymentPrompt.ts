@@ -1,0 +1,15 @@
+export const SELF_HOST_REPOSITORY='https://github.com/lian666666/traqiva-self-host';
+
+export function buildDeploymentPrompt(){
+  return `Help me deploy my own Traqiva installation from ${SELF_HOST_REPOSITORY}. This means hosting the website/API/database in MY Cloudflare account, not connecting my coding agent to someone else's service.
+
+1. Read the public repository README and platform/docs/SELF_HOST.md first. Detect my OS and Node/npm. Clone into a new directory; never overwrite an existing checkout. Use the repository's Node requirements and npm ci from platform/.
+2. Use the official Wrangler login flow or my existing explicitly selected Cloudflare profile. Show the available account names/IDs without printing tokens. Let me choose the destination account and a unique Worker/database name. Do not use Traqiva's hosted production account, database or OAuth client. Never collect credentials in chat or commit them.
+3. Read the self-host options documented in platform/docs/SELF_HOST.md. Generate and review the --dry-run plan with my account ID, Worker name and database name. Deploy with npm run self-host -- --account-id <MY_ACCOUNT_ID> --name <MY_WORKER_NAME> --database <MY_DATABASE_NAME>. Replace these placeholders with my actual choices; never invent IDs. The script writes a separate wrangler.self-host.jsonc. Create a fresh D1 database unless I explicitly choose reuse. Run migrations, package the deployment's CLI, build and deploy. Do not change the original production wrangler.jsonc.
+4. Confirm my actual HTTPS URL, health endpoint, email signup, server-persisted onboarding and account isolation. Use clearly synthetic QA data only for tests. A health check alone is not proof the product works. Let me personally review any legal agreement; do not accept terms for my real account automatically.
+5. Google login is optional. Email/password needs no Google key. If I choose Google, create my own Web OAuth client with only openid/email/profile and register EXACTLY <MY_DEPLOYMENT_ORIGIN>/api/auth/google/callback. Store the client secret as a Worker secret under my installation's config. Never reuse someone else's OAuth secret or expose it as a VITE_ variable. Test actual consent, session and repeat login; otherwise report Google as unverified.
+6. For GitHub Actions, follow the repository's manual workflow and use GitHub Secrets for a least-privilege Cloudflare API token/account ID. Do not run a workflow against another account or promise one-click deployment if the required account/permissions are missing.
+7. Keep account data, environment files, recovery files and credentials out of Git. Keep upstream Apache-2.0 licenses and third-party notices. If I want coding-agent compression afterwards, open MY installation's connection guide and use its CLI URL and project key. Website deployment alone does not intercept an existing desktop chat, prove token savings or enable commercial Caveman model routing.
+
+Finish with my deployment URL, the exact checks that passed, any unrun checks and required user actions. Do not report configured features as verified without running the flow.`;
+}

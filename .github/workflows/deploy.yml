@@ -1,0 +1,53 @@
+name: Deploy your Traqiva
+on:
+  workflow_dispatch:
+    inputs:
+      worker_name:
+        description: Your Worker name (fresh name for the first deployment)
+        required: true
+        type: string
+      database_name:
+        description: Your D1 database name (fresh name for the first deployment)
+        required: true
+        type: string
+      reuse_existing_database:
+        description: Explicitly authorize migrations to an existing database of this name
+        default: false
+        type: boolean
+      reuse_existing_worker:
+        description: Explicitly authorize replacing an existing Worker of this name
+        default: false
+        type: boolean
+permissions:
+  contents: read
+concurrency:
+  group: traqiva-self-host-${{ inputs.worker_name }}
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: platform
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - run: npm ci
+      - run: npm run check && npm run lint && npm test && npm run test:cli && npm run test:self-host
+      - name: Provision, migrate and deploy only your selected resources
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          WORKER_NAME: ${{ inputs.worker_name }}
+          DATABASE_NAME: ${{ inputs.database_name }}
+          REUSE_DATABASE: ${{ inputs.reuse_existing_database }}
+          REUSE_WORKER: ${{ inputs.reuse_existing_worker }}
+        shell: bash
+        run: |
+          args=(--account-id "$CLOUDFLARE_ACCOUNT_ID" --name "$WORKER_NAME" --database "$DATABASE_NAME")
+          if [ "$REUSE_DATABASE" = true ]; then args+=(--reuse-existing); fi
+          if [ "$REUSE_WORKER" = true ]; then args+=(--reuse-existing-worker); fi
+          npm run self-host -- "${args[@]}"
