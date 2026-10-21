@@ -2,7 +2,7 @@
   "schema": 1,
   "template": "traqiva-self-host",
   "history_exported": false,
-  "generated_at": "2026-10-21T22:02:13.699Z",
+  "generated_at": "2026-10-21T22:20:11.363Z",
   "files": [
     {
       "path": ".gitattributes",
@@ -146,8 +146,8 @@
     },
     {
       "path": "platform/docs/CAPABILITIES.md",
-      "bytes": 9518,
-      "sha256": "f8bf81a09413375e49649513bdc84b10924ec19264d5c11962a018adf57279d4"
+      "bytes": 11911,
+      "sha256": "e78686ff41f5dc512e1859ce760c2d6e4234712126c6c1ba071bf184f5a1a276"
     },
     {
       "path": "platform/docs/GITHUB_AUTH.md",
@@ -4291,8 +4291,8 @@
     },
     {
       "path": "platform/src/App.tsx",
-      "bytes": 2896,
-      "sha256": "db33073b2dedebd0380f5aa2df6c5e5a00d47db53b801930eb17bd45cf9bfd0e"
+      "bytes": 3143,
+      "sha256": "7337a02b231f2e7d9fc54f41cf26ea25c9d1bea0762cd3ab90edb522cc8cf6a1"
     },
     {
       "path": "platform/src/Auth.tsx",
@@ -4335,6 +4335,51 @@
       "sha256": "b2ee9a0a46b9ed8228ef6c79a766b94b3842841222c6aa44451eac230fc73c53"
     },
     {
+      "path": "platform/src/demo/demo.css",
+      "bytes": 24426,
+      "sha256": "4aa50583808bddd84a41b744aee6c10ff70bd3bf2c633945ae06887f1bad46d2"
+    },
+    {
+      "path": "platform/src/demo/demoData.ts",
+      "bytes": 6320,
+      "sha256": "5574f63ae673dce651fa9192f758ba537dc89daef72e5792706e66326cd8c831"
+    },
+    {
+      "path": "platform/src/demo/DemoEvaluate.tsx",
+      "bytes": 12415,
+      "sha256": "f19349152a691913f946df74958deb206f8ca935d029ad5b2e0224fb0bc699b0"
+    },
+    {
+      "path": "platform/src/demo/DemoPage.tsx",
+      "bytes": 865,
+      "sha256": "ca9042f0e0d6d7ca0ec6be3f8b2588e8ca15cffc9b04086aaf49b9b386201392"
+    },
+    {
+      "path": "platform/src/demo/demoState.ts",
+      "bytes": 7832,
+      "sha256": "d8d523566bb820bb8c6d2b61335b7db3fa5d722e38d84633f553bf2c4db42d33"
+    },
+    {
+      "path": "platform/src/demo/DemoTraffic.tsx",
+      "bytes": 11438,
+      "sha256": "12a37652e3ea6ea0799c558076bd4e3828953dcc50143ad5f5e80ab1620b4c19"
+    },
+    {
+      "path": "platform/src/demo/demoUi.tsx",
+      "bytes": 2014,
+      "sha256": "919eeecb1009c936fb941d272db32d3036dc1b28924088bdc298333b4c5fcf5c"
+    },
+    {
+      "path": "platform/src/demo/DemoWorkspace.tsx",
+      "bytes": 17056,
+      "sha256": "0832972209f00a11984b0dde63a60be873b065779c0ed737c036b4142b853d88"
+    },
+    {
+      "path": "platform/src/demo/InteractiveDemo.tsx",
+      "bytes": 8678,
+      "sha256": "67c3671ba5f1d98362a730c2be4fa8b51b930d34834fc3b7f4065be0f1a8f676"
+    },
+    {
       "path": "platform/src/Deployment.tsx",
       "bytes": 5677,
       "sha256": "cd5ea626f3a4c09b0438e4d0dcffb266f81734eb5db07ac516a7c722ae75a4ae"
@@ -4365,9 +4410,19 @@
       "sha256": "0c6bd36bcfb5336dddd5f39cb4891bd1fdde70def0abeacd238deec52f9de6ed"
     },
     {
+      "path": "platform/src/landing/landing-demo.css",
+      "bytes": 926,
+      "sha256": "c07517fdc65d35d268205216218bea60bbe210112fea87d7f6414dc1110de628"
+    },
+    {
       "path": "platform/src/landing/LandingCode.tsx",
       "bytes": 907,
       "sha256": "530fdda266c8ecedf9512f6028569fbc29cc0f9d8748c66e07581a50c72bafa2"
+    },
+    {
+      "path": "platform/src/landing/LandingDemo.tsx",
+      "bytes": 1229,
+      "sha256": "230dba913208e6beab97fc0ace56261ab6eea01ef3e74564a949b65b8a1a8da4"
     },
     {
       "path": "platform/src/landing/LandingMesh.tsx",
@@ -4381,8 +4436,8 @@
     },
     {
       "path": "platform/src/Marketing.tsx",
-      "bytes": 16509,
-      "sha256": "200efa0f3d1de4b5534e91651d23f37a7793996b933141b3c205ce54184f728f"
+      "bytes": 16575,
+      "sha256": "d7ea8fa98ea927817a0a3fcc894586deaef6c96fbaed26d0390818fd841bac07"
     },
     {
       "path": "platform/src/onboarding-compact.css",
@@ -4568,6 +4623,16 @@
       "path": "platform/tests/onboarding-compact-ui.test.ts",
       "bytes": 5270,
       "sha256": "f8d4378a468c34fa24e2cb815b56e4090119019bcfc5b3614641f17890f89dff"
+    },
+    {
+      "path": "platform/tests/public-demo-state.test.ts",
+      "bytes": 8322,
+      "sha256": "592a3ff785a89aeb644910aeb60eb269ee7d40e7e80a61c5e1b5950803bd719f"
+    },
+    {
+      "path": "platform/tests/public-demo-ui.test.ts",
+      "bytes": 1773,
+      "sha256": "8347aeef474f66a9426856d884ba84c4c628d231c1532159dd425e3112bb7ece"
     },
     {
       "path": "platform/tests/setup-state-ui.test.ts",
