@@ -2,7 +2,7 @@
   "schema": 1,
   "template": "traqiva-self-host",
   "history_exported": false,
-  "generated_at": "2026-10-21T21:47:36.999Z",
+  "generated_at": "2026-10-21T22:02:13.699Z",
   "files": [
     {
       "path": ".gitattributes",
@@ -146,8 +146,8 @@
     },
     {
       "path": "platform/docs/CAPABILITIES.md",
-      "bytes": 7390,
-      "sha256": "38b6f98956df3515c1cb5b893d86597b8c1fc33738b34065215d8ece5918a8aa"
+      "bytes": 9518,
+      "sha256": "f8bf81a09413375e49649513bdc84b10924ec19264d5c11962a018adf57279d4"
     },
     {
       "path": "platform/docs/GITHUB_AUTH.md",
@@ -4245,6 +4245,11 @@
       "sha256": "df4ecdc15e80838810cea5217a40bcdbad0dfd23b4fc663e5ac4cadc8414b02a"
     },
     {
+      "path": "platform/server/developer-sessions.ts",
+      "bytes": 6057,
+      "sha256": "ed45f5be976a2217ae1b777f61ea8fdbf12049255e324f34c2efd470a251e764"
+    },
+    {
       "path": "platform/server/github.ts",
       "bytes": 11503,
       "sha256": "85aa5986998e64cb82646592319015e6fd2962178d1b58a3734fbce23a74dd7a"
@@ -4256,8 +4261,8 @@
     },
     {
       "path": "platform/server/index.ts",
-      "bytes": 50062,
-      "sha256": "b124bb2963ab8dcddac60223693680f43e6302b992a730a7ec86571bb3890912"
+      "bytes": 50177,
+      "sha256": "39901e4b65e8cbd48bc8188eb6da470c8965aecf6c9a9c5700f6230458c8e46f"
     },
     {
       "path": "platform/server/onboarding.ts",
@@ -4286,8 +4291,8 @@
     },
     {
       "path": "platform/src/App.tsx",
-      "bytes": 2741,
-      "sha256": "e29bcc8f6944b1cf6158a1c36e4dba00d9257d0a99dfc726da07e536935d73a1"
+      "bytes": 2896,
+      "sha256": "db33073b2dedebd0380f5aa2df6c5e5a00d47db53b801930eb17bd45cf9bfd0e"
     },
     {
       "path": "platform/src/Auth.tsx",
@@ -4405,9 +4410,19 @@
       "sha256": "7adca1826eec98ee8da8ec035f240f43136f2ebc833f83789e359e911969ffef"
     },
     {
+      "path": "platform/src/pages/developer-sessions.css",
+      "bytes": 9914,
+      "sha256": "5efc0bce6539dca5d3a30a48bf7705a7f7178055dc4e872a34b2225c77e23437"
+    },
+    {
       "path": "platform/src/pages/Developers.tsx",
-      "bytes": 5827,
-      "sha256": "f6334daa6c88ad0885fe2d45c5d9c3749e61fa728f3b653b64f72baecf7d29b9"
+      "bytes": 15818,
+      "sha256": "f13f0a92e6816eec8067e21152bcf25c3abfb7ba617e5bf7997f8758831995c9"
+    },
+    {
+      "path": "platform/src/pages/developerSessions.ts",
+      "bytes": 2504,
+      "sha256": "9a06c354cf2614789ab7827ebe5193eea4e34b171c637be51fe13dcd15d64626"
     },
     {
       "path": "platform/src/pages/Evals.tsx",
@@ -4471,13 +4486,13 @@
     },
     {
       "path": "platform/src/shell-reference.css",
-      "bytes": 11338,
-      "sha256": "b1aaa6438151e49032fded930e06a801533d18164b089f321921377873d30181"
+      "bytes": 12084,
+      "sha256": "5847762d1d8f3f49309683524b3ce9b16beb53bcdce4ce8520d6cda0d6cc1a22"
     },
     {
       "path": "platform/src/Shell.tsx",
-      "bytes": 14858,
-      "sha256": "44524093d8c2b2483cd6c05e52a626ddca8f8e2e40b66fe7412c5cedaa6afde2"
+      "bytes": 17049,
+      "sha256": "495d12d0449c25b427258ab5dffa8660df7d9abf2313f1cccc6cd5cdf1d34aad"
     },
     {
       "path": "platform/src/styles.css",
@@ -4505,6 +4520,11 @@
       "sha256": "261cbe0461a56ea0b1ba3d077e8a99c24106e91572f2b7beac0999edba0728cd"
     },
     {
+      "path": "platform/tests/backend-developer-sessions.test.ts",
+      "bytes": 14132,
+      "sha256": "638da855ec0de3bb2be746bdd889aedf19d732c00d0c382cc8ebb7af81604d2f"
+    },
+    {
       "path": "platform/tests/backend-github.test.ts",
       "bytes": 21755,
       "sha256": "1f05758dafbcd81c154d185a024830a574661e6e72b53246020dcbc877a46324"
@@ -4530,6 +4550,11 @@
       "sha256": "b12ab1ed880894a4b179776a2d306e9944f20363f4ac0f8ae11754a49cab32bb"
     },
     {
+      "path": "platform/tests/developer-sessions-ui.test.ts",
+      "bytes": 7338,
+      "sha256": "096088bb6fc6c716b38516895c2be8070618ab40b00a3d0bde3e10cabb29d275"
+    },
+    {
       "path": "platform/tests/github-auth-ui.test.ts",
       "bytes": 6266,
       "sha256": "7a117abb5b59c59e566e541b8b210b7152d8a8c2940199522d6a4fdb327bcf15"
@@ -4548,6 +4573,11 @@
       "path": "platform/tests/setup-state-ui.test.ts",
       "bytes": 3750,
       "sha256": "bfae46eecf3df8bcab76b8c51aa8eb998e26617816d2f4be6d317ab37ea318d4"
+    },
+    {
+      "path": "platform/tests/shell-layout-ui.test.ts",
+      "bytes": 2618,
+      "sha256": "2942b0092d16d1328b3dbdb76481a3b0bcd6ad3140f0e6ac9faf1ba324802293"
     },
     {
       "path": "platform/tsconfig.json",

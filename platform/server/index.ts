@@ -7,6 +7,7 @@ import { askProvider, groundedProjectContext, ProviderError, type AssistantProvi
 import { googleAvailable, registerGoogleAuth } from './google';
 import { githubAvailable, registerGithubAuth } from './github';
 import { onboardingFor, registerOnboarding, requireTerms, termsFor } from './onboarding';
+import { registerDeveloperSessions } from './developer-sessions';
 
 export const app = new Hono<{ Bindings: Env; Variables: { user: Row } }>();
 const COOKIE = 'traqiva_session';
@@ -105,6 +106,7 @@ registerGoogleAuth(app, { currentUser, createSession, authLimit });
 registerGithubAuth(app, { currentUser, createSession, authLimit });
 app.get('/api/auth/providers', c => c.json({ google: googleAvailable(c.env, c.req.url), github: githubAvailable(c.env, c.req.url) }));
 registerOnboarding(app, { userRequired, workspaceFor });
+registerDeveloperSessions(app, { userProject });
 app.get('/api/session', async c => c.json(await sessionPayload(c, await currentUser(c))));
 app.post('/api/auth/register', async c => {
   const body = await readJson(c.req.raw);
