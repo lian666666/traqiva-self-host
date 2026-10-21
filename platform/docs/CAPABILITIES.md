@@ -14,11 +14,13 @@ This is a source-built derivative of selected public Caveman v4.0.1 local compon
 | Verified savings | Display of evidence status and measurement boundaries; narrow explicit-input token A/B below | No invoice verification or general coding-quality benchmark; no measured automatic desktop reduction |
 | Evaluations | User-defined exact-match cases, runs and recorded outcomes | Not a general semantic-quality evaluator or Caveman Cloud's full evaluation service |
 | Ask | BYOK OpenAI/Anthropic question answering over selected project metadata | Explicit calls only, user's provider billing; not server-sponsored or automatically running |
-| Authentication and projects | Email/password, Google OIDC, workspace/project membership, project keys, onboarding | Google needs each deployment owner's client. Email ownership verification/reset mail, SSO/passkeys and commercial billing are not implemented |
+| Authentication and projects | Email/password, Google OIDC, GitHub OAuth, explicit social account linking, workspace/project membership, project keys, onboarding | Each social provider needs the deployment owner's own OAuth client. Email ownership verification/reset mail, SSO/passkeys and commercial billing are not implemented |
 | Model/effort routing | User-selected model forwarded | Automatic “cheapest correct model” / effort routing is not implemented |
 | Other upstream components | No claim | “Say less” voice integration, complete read-less hooks, Blocks/memory, browse, commercial organization/credits/billing ecosystem are not reproduced |
 
 ## Actual checks
+
+On 2026-10-21 the hosted release completed real GitHub consent with only `read:user user:email`, explicit linking to an existing Google account, sign-out, and GitHub sign-in. The authenticated user, workspace, active project and project count stayed the same; both provider links persisted. New-account creation and failure paths were checked through controlled OAuth tests, not a second live GitHub identity. The final application suite passed 125 tests, alongside lint, TypeScript and the production build. See [GitHub setup and verification](GITHUB_AUTH.md).
 
 On 2026-10-21 a four-run real Codex A/B test used the same `gpt-6.1-sol / ultra` and synthetic extraction task in A→B→B→A order. Explicitly supplying the Traqiva-compressed log reduced Codex-reported input from **20,756 to 14,681 tokens (29.27%)**, with all five required facts correct in every run and zero cached-input tokens. Mean input plus output fell **29.13%**. This is one explicit-precompression task, not automatic desktop or billing savings. The automatic file-reading control was blocked by its child execution policy, so that path has no completed A/B result. See the [complete measurement and reproduction record](TOKEN_USAGE_AB_TEST.md).
 

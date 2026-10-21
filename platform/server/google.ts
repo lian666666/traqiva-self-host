@@ -35,6 +35,7 @@ function configured(env: Env, requestUrl: string): Config | null {
     return { clientId, clientSecret, redirectUri };
   } catch { return null; }
 }
+export const googleAvailable = (env: Env, requestUrl: string) => Boolean(configured(env, requestUrl));
 function stateCookie(c: Ctx, value: string, maxAge = 600) {
   setCookie(c, COOKIE, value, { httpOnly: true, secure: true, sameSite: 'Lax', path: '/', maxAge });
 }
@@ -90,7 +91,6 @@ async function verifiedIdentity(config: Config, code: string, state: Row) {
 }
 
 export function registerGoogleAuth(app: Hono<AppEnv>, auth: Auth) {
-  app.get('/api/auth/providers', c => c.json({ google: Boolean(configured(c.env, c.req.url)) }));
   app.use('/api/auth/google*', async (c, next) => { c.header('Referrer-Policy', 'no-referrer'); await next(); });
   app.get('/api/auth/google', async c => {
     try {
@@ -103,7 +103,7 @@ export function registerGoogleAuth(app: Hono<AppEnv>, auth: Auth) {
       await auth.authLimit(c, 'google-start');
       const state = randomSecret(), cookie = randomSecret(), nonce = randomSecret(), verifier = randomSecret(), at = now();
       const sessionToken = intent === 'link' ? getCookie(c, SESSION) : undefined;
-      await c.env.DB.prepare('INSERT INTO oauth_states(state_hash,cookie_hash,nonce_hash,pkce_verifier,intent,user_id,session_hash,expires_at,created_at) VALUES(?,?,?,?,?,?,?,?,?)').bind(
+      await c.env.DB.prepare("INSERT INTO oauth_states(provider,state_hash,cookie_hash,nonce_hash,pkce_verifier,intent,user_id,session_hash,expires_at,created_at) VALUES('google',?,?,?,?,?,?,?,?,?)").bind(
         await hashSecret(state), await hashSecret(cookie), await hashSecret(nonce), verifier, intent, user?.id ?? null, sessionToken ? await hashSecret(sessionToken) : null,
         new Date(Date.parse(at) + 600_000).toISOString(), at,
       ).run();
@@ -120,7 +120,7 @@ export function registerGoogleAuth(app: Hono<AppEnv>, auth: Auth) {
       const stateValue = c.req.query('state'), cookie = getCookie(c, COOKIE);
       if (!stateValue || !cookie || !/^[a-f0-9]{64}$/.test(stateValue) || !/^[a-f0-9]{64}$/.test(cookie)) fail('invalid_state');
       // DELETE RETURNING makes state consumption a single atomic D1 operation, even for concurrent callbacks.
-      const state = await one(c.env, 'DELETE FROM oauth_states WHERE state_hash=? AND cookie_hash=? AND expires_at>? RETURNING *', await hashSecret(stateValue), await hashSecret(cookie), now());
+      const state = await one(c.env, "DELETE FROM oauth_states WHERE provider='google' AND state_hash=? AND cookie_hash=? AND expires_at>? RETURNING *", await hashSecret(stateValue), await hashSecret(cookie), now());
       if (!state) fail('invalid_state');
       const issuer = c.req.query('iss'); if (issuer && !issuers.includes(issuer)) fail('invalid_identity');
       if (c.req.query('error')) fail(c.req.query('error') === 'access_denied' ? 'access_denied' : 'google_exchange_failed');

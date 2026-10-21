@@ -2,7 +2,7 @@
   "schema": 1,
   "template": "traqiva-self-host",
   "history_exported": false,
-  "generated_at": "2026-10-21T21:29:30.421Z",
+  "generated_at": "2026-10-21T21:39:39.048Z",
   "files": [
     {
       "path": ".gitattributes",
@@ -36,8 +36,8 @@
     },
     {
       "path": "platform/.env.example",
-      "bytes": 881,
-      "sha256": "da86c15b8956edd12536a6e5c31a06ab37a8a0cd1de1a034832c28fb54fbae7d"
+      "bytes": 1252,
+      "sha256": "7b90b147de3f52f682fcd99006dfe737adb5956cb45ee362265471bf8d6508f4"
     },
     {
       "path": "platform/.gitignore",
@@ -146,8 +146,13 @@
     },
     {
       "path": "platform/docs/CAPABILITIES.md",
-      "bytes": 6757,
-      "sha256": "bbd277779ddc91ce5786b453e3a492c128dfdfb5773215918cef9e9b22c1b368"
+      "bytes": 7390,
+      "sha256": "38b6f98956df3515c1cb5b893d86597b8c1fc33738b34065215d8ece5918a8aa"
+    },
+    {
+      "path": "platform/docs/GITHUB_AUTH.md",
+      "bytes": 5127,
+      "sha256": "8adb700aa56e2eb89b4df4b392cb6f762ad49efeba8bedf38962490e0876ee44"
     },
     {
       "path": "platform/docs/GOOGLE_AUTH.md",
@@ -156,8 +161,8 @@
     },
     {
       "path": "platform/docs/SELF_HOST.md",
-      "bytes": 7243,
-      "sha256": "c5b5bce0b2be93afc81ffb1a66c97540533ad12bfdfb4b1db5b2ce94962c8d66"
+      "bytes": 7855,
+      "sha256": "7477c27d0ca2e795b8faf56e6ca81bc9a8916d160f75de5e2f82106f4bd33991"
     },
     {
       "path": "platform/docs/TOKEN_USAGE_AB_TEST.md",
@@ -223,6 +228,11 @@
       "path": "platform/migrations/0004_onboarding_consent.sql",
       "bytes": 759,
       "sha256": "d3644848aa4ca34c8618fe7488f0bfb43726e35fe4887b3a2b397f70224aed89"
+    },
+    {
+      "path": "platform/migrations/0005_github_oauth.sql",
+      "bytes": 957,
+      "sha256": "fffbe56aa79662e08bdebf0fb18c857d55eb59b5b268ec9229ac4a519418f63d"
     },
     {
       "path": "platform/package-lock.json",
@@ -4235,14 +4245,19 @@
       "sha256": "df4ecdc15e80838810cea5217a40bcdbad0dfd23b4fc663e5ac4cadc8414b02a"
     },
     {
+      "path": "platform/server/github.ts",
+      "bytes": 11503,
+      "sha256": "85aa5986998e64cb82646592319015e6fd2962178d1b58a3734fbce23a74dd7a"
+    },
+    {
       "path": "platform/server/google.ts",
-      "bytes": 12324,
-      "sha256": "c997335359f10b131c502dd6140b23e148fbeae4ed23284d37ac1b1ea5213cb5"
+      "bytes": 12369,
+      "sha256": "83df922c1d25765679823707194a8663b080ddfd1864816af6c378f49348b596"
     },
     {
       "path": "platform/server/index.ts",
-      "bytes": 49668,
-      "sha256": "0e928a07228de91bd02593ce4e3ce0839c85960c00bc1c2e9eda9f7467880290"
+      "bytes": 50062,
+      "sha256": "b124bb2963ab8dcddac60223693680f43e6302b992a730a7ec86571bb3890912"
     },
     {
       "path": "platform/server/onboarding.ts",
@@ -4256,8 +4271,8 @@
     },
     {
       "path": "platform/server/types.ts",
-      "bytes": 758,
-      "sha256": "6bfeee0360d36f4df9dc8333a8ecf91b131483bf2412531caf77a6163bda3697"
+      "bytes": 852,
+      "sha256": "a46ccf4abe268d26779b217dba43dd366f37b751443ab3d3affb8c3fcd3afec4"
     },
     {
       "path": "platform/server/usage.ts",
@@ -4276,8 +4291,8 @@
     },
     {
       "path": "platform/src/Auth.tsx",
-      "bytes": 4781,
-      "sha256": "22fb284bee6c48154c5de2fd85d9f121453a49639bc50d78a3bd09f21ebe19c2"
+      "bytes": 5784,
+      "sha256": "981471c86c8f05d587d814944c83a29d7fa748ecf3245cb0ce48289663b68370"
     },
     {
       "path": "platform/src/components/AssistantSetupCard.tsx",
@@ -4285,9 +4300,14 @@
       "sha256": "4ee5277cbb51bfd2de031a2fe1e2a583301ff754409ba668290f98106f5f2e26"
     },
     {
+      "path": "platform/src/components/GitHubMark.tsx",
+      "bytes": 687,
+      "sha256": "933210a31b96c33417756c45dced6b4520223054a55528dbf9fab3de2e3869e2"
+    },
+    {
       "path": "platform/src/components/GoogleAccountConnection.tsx",
-      "bytes": 1994,
-      "sha256": "9acaf1c3a75e1a386ba6250108c2bd7483b37e1b0dcc36d8cb58744d3071d3f9"
+      "bytes": 2594,
+      "sha256": "8b4df2b5d0bff04519c88dcf0055a8a2e3ee30423b890845c5c42c5adfdcc070"
     },
     {
       "path": "platform/src/components/GoogleMark.tsx",
@@ -4316,8 +4336,8 @@
     },
     {
       "path": "platform/src/googleAuth.ts",
-      "bytes": 2101,
-      "sha256": "19b3d63abb8a40ad305b3ec0c5be978e79220aacd2294f44cf51a4ad5e282cf8"
+      "bytes": 2836,
+      "sha256": "d187275ca92355857b6be0fc7f4877639662dc5c5910095a402ca09a47fb1924"
     },
     {
       "path": "platform/src/landing.css",
@@ -4356,8 +4376,8 @@
     },
     {
       "path": "platform/src/Onboarding.tsx",
-      "bytes": 11831,
-      "sha256": "4764bbec5b337e7e2b37cd3a2fa0c0778327c494dfb03d333efd941fe893f4e9"
+      "bytes": 11858,
+      "sha256": "cfb4b03992fc02989b452b5e6dc86b6d33d9a8d0096b071fda62f68aac13c292"
     },
     {
       "path": "platform/src/pages/Admin.tsx",
@@ -4436,8 +4456,8 @@
     },
     {
       "path": "platform/src/setupState.ts",
-      "bytes": 1092,
-      "sha256": "6db3039a001eef578ffd2e026bf47f487f59e62ad11be91aa48b142dc119b8a2"
+      "bytes": 1238,
+      "sha256": "f58eb6c1479a5390b021ea668a72ee1515ec399483b306b04e1c621e56d41d11"
     },
     {
       "path": "platform/src/shell-reference.css",
@@ -4456,8 +4476,8 @@
     },
     {
       "path": "platform/src/types.ts",
-      "bytes": 2838,
-      "sha256": "2a18440e6355e21c007ee44b97a6f825e940f6f1268c7407caab0ee1f21776a2"
+      "bytes": 2929,
+      "sha256": "86eeeb26325cdb36055e1eabf56d8e7e6e8d13a70a4ead4ed549ba7d9e507be8"
     },
     {
       "path": "platform/src/ui.tsx",
@@ -4475,9 +4495,14 @@
       "sha256": "261cbe0461a56ea0b1ba3d077e8a99c24106e91572f2b7beac0999edba0728cd"
     },
     {
+      "path": "platform/tests/backend-github.test.ts",
+      "bytes": 21755,
+      "sha256": "1f05758dafbcd81c154d185a024830a574661e6e72b53246020dcbc877a46324"
+    },
+    {
       "path": "platform/tests/backend-google.test.ts",
-      "bytes": 21256,
-      "sha256": "16d6d196becd922cc506925d0b34890e250a8b24a0b5546585674d0e35f34167"
+      "bytes": 21301,
+      "sha256": "100fbf0c683a15e237cd185635766130ebc6c630c03c4d931cced0c2a9cb97d9"
     },
     {
       "path": "platform/tests/backend-onboarding.test.ts",
@@ -4495,9 +4520,14 @@
       "sha256": "b12ab1ed880894a4b179776a2d306e9944f20363f4ac0f8ae11754a49cab32bb"
     },
     {
+      "path": "platform/tests/github-auth-ui.test.ts",
+      "bytes": 6266,
+      "sha256": "7a117abb5b59c59e566e541b8b210b7152d8a8c2940199522d6a4fdb327bcf15"
+    },
+    {
       "path": "platform/tests/google-auth-ui.test.ts",
-      "bytes": 1802,
-      "sha256": "a0be4a696a8eda8b7bd0e9c4076eedd6a2adf66ff8b81660782a9cef6afc19b5"
+      "bytes": 1889,
+      "sha256": "9e46686e2d3a1a43cd0cc6ecf5413dc3c3cbf8ad155b0f5337ac2c79ec4f5292"
     },
     {
       "path": "platform/tests/setup-state-ui.test.ts",
@@ -4526,8 +4556,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 2822,
-      "sha256": "14b274a9e5df73e56eb44352e21497760d5bfd7402664701fc8feb3cd51ecc6f"
+      "bytes": 2973,
+      "sha256": "7f74ac6a747f22b6452a83e890c16f26abc4d42907360ab81f74ee1ef61a6cc9"
     }
   ]
 }

@@ -3,7 +3,7 @@ import { Link,Navigate,useNavigate,useSearchParams } from 'react-router-dom';
 import { ArrowLeft,ArrowRight,Box,Check,Code2,LogOut,RefreshCw,ShieldCheck,Terminal } from 'lucide-react';
 import { api,date,json,useApp } from './api';
 import { Code,ErrorNotice,Logo,Select,Spinner } from './ui';
-import { googleAuthError } from './googleAuth';
+import { oauthAuthError } from './googleAuth';
 import { canFinishSetup,setupProjectFor,setupStageFor,TERMS_VERSION } from './setupState';
 import { useConnectionStatus } from './useConnectionStatus';
 import type { Project,SetupGoal } from './types';
@@ -52,7 +52,7 @@ const result = await client.chat.completions.create({
       <div className="onboarding-step">Step {shownStage==='goals'?1:shownStage==='project'?2:3} of 3</div>
       <h1>{shownStage==='goals'?'What do you want to do?':shownStage==='project'?'Give your project a home.':session.setup?.goals.includes('coding')?'Set up your coding agent.':'Connect your application.'}</h1>
       <p>{shownStage==='goals'?'Choose one or both. Setup only asks for what you need.':shownStage==='project'?'Keep your requests, evaluations, and insights together.':'Connect this project and add tools you can verify.'}</p>
-      <ErrorNotice message={error||googleAuthError(params.get('oauth_error'))}/>
+      <ErrorNotice message={error||oauthAuthError(params.get('oauth_error'),params.get('oauth_provider'))}/>
 
       {shownStage==='goals'&&<><div className="goal-grid">{[{id:'coding' as SetupGoal,icon:Terminal,title:'Spend less on coding agents',description:'Connect the coding agents you use. Inspect token usage and test recoverable context compression.'},{id:'observe' as SetupGoal,icon:Box,title:'Build more efficient agents',description:'Trace agents in your own code. Understand their quality, costs, and opportunities to improve.'}].map(goal=><button key={goal.id} aria-pressed={goals.includes(goal.id)} className={`goal-option ${goals.includes(goal.id)?'selected':''}`} onClick={()=>setGoals(values=>values.includes(goal.id)?values.filter(value=>value!==goal.id):[...values,goal.id])} disabled={!!busy}><span className="goal-check">{goals.includes(goal.id)&&<Check size={13}/>}</span><goal.icon size={42} strokeWidth={1.2}/><h3>{goal.title}</h3><p>{goal.description}</p></button>)}</div><button className="button primary onboarding-next" disabled={!goals.length||!!busy} onClick={()=>void saveGoals()}>{busy==='goals'?<Spinner/>:<>Continue<ArrowRight size={16}/></>}</button></>}
 

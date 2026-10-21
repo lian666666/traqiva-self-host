@@ -54,6 +54,10 @@ npx wrangler secret put GOOGLE_REDIRECT_URI --config wrangler.self-host.jsonc
 
 Pass your selected `--profile` as needed. Enter each value interactively, not in command arguments. No credentials are included in the template. See [Google configuration](GOOGLE_AUTH.md). New Google users receive their own workspace; a verified-email collision with a password account requires password sign-in and an explicit link. No automatic account merge by email occurs. OAuth tokens are not retained. A basic sign-in flow does not prove Google brand verification or Production publishing.
 
+## Optional GitHub sign-in
+
+Create your own GitHub OAuth App with exact callback `https://YOUR_DEPLOYMENT/api/auth/github/callback`; leave wildcard matching and device flow disabled. Configure `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` and `GITHUB_REDIRECT_URI` as Worker secrets using your generated `wrangler.self-host.jsonc` and selected profile. Only `read:user user:email` are requested. Credentials are not included in the template. See [GitHub setup and account-linking behavior](GITHUB_AUTH.md). Existing-account email matches require an explicit authenticated link; they never silently merge accounts.
+
 ## Providers, native runtime and costs
 
 Native compression and recovery can run locally without a paid model. Install the CLI from your deployment's `/downloads/traqiva-cli-0.1.0.tgz`, then use `traqiva engine install --url https://YOUR_DEPLOYMENT`. Native downloads are separate and SHA-256 checked. Windows was executed; Linux/macOS binaries were cross-compiled. Go source and reproducible build scripts are included if you prefer rebuilding. Read [runtime limits](../runtime/README.md).

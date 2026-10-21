@@ -15,7 +15,7 @@ npm run self-host -- --account-id YOUR_CLOUDFLARE_ACCOUNT_ID --name YOUR_WORKER_
 npm run self-host -- --account-id YOUR_CLOUDFLARE_ACCOUNT_ID --name YOUR_WORKER_NAME --database YOUR_DATABASE_NAME
 ```
 
-The script verifies account access, refuses an existing Worker or database by default, creates your database, builds the CLI and website, applies migrations and deploys your Worker. Its generated `wrangler.self-host.jsonc` and `.self-host-state.json` are ignored by Git. Reuse the same checkout for subsequent deployments. See [the full deployment guide](platform/docs/SELF_HOST.md) for explicit reuse, CI, local development and optional Google sign-in.
+The script verifies account access, refuses an existing Worker or database by default, creates your database, builds the CLI and website, applies migrations and deploys your Worker. Its generated `wrangler.self-host.jsonc` and `.self-host-state.json` are ignored by Git. Reuse the same checkout for subsequent deployments. See [the full deployment guide](platform/docs/SELF_HOST.md) for explicit reuse, CI, local development and optional Google/GitHub sign-in. Each deployment uses its own OAuth applications; [GitHub setup](platform/docs/GITHUB_AUTH.md) requests only read-only profile and email access.
 
 Open your resulting URL and create your own account. No demo credentials are installed. API providers and native compression are optional, separate integrations. Model calls and Cloudflare resources may incur charges in your accounts.
 

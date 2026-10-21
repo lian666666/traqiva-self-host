@@ -2,10 +2,11 @@ import { describe,expect,it } from 'vitest';
 import { googleAuthError } from '../src/googleAuth';
 
 describe('Google sign-in error presentation',()=>{
-  it('requires email authentication and explicit account linking for an existing email',()=>{
+  it('requires the original sign-in method and explicit account linking for an existing email',()=>{
     const message=googleAuthError('email_signin_required');
-    expect(message).toContain('Sign in with your email and password');
+    expect(message).toContain('Sign in using your existing Google, GitHub or email account');
     expect(message).toContain('connect Google from your account settings');
+    expect(message).not.toContain('email and password');
   });
 
   it('distinguishes cancellation, expired state and account conflict without claiming success',()=>{

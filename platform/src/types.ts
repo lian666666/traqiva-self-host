@@ -1,4 +1,5 @@
-export type User = { id: string; name: string; email: string; google_linked?: boolean };
+export type User = { id: string; name: string; email: string; google_linked?: boolean; github_linked?: boolean };
+export type AuthProviders = { google: boolean; github: boolean };
 export type Workspace = { id: string; name: string; retention_days: number; mode: 'observe'|'optimize'; autopilot: 'off'|'suggest'; monthly_budget: number };
 export type Project = { id: string; name: string; created_at?: string };
 export type SetupGoal='coding'|'observe';

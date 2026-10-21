@@ -4,7 +4,8 @@ import { ApiError, compactJson, hashPassword, hashSecret, id, now, randomSecret,
 import { computeCost, estimateTokens, UsageCollector, type Prices, type Usage } from './usage';
 import type { Env, Execution, Principal, Row } from './types';
 import { askProvider, groundedProjectContext, ProviderError, type AssistantProvider, type AssistantSource } from './assistant';
-import { registerGoogleAuth } from './google';
+import { googleAvailable, registerGoogleAuth } from './google';
+import { githubAvailable, registerGithubAuth } from './github';
 import { onboardingFor, registerOnboarding, requireTerms, termsFor } from './onboarding';
 
 export const app = new Hono<{ Bindings: Env; Variables: { user: Row } }>();
@@ -17,7 +18,7 @@ const numeric = (value: unknown, fallback: number | null = null) => typeof value
 const integer = (value: unknown) => Number.isSafeInteger(value) && numeric(value) !== null ? value as number : null;
 const traceFields = 'id,project_id,model,provider,status,http_status,input_tokens,output_tokens,cached_tokens,latency_ms,cost_usd,cost_basis,input_bytes,output_bytes,original_tokens,optimized_tokens,token_basis,saved_tokens,created_at,source,compressed,algorithm';
 const publicTrace = (row: Row): Row => ({ ...row, compressed: Boolean(row.compressed) });
-const publicUser = (row: Row) => ({ id: row.id, name: row.name, email: row.email, google_linked: Boolean(row.google_linked) });
+const publicUser = (row: Row) => ({ id: row.id, name: row.name, email: row.email, google_linked: Boolean(row.google_linked), github_linked: Boolean(row.github_linked) });
 const publicWorkspace = (row: Row) => ({ id: row.id, name: row.name, retention_days: row.retention_days, mode: row.mode, autopilot: row.autopilot, monthly_budget: row.monthly_budget ?? 0 });
 
 app.onError((error, c) => error instanceof ApiError ? c.json({ error: error.message }, error.status as any) : c.json({ error: 'The request could not be completed.' }, 500));
@@ -76,11 +77,11 @@ async function audit(env: Env, principal: Principal, action: string, details: un
 }
 async function sessionPayload(c: any, user: Row | null) {
   if (!user) return { user: null, workspace: null, projects: [], activeProject: null, setup: null, terms: null };
-  const linked = await dbOne(c.env, "SELECT 1 AS linked FROM oauth_identities WHERE provider='google' AND user_id=?", user.id);
+  const linked = await dbAll(c.env, "SELECT provider FROM oauth_identities WHERE user_id=?", user.id);
   const workspace = await workspaceFor(c.env, user.id);
   const projects = await dbAll(c.env, 'SELECT id,name,workspace_id,created_at FROM projects WHERE workspace_id=? ORDER BY created_at', workspace.id);
   const setup = await onboardingFor(c.env, user.id), terms = await termsFor(c.env, workspace.id);
-  return { user: publicUser({ ...user, google_linked: Boolean(linked) }), workspace: publicWorkspace(workspace), projects, activeProject: projects.find(project => project.id === setup.project_id) ?? projects[0] ?? null, setup, terms };
+  return { user: publicUser({ ...user, google_linked: linked.some(row => row.provider === 'google'), github_linked: linked.some(row => row.provider === 'github') }), workspace: publicWorkspace(workspace), projects, activeProject: projects.find(project => project.id === setup.project_id) ?? projects[0] ?? null, setup, terms };
 }
 async function createSession(c: any, userId: string) {
   const token = randomSecret();
@@ -101,6 +102,8 @@ const emailField = (value: unknown) => {
 };
 
 registerGoogleAuth(app, { currentUser, createSession, authLimit });
+registerGithubAuth(app, { currentUser, createSession, authLimit });
+app.get('/api/auth/providers', c => c.json({ google: googleAvailable(c.env, c.req.url), github: githubAvailable(c.env, c.req.url) }));
 registerOnboarding(app, { userRequired, workspaceFor });
 app.get('/api/session', async c => c.json(await sessionPayload(c, await currentUser(c))));
 app.post('/api/auth/register', async c => {

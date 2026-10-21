@@ -60,12 +60,12 @@ async function passwordAccount() {
 
 describe('Google authorization code OIDC with real signatures and SQL state', () => {
   it('advertises availability only when fully configured for this exact callback origin', async () => {
-    expect(await (await request('/api/auth/providers')).json()).toEqual({ google: true });
+    expect(await (await request('/api/auth/providers')).json()).toEqual({ google: true, github: false });
     delete env.GOOGLE_CLIENT_SECRET;
-    expect(await (await request('/api/auth/providers')).json()).toEqual({ google: false });
+    expect(await (await request('/api/auth/providers')).json()).toEqual({ google: false, github: false });
     expect((await request('/api/auth/google')).headers.get('location')).toBe('/login?oauth_error=google_unavailable');
     env.GOOGLE_CLIENT_SECRET = 'secret'; env.GOOGLE_REDIRECT_URI = 'https://other.test/api/auth/google/callback';
-    expect(await (await request('/api/auth/providers')).json()).toEqual({ google: false });
+    expect(await (await request('/api/auth/providers')).json()).toEqual({ google: false, github: false });
   });
   it('uses bounded state, nonce, PKCE S256 and a host-only secure cookie without exposing secrets', async () => {
     const flow = await start('signup');
