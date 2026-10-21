@@ -2,7 +2,7 @@
   "schema": 1,
   "template": "traqiva-self-host",
   "history_exported": false,
-  "generated_at": "2026-10-21T21:39:39.048Z",
+  "generated_at": "2026-10-21T21:47:36.999Z",
   "files": [
     {
       "path": ".gitattributes",
@@ -4300,6 +4300,11 @@
       "sha256": "4ee5277cbb51bfd2de031a2fe1e2a583301ff754409ba668290f98106f5f2e26"
     },
     {
+      "path": "platform/src/components/CompactAgentSetup.tsx",
+      "bytes": 1090,
+      "sha256": "b5bd9fd655264cb1258cf8ee052c8ef1394fb2c1f672dba104a5e96f7c2ee013"
+    },
+    {
       "path": "platform/src/components/GitHubMark.tsx",
       "bytes": 687,
       "sha256": "933210a31b96c33417756c45dced6b4520223054a55528dbf9fab3de2e3869e2"
@@ -4375,9 +4380,14 @@
       "sha256": "200efa0f3d1de4b5534e91651d23f37a7793996b933141b3c205ce54184f728f"
     },
     {
+      "path": "platform/src/onboarding-compact.css",
+      "bytes": 4269,
+      "sha256": "ce6eb7b0e1d38988b67f09732023e96a6748739ec0b35120d7087e00ba84e94f"
+    },
+    {
       "path": "platform/src/Onboarding.tsx",
-      "bytes": 11858,
-      "sha256": "cfb4b03992fc02989b452b5e6dc86b6d33d9a8d0096b071fda62f68aac13c292"
+      "bytes": 12543,
+      "sha256": "c219e0bdf12de71e2dda96d122a357da67366e2bbeb54ef1653cb3a65060093a"
     },
     {
       "path": "platform/src/pages/Admin.tsx",
@@ -4528,6 +4538,11 @@
       "path": "platform/tests/google-auth-ui.test.ts",
       "bytes": 1889,
       "sha256": "9e46686e2d3a1a43cd0cc6ecf5413dc3c3cbf8ad155b0f5337ac2c79ec4f5292"
+    },
+    {
+      "path": "platform/tests/onboarding-compact-ui.test.ts",
+      "bytes": 5270,
+      "sha256": "f8d4378a468c34fa24e2cb815b56e4090119019bcfc5b3614641f17890f89dff"
     },
     {
       "path": "platform/tests/setup-state-ui.test.ts",
