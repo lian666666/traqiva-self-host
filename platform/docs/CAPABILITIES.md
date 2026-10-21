@@ -11,7 +11,7 @@ This is a source-built derivative of selected public Caveman v4.0.1 local compon
 | Traces and analytics | D1-backed projects, request traces, token/cost metadata and filters | Only connected/imported traffic is visible. A dashboard cannot infer unseen desktop requests |
 | Compression events | Separate estimated token/byte event table, native metadata upload and JSON minification lab | Events are not provider requests. Local estimates are not billing reductions |
 | Improvements | Deterministic metadata checks for repetition, error rates and cache candidates | Suggestions, not a continuous self-optimizing model or proof a recommended change was deployed |
-| Verified savings | Display of evidence status and measurement boundaries | No causal provider-billing or quality-controlled savings experiment has been completed |
+| Verified savings | Display of evidence status and measurement boundaries; narrow explicit-input token A/B below | No invoice verification or general coding-quality benchmark; no measured automatic desktop reduction |
 | Evaluations | User-defined exact-match cases, runs and recorded outcomes | Not a general semantic-quality evaluator or Caveman Cloud's full evaluation service |
 | Ask | BYOK OpenAI/Anthropic question answering over selected project metadata | Explicit calls only, user's provider billing; not server-sponsored or automatically running |
 | Authentication and projects | Email/password, Google OIDC, workspace/project membership, project keys, onboarding | Google needs each deployment owner's client. Email ownership verification/reset mail, SSO/passkeys and commercial billing are not implemented |
@@ -19,6 +19,8 @@ This is a source-built derivative of selected public Caveman v4.0.1 local compon
 | Other upstream components | No claim | “Say less” voice integration, complete read-less hooks, Blocks/memory, browse, commercial organization/credits/billing ecosystem are not reproduced |
 
 ## Actual checks
+
+On 2026-10-21 a four-run real Codex A/B test used the same `gpt-6.1-sol / ultra` and synthetic extraction task in A→B→B→A order. Explicitly supplying the Traqiva-compressed log reduced Codex-reported input from **20,756 to 14,681 tokens (29.27%)**, with all five required facts correct in every run and zero cached-input tokens. Mean input plus output fell **29.13%**. This is one explicit-precompression task, not automatic desktop or billing savings. The automatic file-reading control was blocked by its child execution policy, so that path has no completed A/B result. See the [complete measurement and reproduction record](TOKEN_USAGE_AB_TEST.md).
 
 On 2026-10-20 a clean Windows CLI installation downloaded the native engine from the deployed HTTPS manifest, verified its archive SHA-256 and compressed a synthetic 240-line log containing a unique error. Input **15,429 bytes**, output **467 bytes**, offline BPE estimates **5,304 → 141 tokens**. Recovery returned the original byte for byte, checked with Node Buffers. No provider/model call occurred. This demonstrates recoverable local compression on that fixture; it does not measure a complete agent session, semantic task quality or a bill reduction.
 

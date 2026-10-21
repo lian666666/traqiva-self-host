@@ -2,7 +2,7 @@
   "schema": 1,
   "template": "traqiva-self-host",
   "history_exported": false,
-  "generated_at": "2026-10-20T21:02:29.960Z",
+  "generated_at": "2026-10-21T21:29:30.421Z",
   "files": [
     {
       "path": ".gitattributes",
@@ -140,9 +140,14 @@
       "sha256": "921270ee71e45f1c0f7163c078af998e4c8d8628e32ea299ec0f15953a9852a5"
     },
     {
+      "path": "platform/cli/tests/token-usage-ab.mjs",
+      "bytes": 10855,
+      "sha256": "f8c1362577b669d7e58d469a1732b529733edb1f7434ef1924eee76a9b595176"
+    },
+    {
       "path": "platform/docs/CAPABILITIES.md",
-      "bytes": 6044,
-      "sha256": "a609dffd5c5e448e7064c501350d8e11d43e8fb4249030ea9c69ddedcf118420"
+      "bytes": 6757,
+      "sha256": "bbd277779ddc91ce5786b453e3a492c128dfdfb5773215918cef9e9b22c1b368"
     },
     {
       "path": "platform/docs/GOOGLE_AUTH.md",
@@ -153,6 +158,11 @@
       "path": "platform/docs/SELF_HOST.md",
       "bytes": 7243,
       "sha256": "c5b5bce0b2be93afc81ffb1a66c97540533ad12bfdfb4b1db5b2ce94962c8d66"
+    },
+    {
+      "path": "platform/docs/TOKEN_USAGE_AB_TEST.md",
+      "bytes": 5215,
+      "sha256": "3e872bf23f1c03bb323b75fa57ee4d8f7d6f9ac19efd57ddded33715907539b2"
     },
     {
       "path": "platform/eslint.config.js",
