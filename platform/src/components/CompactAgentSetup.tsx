@@ -3,7 +3,7 @@ import { Code } from '../ui';
 import type { SetupAssistant } from '../setupPrompt';
 
 export function buildConnectCommand(assistant:SetupAssistant,origin:string,projectId:string){
-  return `npm install --global ${origin}/downloads/traqiva-cli-0.1.0.tgz
+  return `npm install --global ${origin}/cli.tgz
 traqiva connect --url ${origin} --project ${projectId} --key YOUR_PROJECT_KEY
 traqiva engine install --url ${origin}
 traqiva setup --agent ${assistant} --print`;

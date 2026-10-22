@@ -8,6 +8,9 @@ import { googleAvailable, registerGoogleAuth } from './google';
 import { githubAvailable, registerGithubAuth } from './github';
 import { onboardingFor, registerOnboarding, requireTerms, termsFor } from './onboarding';
 import { registerDeveloperSessions } from './developer-sessions';
+import { AUTO_MODEL, autoSettings, routeAuto, validateAutoSettings } from './auto';
+import { sampledWasteRules, WASTE_SAMPLE_LIMIT, WASTE_WINDOW_DAYS } from './waste';
+import { autoRequestBody } from './json-fields';
 
 export const app = new Hono<{ Bindings: Env; Variables: { user: Row } }>();
 const COOKIE = 'traqiva_session';
@@ -17,8 +20,8 @@ const dbOne = <T = Row>(env: Env, sql: string, ...args: unknown[]) => env.DB.pre
 const dbAll = async <T = Row>(env: Env, sql: string, ...args: unknown[]) => (await env.DB.prepare(sql).bind(...args).all<T>()).results;
 const numeric = (value: unknown, fallback: number | null = null) => typeof value === 'number' && Number.isFinite(value) && value >= 0 && value <= 1e12 ? value : fallback;
 const integer = (value: unknown) => Number.isSafeInteger(value) && numeric(value) !== null ? value as number : null;
-const traceFields = 'id,project_id,model,provider,status,http_status,input_tokens,output_tokens,cached_tokens,latency_ms,cost_usd,cost_basis,input_bytes,output_bytes,original_tokens,optimized_tokens,token_basis,saved_tokens,created_at,source,compressed,algorithm';
-const publicTrace = (row: Row): Row => ({ ...row, compressed: Boolean(row.compressed) });
+const traceFields = 'id,project_id,model,provider,status,http_status,input_tokens,output_tokens,cached_tokens,latency_ms,cost_usd,cost_basis,input_bytes,output_bytes,original_tokens,optimized_tokens,token_basis,saved_tokens,created_at,source,compressed,algorithm,routing_json';
+const publicTrace = ({ routing_json, ...row }: Row): Row => ({ ...row, compressed: Boolean(row.compressed), routing: routing_json ? JSON.parse(routing_json) : null });
 const publicUser = (row: Row) => ({ id: row.id, name: row.name, email: row.email, google_linked: Boolean(row.google_linked), github_linked: Boolean(row.github_linked) });
 const publicWorkspace = (row: Row) => ({ id: row.id, name: row.name, retention_days: row.retention_days, mode: row.mode, autopilot: row.autopilot, monthly_budget: row.monthly_budget ?? 0 });
 
@@ -107,6 +110,19 @@ registerGithubAuth(app, { currentUser, createSession, authLimit });
 app.get('/api/auth/providers', c => c.json({ google: googleAvailable(c.env, c.req.url), github: githubAvailable(c.env, c.req.url) }));
 registerOnboarding(app, { userRequired, workspaceFor });
 registerDeveloperSessions(app, { userProject });
+app.get('/api/auto', async c => {
+  const { project } = await userProject(c, c.req.query('project'));
+  return c.json({ settings: await autoSettings(c.env, project.id), sentinel: AUTO_MODEL, method: 'rules_v1' });
+});
+app.patch('/api/auto', async c => {
+  const body = await readJson(c.req.raw), principal = await userProject(c, body.project_id);
+  const member = await dbOne(c.env, 'SELECT role FROM members WHERE workspace_id=? AND user_id=?', principal.workspace.id, principal.userId);
+  if (member?.role !== 'owner') throw new ApiError(403, 'Workspace owner access is required to configure Auto and waste checks.');
+  const settings = validateAutoSettings(body, await autoSettings(c.env, principal.project.id));
+  await c.env.DB.prepare('INSERT INTO project_auto_settings(project_id,settings_json,updated_at) VALUES(?,?,?) ON CONFLICT(project_id) DO UPDATE SET settings_json=excluded.settings_json,updated_at=excluded.updated_at').bind(principal.project.id, JSON.stringify(settings), settings.updated_at).run();
+  await audit(c.env, principal, 'auto.configured', { enabled: settings.enabled, waste_checks_enabled: settings.waste_checks_enabled, provider: settings.provider, method: 'rules_v1', provider_called: false });
+  return c.json({ settings, sentinel: AUTO_MODEL, method: 'rules_v1' });
+});
 app.get('/api/session', async c => c.json(await sessionPayload(c, await currentUser(c))));
 app.post('/api/auth/register', async c => {
   const body = await readJson(c.req.raw);
@@ -236,7 +252,7 @@ function traceStatement(env: Env, principal: Principal, record: any, source: str
   const limited = (value: string | null) => value && encoder.encode(value).byteLength > 262144 ? JSON.stringify({ body_stored: false, reason: 'telemetry_size_limit' }) : value;
   const cost = numeric(record.cost_usd);
   const httpStatus = integer(record.http_status) ?? (typeof record.status === 'number' ? integer(record.status) : null);
-  const statement = env.DB.prepare('INSERT INTO traces(id,project_id,model,provider,status,http_status,input_tokens,output_tokens,cached_tokens,latency_ms,cost_usd,cost_basis,input_bytes,output_bytes,original_tokens,optimized_tokens,token_basis,saved_tokens,created_at,source,compressed,algorithm,request_json,response_json) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)').bind(traceId, principal.project.id, model, provider, record.status === 'error' || (httpStatus ?? 200) >= 400 ? 'error' : 'success', httpStatus, basis === 'unavailable' ? null : input, basis === 'unavailable' ? null : output, basis === 'unavailable' ? null : cached, numeric(record.latency_ms, 0), cost, cost === null ? 'unavailable' : record.cost_basis === 'user_price_estimate' ? 'user_price_estimate' : 'client_reported', integer(record.input_bytes) ?? 0, integer(record.output_bytes) ?? 0, original, optimized, basis, saved, at, source.slice(0, 64), record.compressed === true ? 1 : 0, typeof record.algorithm === 'string' ? record.algorithm.slice(0, 100) : null, limited(requestJson), limited(responseJson));
+  const statement = env.DB.prepare('INSERT INTO traces(id,project_id,model,provider,status,http_status,input_tokens,output_tokens,cached_tokens,latency_ms,cost_usd,cost_basis,input_bytes,output_bytes,original_tokens,optimized_tokens,token_basis,saved_tokens,created_at,source,compressed,algorithm,request_json,response_json,routing_json) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)').bind(traceId, principal.project.id, model, provider, record.status === 'error' || (httpStatus ?? 200) >= 400 ? 'error' : 'success', httpStatus, basis === 'unavailable' ? null : input, basis === 'unavailable' ? null : output, basis === 'unavailable' ? null : cached, numeric(record.latency_ms, 0), cost, cost === null ? 'unavailable' : record.cost_basis === 'user_price_estimate' ? 'user_price_estimate' : 'client_reported', integer(record.input_bytes) ?? 0, integer(record.output_bytes) ?? 0, original, optimized, basis, saved, at, source.slice(0, 64), record.compressed === true ? 1 : 0, typeof record.algorithm === 'string' ? record.algorithm.slice(0, 100) : null, limited(requestJson), limited(responseJson), source === 'gateway' ? jsonValue(record.routing) : null);
   return { traceId, statement };
 }
 async function insertTrace(env: Env, principal: Principal, record: any, source: string, traceId = id()) {
@@ -324,22 +340,27 @@ app.post('/api/evals/:id/run', async c => {
   return c.json({ run });
 });
 export async function analyzeProject(env: Env, projectId: string) {
+  if (!(await autoSettings(env, projectId)).waste_checks_enabled) return dbAll(env, 'SELECT * FROM improvements WHERE project_id=? ORDER BY created_at DESC', projectId);
   const stats = (await dbOne(env, "SELECT COUNT(*) AS requests,SUM(CASE WHEN status='error' THEN 1 ELSE 0 END) AS errors,SUM(CASE WHEN cost_usd IS NULL THEN 1 ELSE 0 END) AS unpriced,MAX(input_tokens) AS largest_input FROM traces WHERE project_id=?", projectId))!;
-  if (!stats.requests) return [];
-  const rules: Array<{ kind: string; title: string; description: string }> = [];
+  const rules: Array<{ kind: string; title: string; description: string; evidence?: Row }> = [];
   if (stats.errors > 0) rules.push({ kind: 'errors', title: 'Review failed requests', description: `${stats.errors} of ${stats.requests} recorded requests failed. Review the trace errors before changing retry behavior.` });
   if (stats.unpriced > 0) rules.push({ kind: 'pricing', title: 'Add explicit model prices', description: `${stats.unpriced} recorded requests have no known price. Cost and savings remain unavailable for those requests.` });
   if (stats.largest_input > 8000) rules.push({ kind: 'large-context', title: 'Inspect large tool outputs', description: `The largest recorded input is ${stats.largest_input} tokens. Review eligible structured tool output; any compression must preserve recoverability. No saving has been verified.` });
   const at = now();
+  const from = new Date(Date.parse(at) - WASTE_WINDOW_DAYS * 86400_000).toISOString();
+  const sample = await dbAll(env, 'SELECT id,provider,model,status,input_tokens,cached_tokens,token_basis,CASE WHEN length(request_json)<=65536 THEN request_json ELSE NULL END AS request_json FROM traces WHERE project_id=? AND created_at>=? AND created_at<=? ORDER BY created_at DESC,id DESC LIMIT ?', projectId, from, at, WASTE_SAMPLE_LIMIT);
+  rules.push(...sampledWasteRules(sample, from, at));
+  // Expired sampled findings must not continue to look current after retention or traffic changes.
+  for (const kind of ['repeated-prefix', 'cache-coverage']) if (!rules.some(rule => rule.kind === kind)) await env.DB.prepare('DELETE FROM improvements WHERE project_id=? AND kind=?').bind(projectId, kind).run();
   for (const rule of rules) {
     const existing = await dbOne(env, 'SELECT id FROM improvements WHERE project_id=? AND kind=?', projectId, rule.kind);
-    await env.DB.prepare("INSERT INTO improvements(id,project_id,kind,title,description,status,evidence_json,created_at,updated_at) VALUES(?,?,?,?,?,'pending',?,?,?) ON CONFLICT(project_id,kind) DO UPDATE SET description=excluded.description,evidence_json=excluded.evidence_json,updated_at=excluded.updated_at").bind(id(), projectId, rule.kind, rule.title, rule.description, jsonValue(stats), at, at).run();
+    await env.DB.prepare("INSERT INTO improvements(id,project_id,kind,title,description,status,evidence_json,created_at,updated_at) VALUES(?,?,?,?,?,'pending',?,?,?) ON CONFLICT(project_id,kind) DO UPDATE SET description=excluded.description,evidence_json=excluded.evidence_json,updated_at=excluded.updated_at").bind(id(), projectId, rule.kind, rule.title, rule.description, jsonValue(rule.evidence ?? stats), at, at).run();
     if (!existing) await env.DB.prepare('INSERT INTO inbox(id,project_id,type,title,message,created_at) VALUES(?,?,?,?,?,?)').bind(id(), projectId, 'improvement', rule.title, rule.description, at).run();
   }
   return dbAll(env, 'SELECT * FROM improvements WHERE project_id=? ORDER BY created_at DESC', projectId);
 }
 app.get('/api/improvements', async c => { const { project } = await userProject(c, c.req.query('project')); return c.json({ items: (await dbAll(c.env, 'SELECT * FROM improvements WHERE project_id=? ORDER BY created_at DESC', project.id)).map(({ evidence_json, ...row }) => ({ ...row, evidence: JSON.parse(evidence_json) })) }); });
-app.post('/api/improvements/analyze', async c => { const body = await readJson(c.req.raw), principal = await userProject(c, body.project_id); const items = await analyzeProject(c.env, principal.project.id); await audit(c.env, principal, 'improvements.analyzed', { count: items.length, method: 'rules', provider_called: false }); return c.json({ items }); });
+app.post('/api/improvements/analyze', async c => { const body = await readJson(c.req.raw), principal = await userProject(c, body.project_id); if (!(await autoSettings(c.env, principal.project.id)).waste_checks_enabled) throw new ApiError(409, 'Waste checks are disabled for this project. Enable them in Controls to analyze traffic.'); const items = await analyzeProject(c.env, principal.project.id); await audit(c.env, principal, 'improvements.analyzed', { count: items.length, method: 'rules', provider_called: false }); return c.json({ items }); });
 app.patch('/api/improvements/:id', async c => {
   const body = await readJson(c.req.raw); if (!['accepted', 'dismissed'].includes(body.status)) throw new ApiError(400, 'status must be accepted or dismissed.');
   const user = await userRequired(c), row = await dbOne(c.env, 'SELECT i.* FROM improvements i JOIN projects p ON p.id=i.project_id JOIN members m ON m.workspace_id=p.workspace_id WHERE i.id=? AND m.user_id=?', c.req.param('id'), user.id);
@@ -426,36 +447,44 @@ async function gateway(c: any) {
   const authorization = c.req.header('authorization') ?? '', bearer = /^Bearer\s+([^\s]+)$/i.exec(authorization)?.[1];
   const providerKey = bearer ?? (provider === 'anthropic' ? c.req.header('x-api-key') : undefined);
   if (!providerKey || providerKey.length > 1024) throw new ApiError(401, 'Provide your upstream provider API key for this request. It is not stored.');
-  const body = await readBodyText(c.req.raw, 2_097_152);
+  let body = await readBodyText(c.req.raw, 2_097_152);
   let payload: any;
   try { payload = JSON.parse(body); } catch { throw new ApiError(400, 'Invalid JSON.'); }
   if (!payload || typeof payload !== 'object' || Array.isArray(payload)) throw new ApiError(400, 'A provider request object is required.');
+  const requestedModel = stringField(payload.model, 'model', 200);
+  let routing;
+  if (requestedModel === AUTO_MODEL) {
+    const routed = routeAuto(payload, await autoSettings(c.env, principal.project.id), path);
+    body = autoRequestBody(body, payload, routed.payload, path); payload = routed.payload; routing = routed.routing;
+  }
   const model = stringField(payload.model, 'model', 200);
   if (model.includes(providerKey)) throw new ApiError(400, 'The model name must not contain a provider credential.');
-  const prices = headerPrices(c.req.raw), safeRequest = redactCredential(payload, providerKey);
+  // One request-level price cannot describe three possible Auto models. Leave costs unknown.
+  const prices = routing ? undefined : headerPrices(c.req.raw), safeRequest = redactCredential(payload, providerKey);
   const headers = new Headers({ 'content-type': 'application/json', 'accept-encoding': 'identity' });
   if (provider === 'openai') headers.set('authorization', `Bearer ${providerKey}`);
   else { headers.set('x-api-key', providerKey); headers.set('anthropic-version', c.req.header('anthropic-version') ?? '2023-06-01'); const beta = c.req.header('anthropic-beta'); if (beta && beta.length < 1000) headers.set('anthropic-beta', beta); }
   let upstream: Response;
   try { upstream = await fetch(`${provider === 'openai' ? 'https://api.openai.com' : 'https://api.anthropic.com'}${path}`, { method: 'POST', headers, body, redirect: 'manual', signal: AbortSignal.timeout(120000) }); }
-  catch { await insertTrace(c.env, principal, { model, provider, status: 'error', http_status: 502, latency_ms: Date.now() - started, token_basis: 'unavailable', input_bytes: encoder.encode(body).byteLength, request: safeRequest, response: { error: 'Upstream connection failed.' } }, 'gateway'); return c.json({ error: 'Upstream connection failed.' }, 502); }
+  catch { await insertTrace(c.env, principal, { model, provider, routing, status: 'error', http_status: 502, latency_ms: Date.now() - started, token_basis: 'unavailable', input_bytes: encoder.encode(body).byteLength, request: safeRequest, response: { error: 'Upstream connection failed.' } }, 'gateway'); return c.json({ error: 'Upstream connection failed.' }, 502); }
   if (upstream.status >= 300 && upstream.status < 400) {
     try { await upstream.body?.cancel(); } catch { /* Redirects remain rejected even if the response stream fails. */ }
-    await insertTrace(c.env, principal, { model, provider, status: 'error', http_status: upstream.status, latency_ms: Date.now() - started, token_basis: 'unavailable', input_bytes: encoder.encode(body).byteLength, request: safeRequest, response: { error: 'Upstream redirects are not allowed.' } }, 'gateway');
+    await insertTrace(c.env, principal, { model, provider, routing, status: 'error', http_status: upstream.status, latency_ms: Date.now() - started, token_basis: 'unavailable', input_bytes: encoder.encode(body).byteLength, request: safeRequest, response: { error: 'Upstream redirects are not allowed.' } }, 'gateway');
     return c.json({ error: 'Upstream redirects are not allowed.' }, 502);
   }
   const responseHeaders = new Headers();
   for (const name of ['content-type', 'cache-control', 'retry-after', 'x-request-id', 'request-id']) { const value = upstream.headers.get(name); if (value) responseHeaders.set(name, value); }
   responseHeaders.set('Cache-Control', 'no-store'); responseHeaders.set('X-Traqiva-Mode', principal.workspace.mode); responseHeaders.set('X-Traqiva-Optimization', 'not-applied');
+  if (routing) { responseHeaders.set('X-Traqiva-Routing-Tier', routing.tier); responseHeaders.set('X-Traqiva-Routing-Method', routing.method); responseHeaders.set('X-Traqiva-Selected-Model', routing.selected_model); }
   const traceId = id(); responseHeaders.set('X-Traqiva-Request-Id', traceId);
-  if (!upstream.body) { await insertTrace(c.env, principal, { model, provider, http_status: upstream.status, latency_ms: Date.now() - started, token_basis: 'unavailable', input_bytes: encoder.encode(body).byteLength }, 'gateway', traceId); return new Response(null, { status: upstream.status, headers: responseHeaders }); }
+  if (!upstream.body) { await insertTrace(c.env, principal, { model, provider, routing, http_status: upstream.status, latency_ms: Date.now() - started, token_basis: 'unavailable', input_bytes: encoder.encode(body).byteLength }, 'gateway', traceId); return new Response(null, { status: upstream.status, headers: responseHeaders }); }
   const [client, metering] = upstream.body.tee();
   const record = (async () => {
     let evidence: { usage: Usage | null; bytes: number; response: unknown }, streamFailed = false;
     try { evidence = await streamEvidence(metering, provider, (upstream.headers.get('content-type') ?? '').includes('text/event-stream')); }
     catch { streamFailed = true; evidence = { usage: null, bytes: 0, response: { error: 'The upstream response ended before usage could be measured.' } }; }
     const cost = computeCost(model, evidence.usage, prices);
-    await insertTrace(c.env, principal, { model, provider, http_status: upstream.status, status: upstream.status >= 400 || streamFailed ? 'error' : 'success', ...evidence.usage, token_basis: evidence.usage ? 'provider' : 'unavailable', latency_ms: Date.now() - started, cost_usd: cost, cost_basis: cost === null ? 'unavailable' : 'user_price_estimate', input_bytes: encoder.encode(body).byteLength, output_bytes: evidence.bytes, request: safeRequest, response: redactCredential(evidence.response, providerKey), compressed: false }, 'gateway', traceId);
+    await insertTrace(c.env, principal, { model, provider, routing, http_status: upstream.status, status: upstream.status >= 400 || streamFailed ? 'error' : 'success', ...evidence.usage, token_basis: evidence.usage ? 'provider' : 'unavailable', latency_ms: Date.now() - started, cost_usd: cost, cost_basis: cost === null ? 'unavailable' : 'user_price_estimate', input_bytes: encoder.encode(body).byteLength, output_bytes: evidence.bytes, request: safeRequest, response: redactCredential(evidence.response, providerKey), compressed: false }, 'gateway', traceId);
   })();
   const execution = (() => { try { return c.executionCtx as Execution; } catch { return undefined; } })();
   if (execution) execution.waitUntil(record); else await record;

@@ -9,6 +9,7 @@ import { createHash } from 'node:crypto';
 import { createServer } from 'node:http';
 import { startAgentProxy, readProxyMetadata } from '../lib/agent.mjs';
 import { nativeRecover } from '../lib/native.mjs';
+import { setControl } from '../lib/controls.mjs';
 
 const proxyBuild = fileURLToPath(new URL('../../runtime/build/traqiva-proxy-windows-amd64.exe', import.meta.url));
 const engineBuild = fileURLToPath(new URL('../../runtime/build/traqiva-engine-0.1.0-windows-amd64.exe', import.meta.url));
@@ -62,4 +63,10 @@ test('source-built native proxy compresses actual Responses tool traffic, preser
   assert.equal(rows.length, 1);
   assert.equal(rows[0].status_code, 200);
   assert.notEqual(rows[0].raw_request_sha256, rows[0].transformed_request_sha256);
+  await setControl('read-less', false, { home });
+  bridge = await startAgentProxy({ home, providerConfig: { openai: { base_url: `http://127.0.0.1:${upstream.address().port}` } }, extraEnv: { CAVE_SSRF_ALLOWLIST: `127.0.0.1:${upstream.address().port}` } });
+  const raw = JSON.stringify(body);
+  const unchanged = await fetch(bridge.url + '/openai/v1/responses', { method: 'POST', headers: { 'content-type': 'application/json', authorization: 'Bearer synthetic-test-key' }, body: raw });
+  assert.equal(await unchanged.text(), expectedSse);
+  assert.equal(captured.at(-1).body, raw, 'Read Less off must leave the actual upstream request unchanged');
 });

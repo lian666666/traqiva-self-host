@@ -5,7 +5,7 @@ import { randomUUID } from 'node:crypto';
 import { isUtf8 } from 'node:buffer';
 
 export const MAX_BYTES = 1024 * 1024;
-export const VERSION = '0.1.1';
+export const VERSION = '0.2.0';
 export const configHome = () => resolve(process.env.TRAQIVA_HOME || join(homedir(), '.traqiva'));
 
 export function publicError(error, secrets = []) {

@@ -1,0 +1,64 @@
+.efficiency-controls { max-width: 1120px; margin: 0 auto; }
+.efficiency-controls .page-intro { margin-bottom: 18px; }
+.efficiency-eyebrow { margin-bottom: 20px; }
+.efficiency-project { margin-bottom: 26px; }
+.efficiency-project-heading { display: flex; justify-content: space-between; align-items: center; gap: 15px; margin: 0 0 13px; }
+.efficiency-project-heading > div { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.efficiency-project-heading strong { font-size: 13px; font-weight: 550; overflow-wrap: anywhere; }
+.efficiency-project-fields { border: 0; padding: 0; margin: 0; min-width: 0; display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(250px, 1fr); gap: 16px; }
+.efficiency-section-header { display: flex; gap: 18px; align-items: flex-start; justify-content: space-between; padding: 20px; border-bottom: 1px solid var(--border); }
+.efficiency-section-header .section-label { margin-bottom: 8px; }
+.efficiency-section-header h2 { font-size: 16px; font-weight: 550; line-height: 1.4; margin: 0 0 5px; }
+.efficiency-section-header p { font-size: 11px; color: var(--muted); margin: 0; }
+.efficiency-section-header > svg { color: var(--muted); margin-top: 4px; }
+.efficiency-switch { position: relative; display: inline-flex; align-items: center; flex-shrink: 0; margin-top: 4px; cursor: pointer; }
+.efficiency-switch input { position: absolute; opacity: 0; width: 34px; height: 21px; margin: 0; }
+.efficiency-switch > span { display: block; width: 34px; height: 21px; border: 1px solid var(--border); border-radius: 20px; background: var(--subtle); transition: background .15s; }
+.efficiency-switch > span::after { content: ''; display: block; width: 15px; height: 15px; border-radius: 50%; background: var(--muted); margin: 2px; transition: transform .15s; }
+.efficiency-switch input:checked + span { background: var(--accent); border-color: var(--accent); }
+.efficiency-switch input:checked + span::after { background: white; transform: translateX(13px); }
+.efficiency-switch input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 4px; }
+.efficiency-switch input:disabled + span { opacity: .45; cursor: not-allowed; }
+.efficiency-routing-content, .efficiency-waste-content { padding: 17px 20px 20px; }
+.efficiency-saved-status { font-size: 11px; font-weight: 500; line-height: 1.7; margin: 0 0 17px; }
+.efficiency-saved-status > span { color: var(--muted); font-weight: 400; }
+.efficiency-models { display: flex; flex-direction: column; gap: 12px; }
+.efficiency-models > div { display: grid; grid-template-columns: minmax(0, 1fr) 136px; gap: 10px; }
+.efficiency-models .field { margin: 0; font-size: 10px; gap: 6px; }
+.efficiency-models input, .efficiency-models select { min-width: 0; font-size: 11px; padding: 9px 10px; }
+.efficiency-boundary, .efficiency-routing-example p, .efficiency-waste-content > p:not(.efficiency-saved-status), .efficiency-local-detail > p, .efficiency-local-footer > p { font-size: 11px; line-height: 1.8; color: var(--muted); }
+.efficiency-boundary { margin: 16px 0 0; }
+.efficiency-validation { font-size: 11px; color: var(--red); margin: 14px 0 0; }
+.efficiency-routing-example { padding-top: 15px; margin-top: 15px; border-top: 1px solid var(--border); }
+.efficiency-routing-example > summary { display: flex; gap: 7px; align-items: center; width: fit-content; font-size: 11px; color: var(--text); list-style: none; cursor: pointer; }
+.efficiency-routing-example > summary::-webkit-details-marker, .efficiency-local-row > summary::-webkit-details-marker { display: none; }
+.efficiency-routing-example > p { margin-bottom: 12px; }
+.efficiency-waste-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 15px; margin-top: 18px; }
+.efficiency-waste-actions > .text-button { font-size: 10px; }
+.efficiency-waste-content .efficiency-findings-count { margin: 15px 0 0; font-size: 10px; }
+.efficiency-save { display: flex; justify-content: space-between; align-items: center; gap: 14px; margin-top: 16px; }
+.efficiency-save > span { color: var(--muted); font-size: 10px; line-height: 1.6; }
+.efficiency-local-row { border-bottom: 1px solid var(--border); }
+.efficiency-local-row > summary { list-style: none; cursor: pointer; display: flex; gap: 14px; align-items: center; padding: 17px 20px; }
+.efficiency-tool-icon { color: var(--muted); display: inline-flex; align-items: center; justify-content: center; width: 28px; flex-shrink: 0; }
+.efficiency-tool-copy { min-width: 0; flex: 1; }
+.efficiency-tool-copy strong { display: block; font-size: 12px; font-weight: 550; margin-bottom: 5px; }
+.efficiency-tool-copy > span { display: block; font-size: 11px; line-height: 1.6; color: var(--muted); }
+.efficiency-control-number { font-size: 10px; font-variant-numeric: tabular-nums; color: var(--muted); }
+.efficiency-local-row > summary > svg { color: var(--muted); }
+.efficiency-local-row[open] > summary > svg { transform: rotate(180deg); }
+.efficiency-local-detail { margin-left: 42px; padding: 0 20px 8px; }
+.efficiency-local-footer { padding: 18px 20px 20px; background: var(--subtle); }
+.efficiency-local-footer > p { margin: 0; }
+.efficiency-local-footer .code-block { background: var(--surface); margin: 12px 0 15px; }
+@media (max-width: 1000px) { .efficiency-project-fields { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 540px) {
+  .efficiency-project-heading { align-items: flex-start; flex-direction: column; }
+  .efficiency-section-header, .efficiency-routing-content, .efficiency-waste-content, .efficiency-local-row > summary, .efficiency-local-footer { padding-left: 15px; padding-right: 15px; }
+  .efficiency-models > div { grid-template-columns: minmax(0, 1fr); gap: 8px; padding-bottom: 13px; border-bottom: 1px solid var(--border); }
+  .efficiency-models > div:last-child { border-bottom: 0; padding-bottom: 0; }
+  .efficiency-save { flex-direction: column; align-items: stretch; }
+  .efficiency-local-row > summary { gap: 10px; }
+  .efficiency-local-detail { margin-left: 0; padding-left: 15px; padding-right: 15px; }
+  .efficiency-control-number { display: none; }
+}

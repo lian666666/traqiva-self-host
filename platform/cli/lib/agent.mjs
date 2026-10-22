@@ -11,6 +11,7 @@ import { setTimeout as delay } from 'node:timers/promises';
 import { configHome, api } from './client.mjs';
 import { engineStatus } from './native.mjs';
 import { nativeProxyStatus, nativeProxyPath, localProxyEnv } from './proxy-native.mjs';
+import { readControls } from './controls.mjs';
 
 const execute = promisify(execFile);
 
@@ -94,9 +95,10 @@ async function freePort() {
   return port;
 }
 
-export async function startAgentProxy({ home = configHome(), providerConfig = {}, extraEnv = {}, mode = 'compress' } = {}) {
+export async function startAgentProxy({ home = configHome(), providerConfig = {}, extraEnv = {}, mode } = {}) {
   const installed = await nativeProxyStatus();
   if (!installed.installed) throw new Error(installed.note);
+  mode ??= (await readControls({ home })).features['read-less'] ? 'compress' : 'record';
   const runId = randomUUID();
   const directory = join(home, 'agent-runs', runId);
   await mkdir(directory, { recursive: true, mode: 0o700 });

@@ -8,10 +8,21 @@ import { compressArtifact, recoverArtifact } from '../lib/operations.mjs';
 import { installNativeProxy, nativeProxyStatus } from '../lib/proxy-native.mjs';
 import { launchAgent } from '../lib/agent.mjs';
 import { runQuickstart } from '../lib/quickstart.mjs';
+import { readControls,setControl,requireControl } from '../lib/controls.mjs';
+import { saveBlock,getBlock,listBlocks,deleteBlock } from '../lib/blocks.mjs';
+import { browsePage,recoverBrowse } from '../lib/browse.mjs';
 
 const help = `Traqiva ${VERSION} — API-key gateway bridge and recoverable artifact compression
 
 traqiva init [--url ORIGIN]
+traqiva controls status
+traqiva controls set say-less|read-less|blocks|browse on|off
+traqiva blocks save FILE --name NAME [--language LANGUAGE]
+traqiva blocks list [--query TEXT]
+traqiva blocks get ID
+traqiva blocks delete ID
+traqiva browse PUBLIC_URL
+traqiva browse recover HANDLE
 traqiva connect --url ORIGIN --project ID --key PROJECT_INGEST_KEY
 traqiva status
 traqiva record TRACE.json
@@ -61,6 +72,20 @@ async function main() {
   if (!command && process.stdin.isTTY && process.stdout.isTTY) { await runQuickstart(); return; }
   if (!command || ['--help', '-h', 'help'].includes(command)) { process.stdout.write(help); return; }
   if (command === '--version') { process.stdout.write(VERSION + '\n'); return; }
+  if(command==='controls'){
+    if(args.length===1&&args[0]==='status'){output(await readControls());return;}
+    if(args.length===3&&args[0]==='set'&&['on','off'].includes(args[2])){output(await setControl(args[1],args[2]==='on'));return;}
+    throw new Error('Use controls status or controls set say-less|read-less|blocks|browse on|off.');
+  }
+  if(command==='blocks'){
+    await requireControl('blocks');const [action,...rest]=args;
+    if(action==='save'){const {flags,positional}=parse(rest,['name','language','description']);if(positional.length!==1||!flags.name)throw new Error('Use blocks save FILE --name NAME [--language LANGUAGE].');output(await saveBlock({name:flags.name,content:await readBoundedFile(positional[0]),...(flags.language?{language:flags.language}:{}),...(flags.description?{description:flags.description}:{})}));}
+    else if(action==='list'){const {flags,positional}=parse(rest,['query']);if(positional.length)throw new Error('Use blocks list [--query TEXT].');output(await listBlocks(flags.query?{query:flags.query}:{}));}
+    else if(action==='get'&&rest.length===1)process.stdout.write((await getBlock(rest[0])).content);
+    else if(action==='delete'&&rest.length===1)output(await deleteBlock(rest[0]));
+    else throw new Error('Use blocks save, list, get or delete.');
+    return;
+  }
   if (command === 'init') {
     const { flags, positional } = parse(args, ['url']);
     if (positional.length) throw new Error('Use traqiva init [--url ORIGIN].');
@@ -86,9 +111,14 @@ async function main() {
     return;
   }
   let config;
-  if (['compress', 'recover', 'mcp', 'engine', 'proxy', 'agent'].includes(command)) {
+  if (['compress', 'recover', 'mcp', 'engine', 'proxy', 'agent','browse'].includes(command)) {
     try { config = await loadConfig(); } catch { config = null; }
   } else config = await loadConfig();
+  if(command==='browse'){
+    if(args[0]==='recover'&&args.length===2){output(await recoverBrowse(args[1]));return;}
+    if(args.length!==1)throw new Error('Use browse PUBLIC_URL or browse recover HANDLE.');
+    await requireControl('browse');output(await browsePage(config,args[0]));return;
+  }
   if (command === 'proxy') {
     const [action, ...proxyArgs] = args;
     if (action === 'status') {
@@ -140,6 +170,7 @@ async function main() {
     if (!Number.isInteger(result?.accepted) || result.accepted < 0 || !Array.isArray(result.ids)) throw new Error('Traqiva did not confirm trace ingestion.');
     output(result);
   } else if (command === 'compress') {
+    await requireControl('read-less');
     const { positional } = parse(args);
     if (positional.length !== 1) throw new Error('compress requires one UTF-8 file. Installed native engines work locally; otherwise the connected cloud service is used.');
     output(await compressArtifact(config, await readBoundedFile(positional[0])));

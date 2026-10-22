@@ -60,7 +60,7 @@ Create your own GitHub OAuth App with exact callback `https://YOUR_DEPLOYMENT/ap
 
 ## Providers, native runtime and costs
 
-Native compression and recovery can run locally without a paid model. Install the CLI from your deployment's `/downloads/traqiva-cli-0.1.0.tgz`, then use `traqiva engine install --url https://YOUR_DEPLOYMENT`. Native downloads are separate and SHA-256 checked. Windows was executed; Linux/macOS binaries were cross-compiled. Go source and reproducible build scripts are included if you prefer rebuilding. Read [runtime limits](../runtime/README.md).
+Native compression and recovery can run locally without a paid model. Install the CLI from your deployment's `/cli.tgz`, then use `traqiva engine install --url https://YOUR_DEPLOYMENT`. Native downloads are separate and SHA-256 checked. Windows was executed; Linux/macOS binaries were cross-compiled. Go source and reproducible build scripts are included if you prefer rebuilding. Read [runtime limits](../runtime/README.md).
 
 The cloud gateway and Ask use the end user's OpenAI or Anthropic API key. Keys are forwarded for the requested operation and not stored. These calls may be billed by the provider. The experimental native Codex launcher is a separate integration and does not intercept an existing desktop chat. See [capabilities](CAPABILITIES.md).
 

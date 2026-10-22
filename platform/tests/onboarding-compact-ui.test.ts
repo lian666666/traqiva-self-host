@@ -77,7 +77,7 @@ describe('Compact coding-agent onboarding',()=>{
 
   it.each(['codex','claude'] as const)('uses the selected %s integration in one supported command sequence',assistant=>{
     const html=renderToStaticMarkup(createElement(CompactAgentSetup,{assistant,origin:'https://traqiva.example.test',projectId:'project-test'}));
-    expect(html).toContain('npm install --global https://traqiva.example.test/downloads/traqiva-cli-0.1.0.tgz');
+    expect(html).toContain('npm install --global https://traqiva.example.test/cli.tgz');
     expect(html).toContain('traqiva connect --url https://traqiva.example.test --project project-test --key YOUR_PROJECT_KEY');
     expect(html).toContain('traqiva engine install --url https://traqiva.example.test');
     expect(html).toContain(`traqiva setup --agent ${assistant} --print`);

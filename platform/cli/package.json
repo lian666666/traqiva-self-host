@@ -1,7 +1,7 @@
 {
   "name": "traqiva-cli-local",
-  "version": "0.1.1",
-  "description": "Traqiva trace client, native compression MCP and explicit local coding-agent proxy launcher.",
+  "version": "0.2.0",
+  "description": "Traqiva recoverable compression, reusable code Blocks, public-web Browse, MCP tools and explicit API/agent bridges.",
   "type": "module",
   "license": "Apache-2.0",
   "engines": { "node": ">=22.13" },
@@ -9,6 +9,6 @@
   "files": ["bin", "lib", "README.md", "LICENSE", "NOTICE"],
   "scripts": {
     "test": "node --test tests/*.test.mjs",
-    "check": "node --check bin/traqiva.mjs && node --check lib/client.mjs && node --check lib/mcp.mjs && node --check lib/proxy.mjs && node --check lib/native.mjs && node --check lib/operations.mjs && node --check lib/agent.mjs && node --check lib/proxy-native.mjs && node --check lib/quickstart.mjs && node --check lib/commands.mjs"
+    "check": "node --check bin/traqiva.mjs && node --check lib/client.mjs && node --check lib/mcp.mjs && node --check lib/proxy.mjs && node --check lib/native.mjs && node --check lib/operations.mjs && node --check lib/agent.mjs && node --check lib/proxy-native.mjs && node --check lib/quickstart.mjs && node --check lib/commands.mjs && node --check lib/controls.mjs && node --check lib/say-less.mjs && node --check lib/json-members.mjs && node --check lib/efficiency-tools.mjs && node --check lib/blocks.mjs && node --check lib/browse.mjs"
   }
 }

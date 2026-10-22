@@ -1,10 +1,13 @@
 import { createServer } from 'node:http';
 import { once } from 'node:events';
+import { isUtf8 } from 'node:buffer';
 import { MAX_BYTES } from './client.mjs';
+import { readControls } from './controls.mjs';
+import { applySayLessRaw } from './say-less.mjs';
 
 const routes = new Set(['/v1/chat/completions', '/v1/responses', '/v1/messages']);
 const requestHeaders = ['authorization', 'x-api-key', 'content-type', 'anthropic-version', 'anthropic-beta'];
-const responseHeaders = ['content-type', 'cache-control', 'retry-after', 'x-request-id', 'request-id', 'x-traqiva-request-id', 'x-traqiva-optimization', 'x-traqiva-token-basis'];
+const responseHeaders = ['content-type', 'cache-control', 'retry-after', 'x-request-id', 'request-id', 'x-traqiva-request-id', 'x-traqiva-optimization', 'x-traqiva-token-basis', 'x-traqiva-routing-tier', 'x-traqiva-routing-method', 'x-traqiva-selected-model'];
 
 export async function serveProxy(config, port) {
   const server = createServer(async (incoming, outgoing) => {
@@ -26,11 +29,21 @@ export async function serveProxy(config, port) {
         if (size > MAX_BYTES) { fail(413, 'Request exceeds 1 MiB.'); return; }
         chunks.push(chunk);
       }
+      let body = Buffer.concat(chunks);
+      if ((await readControls()).features['say-less']) {
+        if (!isUtf8(body)) { fail(400, 'Say Less requires valid UTF-8 JSON.'); return; }
+        const raw = body.toString('utf8');
+        try { JSON.parse(raw); }
+        catch { fail(400, 'Say Less requires a valid JSON request.'); return; }
+        try { body = Buffer.from(applySayLessRaw(raw, incoming.url)); }
+        catch { fail(400, 'Say Less does not support this request shape.'); return; }
+        if (body.length > MAX_BYTES) { fail(413, 'Request with Say Less instructions exceeds 1 MiB.'); return; }
+      }
       const headers = { 'x-traqiva-key': config.key };
       for (const header of requestHeaders) if (typeof incoming.headers[header] === 'string') headers[header] = incoming.headers[header];
       const controller = new AbortController();
       outgoing.on('close', () => { if (!outgoing.writableEnded) controller.abort(); });
-      const upstream = await fetch(config.url + incoming.url, { method: 'POST', headers, body: Buffer.concat(chunks), redirect: 'error', signal: AbortSignal.any([controller.signal, AbortSignal.timeout(300_000)]) });
+      const upstream = await fetch(config.url + incoming.url, { method: 'POST', headers, body, redirect: 'error', signal: AbortSignal.any([controller.signal, AbortSignal.timeout(300_000)]) });
       outgoing.statusCode = upstream.status;
       for (const header of responseHeaders) if (upstream.headers.has(header)) outgoing.setHeader(header, upstream.headers.get(header));
       outgoing.setHeader('cache-control', 'no-store');

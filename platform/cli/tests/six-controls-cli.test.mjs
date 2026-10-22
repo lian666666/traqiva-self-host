@@ -1,0 +1,21 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { mkdtemp,rm,writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
+const execute=promisify(execFile),bin=fileURLToPath(new URL('../bin/traqiva.mjs',import.meta.url));
+test('CLI switches affect real compression entry and Blocks roundtrip without a cloud account',async t=>{
+ const home=await mkdtemp(join(tmpdir(),'traqiva-six-cli-'));t.after(()=>rm(home,{recursive:true,force:true}));
+ const run=args=>execute(process.execPath,[bin,...args],{env:{...process.env,TRAQIVA_HOME:home},windowsHide:true});
+ const status=JSON.parse((await run(['controls','status'])).stdout);assert.equal(status.features['say-less'],false);
+ const script=join(home,'fixture.js');await writeFile(script,'console.log("reusable");\n');
+ const saved=JSON.parse((await run(['blocks','save',script,'--name','Reusable'])).stdout);
+ assert.equal((await run(['blocks','get',saved.id])).stdout,'console.log("reusable");\n');
+ assert.equal(JSON.parse((await run(['blocks','list','--query','Reusable'])).stdout).total,1);
+ await run(['controls','set','blocks','off']);await assert.rejects(run(['blocks','list']),error=>/blocks is disabled/.test(error.stderr));
+ await run(['controls','set','read-less','off']);await assert.rejects(run(['compress',script]),error=>/read-less is disabled/.test(error.stderr));
+ await run(['controls','set','browse','off']);await assert.rejects(run(['browse','https://example.com']),error=>/browse is disabled/.test(error.stderr));
+});
