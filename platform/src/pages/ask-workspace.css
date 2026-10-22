@@ -9,3 +9,43 @@
 @media(max-width:760px){.ask-workspace{display:flex;flex-direction:column;gap:18px;min-height:calc(100dvh - 150px)}.ask-history{border-right:0;border-bottom:1px solid var(--border);padding:0 0 14px;display:grid;grid-template-columns:1fr auto;gap:10px;align-items:start}.ask-history>header{margin:0;min-height:31px}.ask-new-chat{margin:0;padding:7px 10px;font-size:11px}.ask-history>ul{grid-column:1/-1;display:flex;gap:6px;max-height:75px;overflow:auto}.ask-history li{min-width:145px;max-width:190px}.ask-history li>button{font-size:11px;max-width:190px;padding:8px}.ask-history>p,.ask-history>.notice{grid-column:1/-1;margin:0;padding:0}.ask-credit-summary{grid-column:1/-1;margin:0;padding:2px 0 0;gap:5px}.ask-credit-summary progress{display:none}.ask-credit-summary small{font-size:9px}.ask-credit-summary small br{display:none}.ask-credit-summary small{display:block}.ask-conversation-area{flex:1}.ask-workspace-header{display:none}.ask-thread{min-height:155px}.ask-welcome{padding:20px 0 18px}.ask-welcome h1{font-size:25px}.ask-welcome>p{font-size:11px;max-width:300px;margin:0 auto}.ask-workspace-compose{margin-top:15px}.ask-workspace-composer{padding:12px 13px 10px}.ask-workspace-composer>textarea{font-size:12px;min-height:65px}.ask-compose-tools>div{gap:5px}.ask-compose-tools .icon-button{width:25px}.ask-compose-context{margin:0 8px;padding:8px;font-size:9px;gap:8px}.ask-compose-context select{max-width:170px;font-size:10px}.ask-answer-mode>select{max-width:170px;font-size:11px}.ask-starter-questions{padding:20px 4px 12px;gap:12px}.ask-starter-questions>button{font-size:10px}.ask-message-list{padding-top:7px}.ask-workspace-message>p{font-size:12px}.ask-workspace-message.user>p{font-size:11px}.ask-answer-evidence{font-size:10px}.ask-answer-evidence>details>summary{font-size:10px}.ask-answer-actions{gap:9px}.ask-answer-actions>a,.ask-answer-actions>button{font-size:9px}.ask-advanced-fields{grid-template-columns:1fr 1.5fr}.ask-advanced-fields>.field:last-child{grid-column:1/-1}.ask-advanced-settings{padding:12px}.ask-command-menu>button{font-size:11px}.ask-allowance-note{font-size:9px}.ask-accounting-note{font-size:8px}}
 @media(max-width:400px){.ask-compose-tools>div{gap:2px}.ask-answer-mode>select{max-width:152px;font-size:10px}.ask-compose-context select{max-width:135px}.ask-compose-context>.ask-period select{max-width:90px;font-size:9px}}
 @media(max-width:760px){.ask-privacy-note{font-size:9px;line-height:1.7;margin-top:10px}}
+.ask-workspace.ask-workspace-compact{display:flex;flex-direction:column;width:100%;height:100%;min-height:0;max-width:none;gap:0;margin:0;overflow:hidden}
+.ask-workspace-compact .ask-conversation-area{height:100%;min-height:0;flex:1;overflow:hidden}
+.ask-workspace-compact .ask-thread{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;justify-content:flex-start;scrollbar-gutter:stable}
+.ask-workspace-compact .ask-welcome{margin:auto 0;padding:28px 22px 24px}
+.ask-workspace-compact .ask-welcome>.brand{margin-bottom:16px}
+.ask-workspace-compact .ask-welcome h1{font-size:21px;letter-spacing:-.025em;margin-bottom:10px}
+.ask-workspace-compact .ask-welcome>p{font-size:12px;line-height:1.7;max-width:340px;margin:0 auto}
+.ask-compact-suggestions{display:flex;flex-direction:column;align-items:center;gap:9px;margin:24px 0 0}
+.ask-compact-suggestions>button{border:1px solid var(--border);border-radius:24px;background:var(--surface);padding:10px 17px;font-size:12px;line-height:1.4;color:var(--text)}
+.ask-compact-suggestions>button:hover{background:var(--subtle);border-color:color-mix(in srgb,var(--text) 25%,var(--border))}
+.ask-workspace-compact .ask-message-list{padding:20px 18px 8px;max-width:none}
+.ask-workspace-compact .ask-workspace-message{margin-bottom:23px}
+.ask-workspace-compact .ask-workspace-message>p{font-size:13px;line-height:1.8}
+.ask-workspace-compact .ask-workspace-message.user>p{font-size:12px;padding:9px 12px;max-width:93%}
+.ask-workspace-compact .ask-answer-evidence{font-size:10px;margin-top:11px}
+.ask-workspace-compact .ask-answer-actions{gap:10px;margin-top:10px}
+.ask-workspace-compact .ask-answer-actions>a,.ask-workspace-compact .ask-answer-actions>button{font-size:10px}
+.ask-workspace-compact .ask-thread>.ask-state-note,.ask-workspace-compact .ask-thread>.notice{margin:12px 16px}
+.ask-workspace-compact .ask-workspace-compose{flex-shrink:0;max-width:none;width:auto;margin:8px 12px 0;padding-bottom:10px}
+.ask-workspace-compact .ask-workspace-composer{padding:12px 13px 9px;border-radius:11px}
+.ask-workspace-compact .ask-workspace-composer>textarea{min-height:54px;max-height:140px;font-size:12px;resize:none}
+.ask-workspace-compact .ask-compose-tools>div{gap:5px}
+.ask-workspace-compact .ask-compose-tools .icon-button{width:25px;height:25px}
+.ask-workspace-compact .ask-answer-mode>select{max-width:185px;font-size:11px}
+.ask-workspace-compact .ask-compose-context{margin:0 6px;padding:8px;gap:10px}
+.ask-workspace-compact .ask-compose-context>label:first-child{flex:1;min-width:0}
+.ask-workspace-compact .ask-compose-context select{min-width:0;max-width:100%;font-size:10px}
+.ask-workspace-compact .ask-compose-context>.ask-period{flex-shrink:0;max-width:110px}
+.ask-workspace-compact .ask-privacy-note{margin:9px 3px 0;font-size:9px;line-height:1.5}
+.ask-workspace-compact .ask-state-note{font-size:10px;line-height:1.6;margin-bottom:8px}
+.ask-workspace-compact .ask-advanced-settings{max-height:200px;overflow:auto;padding:11px 12px;margin-top:8px}
+.ask-workspace-compact .ask-advanced-fields{grid-template-columns:1fr 1.5fr;gap:8px;margin-top:10px}
+.ask-workspace-compact .ask-advanced-fields>.field:last-child{grid-column:1/-1}
+.ask-workspace-compact .ask-advanced-settings>p{font-size:9px;line-height:1.5}
+.ask-workspace-compact .ask-command-menu{margin-bottom:8px}
+.ask-workspace-compact .ask-command-menu>button{font-size:11px;padding:10px 8px}
+.ask-compact-footer{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:9px 3px 0;color:var(--muted);font-size:10px}
+.ask-compact-footer>button,.ask-compact-footer>a{display:inline-flex;align-items:center;gap:5px;font-size:10px;color:var(--muted);padding:2px 0}
+.ask-compact-footer>button:hover,.ask-compact-footer>a:hover{color:var(--text)}
+@media(max-width:400px){.ask-workspace-compact .ask-message-list{padding-right:13px;padding-left:13px}.ask-workspace-compact .ask-answer-mode>select{max-width:153px;font-size:10px}.ask-workspace-compact .ask-welcome{padding:18px 15px}.ask-workspace-compact .ask-welcome h1{font-size:20px}.ask-compact-suggestions{margin-top:18px;gap:8px}.ask-compact-suggestions>button{font-size:11px;padding:9px 14px}}

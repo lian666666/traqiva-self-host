@@ -6,6 +6,7 @@ describe('bounded project evidence for Ask', () => {
     const result = buildAskEvidence('project-a', { stats: { requests: 2, input_tokens: 100, priced_requests: 1, estimated_cost_usd: 0.02, saved_tokens_basis: 'client_estimate', private: 'private-stats' }, models: [{ model: 'test-model', requests: 2, tokens: 100, cost: 0.02, prompt: 'private-model' }], series: [{ date: '2026-10-22', requests: 2, tokens: 100, cost: 0.02 }], traces: [{ id: 'trace-a', model: 'test-model', provider: 'test', status: 'success', token_basis: 'estimated', cost_basis: 'user_price_estimate', input_tokens: 100, request_json: 'private-request', response_json: 'private-response', routing: { private: true } }] }, 30);
     expect(result.context).toMatchObject({ project_id: 'project-a', period_days: 30, stats: { requests: 2, priced_requests: 1 }, utc_dates: { from: '2026-10-22', to: '2026-10-22' }, recent_trace_metadata: [{ id: 'trace-a', token_basis: 'estimated', cost_basis: 'user_price_estimate' }] });
     expect(result.context.evidence_limits.aggregate_token_basis).toContain('Mixed or unknown');
+    expect(result.context.evidence_limits.aggregate_scope).toContain('Traqiva AI assistant calls are excluded');
     expect(result.context.evidence_limits.aggregate_cost_basis).toContain('possibly partial');
     expect(result.context.evidence_limits.cache_basis).toContain('unknown');
     const serialized = JSON.stringify(result);

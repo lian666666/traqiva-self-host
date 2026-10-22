@@ -37,5 +37,5 @@ export function askCanSend(options: { question: string; busy: boolean; projectId
 }
 export function askMoney(value: number) {
   if (!Number.isFinite(value)) return '—';
-  return new Intl.NumberFormat('en', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: value > 0 && value < 0.01 ? 4 : 2 }).format(Math.max(0, value));
+  return new Intl.NumberFormat('en', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: value > 0 && value < 1 ? 4 : 2 }).format(Math.max(0, value));
 }

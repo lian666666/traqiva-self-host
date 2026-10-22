@@ -2,7 +2,7 @@ import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import Ask from '../src/pages/Ask';
+import Ask, * as AskPage from '../src/pages/Ask';
 import type { AskConversationDetail, AskStatus } from '../src/pages/askWorkspaceData';
 
 const state = vi.hoisted(() => ({ project: 'project-real', paths: [] as (string | null)[], status: null as AskStatus | null, statusLoading: false, statusError: '', chats: [] as Record<string, unknown>[], detail: null as AskConversationDetail | null, detailLoading: false, detailError: '', historyError: '' }));
@@ -22,6 +22,20 @@ beforeEach(() => {
 });
 
 describe('Ask evidence workspace', () => {
+  it('offers an embedded workspace that ignores the underlying page conversation and question', () => {
+    expect(typeof AskPage.AskWorkspace).toBe('function');
+    const html = renderToStaticMarkup(createElement(MemoryRouter, { initialEntries: ['/app/analytics?days=7&chat=unrelated-page-chat&question=Do%20not%20send%20this'] }, createElement(AskPage.AskWorkspace, { compact: true })));
+    expect(state.paths).not.toContain('/api/ask/conversations/unrelated-page-chat?project=project-real');
+    expect(html).not.toContain('Do not send this');
+    expect(html).not.toContain('Your chats');
+    expect(html).not.toContain('class="ask-workspace-header"');
+    expect(html).toContain('ask-workspace-compact');
+    expect(html).toContain('aria-label="Ask evidence period"');
+    expect(html).toContain('aria-label="Answer mode"');
+    expect(html).toContain('Compare model usage');
+    expect(html).toContain('$0.70 left');
+  });
+
   it('defaults to the built-in model with a real lifetime balance and concise composer', () => {
     const html = render();
     expect(state.paths).toContain('/api/ask/status?project=project-real');

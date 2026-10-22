@@ -12,6 +12,7 @@ import { githubAvailable, registerGithubAuth } from './github';
 import { onboardingFor, registerOnboarding, requireTerms, termsFor } from './onboarding';
 import { registerDeveloperSessions } from './developer-sessions';
 import { registerAgentUsage } from './agent-usage';
+import { EXTERNAL_TRACE_FILTER, registerWorkspaceUsage } from './workspace-usage';
 import { AUTO_MODEL, autoSettings, routeAuto, validateAutoSettings } from './auto';
 import { sampledWasteRules, WASTE_SAMPLE_LIMIT, WASTE_WINDOW_DAYS } from './waste';
 import { autoRequestBody } from './json-fields';
@@ -116,6 +117,7 @@ app.get('/api/auth/providers', c => c.json({ google: googleAvailable(c.env, c.re
 registerOnboarding(app, { userRequired, workspaceFor });
 registerDeveloperSessions(app, { userProject });
 registerAgentUsage(app, { userProject });
+registerWorkspaceUsage(app, { userProject });
 registerHostedAskStatus(app, { userProject });
 registerAskConversations(app, { userProject });
 app.get('/api/auto', async c => {
@@ -191,16 +193,16 @@ app.patch('/api/projects/:id', async c => {
 });
 async function overview(env: Env, projectId: string, days: number) {
   const to = now(), from = new Date(Date.parse(to) - (days - 1) * 86400_000).toISOString().slice(0, 10);
-  const stats = (await dbOne(env, `SELECT COUNT(*) AS requests,COALESCE(SUM(input_tokens),0) AS input_tokens,COALESCE(SUM(output_tokens),0) AS output_tokens,COALESCE(SUM(cached_tokens),0) AS cached_tokens,COUNT(CASE WHEN input_tokens IS NOT NULL AND cached_tokens IS NOT NULL THEN 1 END) AS cache_available_requests,COALESCE(SUM(CASE WHEN input_tokens IS NOT NULL AND cached_tokens IS NOT NULL THEN input_tokens END),0) AS cache_covered_input_tokens,SUM(cost_usd) AS estimated_cost_usd,SUM(CASE WHEN status='error' THEN 1 ELSE 0 END) AS errors,AVG(latency_ms) AS avg_latency_ms,SUM(saved_tokens) AS saved_tokens,SUM(CASE WHEN token_basis='unavailable' THEN 0 ELSE 1 END) AS usage_available_requests,COUNT(cost_usd) AS priced_requests FROM traces WHERE project_id=? AND created_at>=? AND created_at<=?`, projectId, from, to))!;
+  const stats = (await dbOne(env, `SELECT COUNT(*) AS requests,COALESCE(SUM(input_tokens),0) AS input_tokens,COALESCE(SUM(output_tokens),0) AS output_tokens,COALESCE(SUM(cached_tokens),0) AS cached_tokens,COUNT(CASE WHEN input_tokens IS NOT NULL AND cached_tokens IS NOT NULL THEN 1 END) AS cache_available_requests,COALESCE(SUM(CASE WHEN input_tokens IS NOT NULL AND cached_tokens IS NOT NULL THEN input_tokens END),0) AS cache_covered_input_tokens,SUM(cost_usd) AS estimated_cost_usd,SUM(CASE WHEN status='error' THEN 1 ELSE 0 END) AS errors,AVG(latency_ms) AS avg_latency_ms,SUM(saved_tokens) AS saved_tokens,SUM(CASE WHEN token_basis='unavailable' THEN 0 ELSE 1 END) AS usage_available_requests,COUNT(cost_usd) AS priced_requests FROM traces WHERE project_id=? AND ${EXTERNAL_TRACE_FILTER} AND created_at>=? AND created_at<=?`, projectId, from, to))!;
   stats.errors ??= 0; stats.avg_latency_ms ??= 0; stats.usage_available_requests ??= 0;
   stats.saved_tokens_basis = stats.saved_tokens === null ? 'unavailable' : 'client_estimate';
   const compression = (await dbOne(env, 'SELECT COUNT(*) AS events,SUM(estimated_saved_tokens) AS estimated_saved_tokens FROM compression_events WHERE project_id=? AND created_at>=? AND created_at<=?', projectId, from, to))!;
   stats.compression_events = compression.events;
   stats.compression_estimated_saved_tokens = compression.estimated_saved_tokens;
-  const rows = await dbAll(env, 'SELECT substr(created_at,1,10) AS date,COUNT(*) AS requests,COALESCE(SUM(input_tokens+output_tokens),0) AS tokens,SUM(cost_usd) AS cost FROM traces WHERE project_id=? AND created_at>=? AND created_at<=? GROUP BY substr(created_at,1,10) ORDER BY date', projectId, from, to);
+  const rows = await dbAll(env, `SELECT substr(created_at,1,10) AS date,COUNT(*) AS requests,COALESCE(SUM(input_tokens+output_tokens),0) AS tokens,SUM(cost_usd) AS cost FROM traces WHERE project_id=? AND ${EXTERNAL_TRACE_FILTER} AND created_at>=? AND created_at<=? GROUP BY substr(created_at,1,10) ORDER BY date`, projectId, from, to);
   const series = Array.from({ length: days }, (_, index) => { const date = new Date(Date.parse(`${from}T00:00:00Z`) + index * 86400_000).toISOString().slice(0, 10); return rows.find(row => row.date === date) ?? { date, requests: 0, tokens: 0, cost: null }; });
-  const models = await dbAll(env, 'SELECT model,COUNT(*) AS requests,COALESCE(SUM(input_tokens+output_tokens),0) AS tokens,SUM(cost_usd) AS cost FROM traces WHERE project_id=? AND created_at>=? AND created_at<=? GROUP BY model ORDER BY requests DESC LIMIT 30', projectId, from, to);
-  const traces = (await dbAll(env, `SELECT ${traceFields} FROM traces WHERE project_id=? AND created_at>=? AND created_at<=? ORDER BY created_at DESC LIMIT 10`, projectId, from, to)).map(publicTrace);
+  const models = await dbAll(env, `SELECT model,COUNT(*) AS requests,COALESCE(SUM(input_tokens+output_tokens),0) AS tokens,SUM(cost_usd) AS cost FROM traces WHERE project_id=? AND ${EXTERNAL_TRACE_FILTER} AND created_at>=? AND created_at<=? GROUP BY model ORDER BY requests DESC LIMIT 30`, projectId, from, to);
+  const traces = (await dbAll(env, `SELECT ${traceFields} FROM traces WHERE project_id=? AND ${EXTERNAL_TRACE_FILTER} AND created_at>=? AND created_at<=? ORDER BY created_at DESC LIMIT 10`, projectId, from, to)).map(publicTrace);
   return { stats, series, models, traces };
 }
 app.get('/api/overview', async c => {
@@ -210,7 +212,7 @@ app.get('/api/overview', async c => {
 });
 app.get('/api/traces', async c => {
   const { project } = await userProject(c, c.req.query('project'));
-  const args: unknown[] = [project.id]; let where = 'project_id=?';
+  const args: unknown[] = [project.id]; let where = `project_id=? AND ${EXTERNAL_TRACE_FILTER}`;
   for (const field of ['status', 'model'] as const) { const value = c.req.query(field); if (value && value !== 'all') { where += ` AND ${field}=?`; args.push(value.slice(0, 200)); } }
   const search = c.req.query('search');
   if (search) { where += ' AND (model LIKE ? ESCAPE \'\\\' OR provider LIKE ? ESCAPE \'\\\' OR id LIKE ? ESCAPE \'\\\')'; const term = `%${search.slice(0, 120).replace(/[\\%_]/g, '\\$&')}%`; args.push(term, term, term); }
@@ -351,17 +353,18 @@ app.post('/api/evals/:id/run', async c => {
 }
 export async function analyzeProject(env: Env, projectId: string) {
   if (!(await autoSettings(env, projectId)).waste_checks_enabled) return dbAll(env, 'SELECT * FROM improvements WHERE project_id=? ORDER BY created_at DESC', projectId);
-  const stats = (await dbOne(env, "SELECT COUNT(*) AS requests,SUM(CASE WHEN status='error' THEN 1 ELSE 0 END) AS errors,SUM(CASE WHEN cost_usd IS NULL THEN 1 ELSE 0 END) AS unpriced,MAX(input_tokens) AS largest_input FROM traces WHERE project_id=?", projectId))!;
+  const stats = (await dbOne(env, `SELECT COUNT(*) AS requests,SUM(CASE WHEN status='error' THEN 1 ELSE 0 END) AS errors,SUM(CASE WHEN cost_usd IS NULL THEN 1 ELSE 0 END) AS unpriced,MAX(input_tokens) AS largest_input FROM traces WHERE project_id=? AND ${EXTERNAL_TRACE_FILTER}`, projectId))!;
   const rules: Array<{ kind: string; title: string; description: string; evidence?: Row }> = [];
   if (stats.errors > 0) rules.push({ kind: 'errors', title: 'Review failed requests', description: `${stats.errors} of ${stats.requests} recorded requests failed. Review the trace errors before changing retry behavior.` });
   if (stats.unpriced > 0) rules.push({ kind: 'pricing', title: 'Add explicit model prices', description: `${stats.unpriced} recorded requests have no known price. Cost and savings remain unavailable for those requests.` });
   if (stats.largest_input > 8000) rules.push({ kind: 'large-context', title: 'Inspect large tool outputs', description: `The largest recorded input is ${stats.largest_input} tokens. Review eligible structured tool output; any compression must preserve recoverability. No saving has been verified.` });
   const at = now();
   const from = new Date(Date.parse(at) - WASTE_WINDOW_DAYS * 86400_000).toISOString();
-  const sample = await dbAll(env, 'SELECT id,provider,model,status,input_tokens,cached_tokens,token_basis,CASE WHEN length(request_json)<=65536 THEN request_json ELSE NULL END AS request_json FROM traces WHERE project_id=? AND created_at>=? AND created_at<=? ORDER BY created_at DESC,id DESC LIMIT ?', projectId, from, at, WASTE_SAMPLE_LIMIT);
+  const sample = await dbAll(env, `SELECT id,provider,model,status,input_tokens,cached_tokens,token_basis,CASE WHEN length(request_json)<=65536 THEN request_json ELSE NULL END AS request_json FROM traces WHERE project_id=? AND ${EXTERNAL_TRACE_FILTER} AND created_at>=? AND created_at<=? ORDER BY created_at DESC,id DESC LIMIT ?`, projectId, from, at, WASTE_SAMPLE_LIMIT);
   rules.push(...sampledWasteRules(sample, from, at));
-  // Expired sampled findings must not continue to look current after retention or traffic changes.
-  for (const kind of ['repeated-prefix', 'cache-coverage']) if (!rules.some(rule => rule.kind === kind)) await env.DB.prepare('DELETE FROM improvements WHERE project_id=? AND kind=?').bind(projectId, kind).run();
+  // Expired pending machine findings must not look current after traffic changes.
+  // Preserve findings the user has already reviewed, including accepted/dismissed.
+  for (const kind of ['errors', 'pricing', 'large-context', 'repeated-prefix', 'cache-coverage']) if (!rules.some(rule => rule.kind === kind)) await env.DB.prepare("DELETE FROM improvements WHERE project_id=? AND kind=? AND status='pending'").bind(projectId, kind).run();
   for (const rule of rules) {
     const existing = await dbOne(env, 'SELECT id FROM improvements WHERE project_id=? AND kind=?', projectId, rule.kind);
     await env.DB.prepare("INSERT INTO improvements(id,project_id,kind,title,description,status,evidence_json,created_at,updated_at) VALUES(?,?,?,?,?,'pending',?,?,?) ON CONFLICT(project_id,kind) DO UPDATE SET description=excluded.description,evidence_json=excluded.evidence_json,updated_at=excluded.updated_at").bind(id(), projectId, rule.kind, rule.title, rule.description, jsonValue(rule.evidence ?? stats), at, at).run();

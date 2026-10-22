@@ -78,6 +78,13 @@ describe('hosted Ask uses server-owned OpenAI access and a real user allowance',
     expect(JSON.parse(trace.request_json).body_stored).toBe(false);
     expect(JSON.parse(trace.response_json).body_stored).toBe(false);
     expect(JSON.stringify(trace)).not.toContain(body.answer);
+    // The real hosted flow keeps its audit and ledger but cannot populate the
+    // connected project dashboard or feed its own answer back as traffic.
+    const overview = await (await request('/api/overview?project=' + a.project.id, { cookie: a.cookie })).json() as any;
+    expect(overview.stats).toMatchObject({ requests: 0, input_tokens: 0, output_tokens: 0, estimated_cost_usd: null });
+    expect(overview.traces).toEqual([]);
+    const usage = await (await request('/api/workspace/usage?project=' + a.project.id, { cookie: a.cookie })).json() as any;
+    expect(usage).toMatchObject({ observability: { events: 0 }, ai: { allowance: { used_usd: .00015 } } });
   });
 
   it('persists only a successful exchange and returns tenant-scoped evidence/history', async () => {

@@ -8,12 +8,21 @@ const state=vi.hoisted(()=>({connected:false}));
 vi.mock('../src/api',()=>({
   useApp:()=>({session:{user:{name:'Alex',email:'alex@example.invalid'},workspace:{name:'Studio'},projects:[{id:'p',name:'Default'}],setup:{project_id:'p'},terms:{accepted:true}},project:{id:'p',name:'Default'},setProject:vi.fn(),reload:vi.fn(),notify:vi.fn()}),
   api:vi.fn(),json:vi.fn(),
+  useResource:(_path:string|null,initial:unknown)=>({data:initial,loading:false,error:'',refresh:vi.fn()}),
 }));
 vi.mock('../src/useConnectionStatus',()=>({useConnectionStatus:()=>({status:{connected:state.connected,method:state.connected?'project_key':null,last_activity_at:null},checking:false,error:'',online:true})}));
 const render=(path='/app/developers/sessions')=>renderToStaticMarkup(createElement(MemoryRouter,{initialEntries:[path]},createElement(Shell)));
 beforeEach(()=>{state.connected=false;});
 
 describe('Reference workspace layout',()=>{
+  it('keeps platform usage in four sidebar meters and opens AI from a button',()=>{
+    const html=render('/app/home');
+    expect(html).toContain('aria-label="Traqiva plan usage"');
+    expect(html).toContain('AI credits');expect(html).toContain('Observability');expect(html).toContain('Agent runs');expect(html).toContain('Routing');
+    expect(html).toMatch(/<button[^>]*class="traqiva-ai-launcher"[^>]*aria-expanded="false"/);
+    expect(html).toContain('Traqiva AI');
+    expect(html).not.toContain('id="traqiva-ai-panel"');
+  });
   it('shows all four product options directly, with the deferred Evals option disabled',()=>{
     const html=render();
     expect(html).toContain('aria-label="Products"');

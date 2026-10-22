@@ -36,7 +36,7 @@ export function buildAskEvidence(projectId: string, data: Row, daysValue: unknow
     models, daily_series: series, recent_trace_metadata: traces,
     evidence_limits: {
       model_limit: MODEL_LIMIT, recent_trace_limit: TRACE_LIMIT, daily_series_limit: SERIES_LIMIT,
-      aggregate_scope: 'Project traces in the selected UTC period, including manual imports and assistant calls where present; these are not automatically coding-agent requests. Recent trace metadata is only a sample.',
+      aggregate_scope: 'External project traces in the selected UTC period, including SDK, gateway, native proxy and manual imports. Traqiva AI assistant calls are excluded and accounted separately. These are not automatically attributed coding-agent requests. Recent trace metadata is only a sample.',
       aggregate_token_basis: 'Mixed or unknown: aggregate tokens can combine provider-reported and estimated usage. Per-trace token_basis is authoritative only for that sampled trace.',
       aggregate_cost_basis: 'Recorded cost subtotal, possibly partial and estimated; not an invoice or verified savings. priced_requests gives price coverage.',
       cache_basis: 'Cache totals may include estimates. Use cache_available_requests and cache_covered_input_tokens for coverage; missing cache is unknown, not measured zero.',

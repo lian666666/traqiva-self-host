@@ -2,6 +2,8 @@
 
 Ask Traqiva can answer questions using the signed-in user's authorized project evidence and private chat history. It sends bounded statistics, model summaries and recent trace metadata to OpenAI; raw traffic request/response bodies and other users' projects are excluded. Evidence links point back to the selected project's analytics and traces. The assistant cannot browse the web, run commands, execute tools or create evaluations.
 
+Ask's own usage is accounted separately from connected-agent traffic. Project charts, trace lists and evidence exclude first-party assistant audit records. The sidebar AI credits row reads the real lifetime ledger, while the lower-right Traqiva AI button opens the same assistant in a compact window without changing the underlying page filters. Observability, runtime and routing plan previews do not spend this AI allowance.
+
 ## Operator setup
 
 Self-hosted installations leave hosted Ask disabled by default. The installation operator supplies and pays for OpenAI access; the template includes no provider credential or sponsored account credit.

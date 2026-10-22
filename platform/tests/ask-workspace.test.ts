@@ -27,6 +27,7 @@ describe('Ask workspace safety and presentation', () => {
     expect(askProjectPath('/api/ask/status', 'p&foreign')).toBe('/api/ask/status?project=p%26foreign');
     expect(askProjectPath('/api/ask/status')).toBeNull();
     expect(askMoney(NaN)).toBe('—'); expect(askMoney(0)).toBe('$0.00'); expect(askMoney(.0002)).toBe('$0.0002');
+    expect(askMoney(.9995)).toBe('$0.9995'); expect(askMoney(.7)).toBe('$0.70');
   });
   it('offers only implemented evidence analysis questions', () => {
     expect(askQuestions.map(item => item.command)).toEqual(['/investigate', '/cache', '/compare']);

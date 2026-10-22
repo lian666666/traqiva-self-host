@@ -9,6 +9,7 @@ import type { DemoView } from './demoData';
 import { DemoTraffic } from './DemoTraffic';
 import { DemoEvaluate } from './DemoEvaluate';
 import { DemoWorkspace } from './DemoWorkspace';
+import { DemoAssistantDock,DemoUsageMeters } from './DemoAssistantDock';
 import './demo.css';
 import './demo-overview.css';
 
@@ -22,11 +23,11 @@ const trafficViews=new Set<DemoView>(traffic.map(item=>item.view));
 
 export default function InteractiveDemo({standalone=false,initialView='home'}:{standalone?:boolean;initialView?:DemoView}){
   const [state,dispatch]=useReducer(demoReducer,initialView,view=>({...createDemoState(),view:availableDemoView(view)}));
-  const [navigation,setNavigation]=useState(false),[more,setMore]=useState(false),[workspace,setWorkspace]=useState(false),[groups,setGroups]=useState({Traffic:true,Improve:true,Evaluate:true,Admin:true});
+  const [navigation,setNavigation]=useState(false),[more,setMore]=useState(false),[workspace,setWorkspace]=useState(false),[assistantOpen,setAssistantOpen]=useState(false),[groups,setGroups]=useState({Traffic:true,Improve:true,Evaluate:true,Admin:true});
   const main=useRef<HTMLDivElement>(null),frame=useRef<HTMLDivElement>(null),navOpener=useRef<HTMLButtonElement>(null),navClose=useRef<HTMLButtonElement>(null),projectOpener=useRef<HTMLButtonElement>(null);
   function go(view:DemoView){dispatch({type:'navigate',view:availableDemoView(view)});setNavigation(false);setWorkspace(false);if(navigation)requestAnimationFrame(()=>main.current?.focus({preventScroll:true}));}
   function closeNavigation(){setNavigation(false);requestAnimationFrame(()=>navOpener.current?.focus());}
-  function reset(){dispatch({type:'reset'});setMore(false);setWorkspace(false);setNavigation(false);setGroups({Traffic:true,Improve:true,Evaluate:true,Admin:true});main.current?.scrollTo({top:0});}
+  function reset(){dispatch({type:'reset'});setMore(false);setWorkspace(false);setNavigation(false);setAssistantOpen(false);setGroups({Traffic:true,Improve:true,Evaluate:true,Admin:true});main.current?.scrollTo({top:0});}
   useEffect(()=>{if(!state.selectedTrace)main.current?.scrollTo({top:0});},[state.view,state.selectedTrace]);
   useEffect(()=>{
     if(!navigation&&!workspace)return;
@@ -48,12 +49,14 @@ export default function InteractiveDemo({standalone=false,initialView='home'}:{s
       <div className="demo-shortcuts" aria-label="Demo spaces">{([{view:'home',icon:Home},{view:'sessions',icon:Terminal},{view:'ask',icon:MessageCircle},{view:'inbox',icon:Inbox}] as NavigationItem[]).map(({view,icon:Icon})=><button key={view} type="button" title={demoTitles[view]} aria-label={`Demo ${demoTitles[view]}`} aria-pressed={state.view===view} onClick={()=>go(view)}><Icon size={15}/>{view==='inbox'&&<small>{state.notifications.length}</small>}</button>)}</div>
       <nav className="demo-navigation" aria-label="Demo modules">{item({view:'home',icon:Home})}{group('Traffic',traffic)}{group('Improve',[{view:'improvements',icon:SlidersHorizontal},{view:'sessions',icon:Terminal}])}{AGENT_BUILDER_ENABLED&&group('Evaluate',evaluations)}{group('Admin',[{view:'governance',icon:ShieldCheck},{view:'settings',icon:Settings2}])}</nav>
       <Link className="demo-setup-link" to="/signup">Set up your own project<ArrowRight size={14}/></Link>
+      <DemoUsageMeters/>
     </aside>
     <div className="demo-main" inert={navigation?true:undefined}><header className="demo-header"><button ref={navOpener} type="button" className="demo-mobile-open demo-icon" onClick={()=>setNavigation(true)} aria-label="Open demo navigation" aria-expanded={navigation}><Menu size={17}/></button><strong aria-live="polite">{demoTitles[state.view]}</strong><span className="demo-sample-label"><i/>Sample project</span><div><button type="button" className="demo-icon" title="Reset demo" aria-label="Reset demo" onClick={reset}><RotateCcw size={14}/></button><button type="button" className="demo-icon" title={`Use ${state.theme==='light'?'dark':'light'} demo theme`} aria-label={`Use ${state.theme==='light'?'dark':'light'} demo theme`} onClick={()=>dispatch({type:'set',key:'theme',value:state.theme==='light'?'dark':'light'})}>{state.theme==='light'?<Moon size={14}/>:<Sun size={14}/>}</button>{!standalone&&<Link className="demo-icon" to={`/demo?view=${state.view}`} title="Open demo full screen" aria-label="Open demo full screen"><Expand size={14}/></Link>}</div></header>
       <div ref={main} className="demo-content" role="region" tabIndex={-1} aria-label={`${demoTitles[state.view]} demo content`}>
         {trafficViews.has(state.view)?<DemoTraffic {...props}/>:AGENT_BUILDER_ENABLED&&evalViews.has(state.view)?<DemoEvaluate {...props}/>:<DemoWorkspace {...props}/>}
       </div>
       <footer className="demo-footer"><span><i/>Interactive demo · fictional data</span><span>Changes reset on reload</span></footer>
+      <DemoAssistantDock {...props} open={assistantOpen} onOpenChange={setAssistantOpen}/>
     </div>
   </div>;
 }
