@@ -8,6 +8,7 @@ import { googleAvailable, registerGoogleAuth } from './google';
 import { githubAvailable, registerGithubAuth } from './github';
 import { onboardingFor, registerOnboarding, requireTerms, termsFor } from './onboarding';
 import { registerDeveloperSessions } from './developer-sessions';
+import { registerAgentUsage } from './agent-usage';
 import { AUTO_MODEL, autoSettings, routeAuto, validateAutoSettings } from './auto';
 import { sampledWasteRules, WASTE_SAMPLE_LIMIT, WASTE_WINDOW_DAYS } from './waste';
 import { autoRequestBody } from './json-fields';
@@ -111,6 +112,7 @@ registerGithubAuth(app, { currentUser, createSession, authLimit });
 app.get('/api/auth/providers', c => c.json({ google: googleAvailable(c.env, c.req.url), github: githubAvailable(c.env, c.req.url) }));
 registerOnboarding(app, { userRequired, workspaceFor });
 registerDeveloperSessions(app, { userProject });
+registerAgentUsage(app, { userProject });
 app.get('/api/auto', async c => {
   const { project } = await userProject(c, c.req.query('project'));
   return c.json({ settings: await autoSettings(c.env, project.id), sentinel: AUTO_MODEL, method: 'rules_v1' });

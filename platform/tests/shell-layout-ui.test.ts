@@ -14,10 +14,14 @@ const render=(path='/app/developers/sessions')=>renderToStaticMarkup(createEleme
 beforeEach(()=>{state.connected=false;});
 
 describe('Reference workspace layout',()=>{
-  it('shows the active product and its description directly in the sidebar',()=>{
+  it('shows all four product options directly, with the deferred Evals option disabled',()=>{
     const html=render();
-    expect(html).toContain('Switch product. Current product: Developer insights');
-    expect(html).toContain('Coding agents you use');
+    expect(html).toContain('aria-label="Products"');
+    expect(html).toContain('Observability');
+    expect(html).toContain('Developer insights');
+    expect(html).toContain('Admin');
+    expect(html).toMatch(/<button[^>]*disabled[^>]*>[\s\S]*?Evals[\s\S]*?Coming soon/);
+    expect(html).not.toContain('Switch product.');
     expect(html).toContain('Ask Traqiva');
     expect(html).toContain('Inbox');
   });
@@ -32,16 +36,21 @@ describe('Reference workspace layout',()=>{
     expect(html).not.toContain('href="/app/developers/repositories"');
     expect(html).not.toContain('href="/app/developers/delivery"');
   });
-  it('keeps shared coding traffic tools while hiding the disabled builder product',()=>{
+  it('keeps recorded-traffic tools available without activating the deferred builder product',()=>{
     const html=render('/app/gateway');
-    expect(html).toContain('Coding agents you use');
     expect(html).not.toContain('Agents you build');
     expect(html).not.toContain('href="/app/evals"');
     expect(html).toContain('href="/app/traces"');
     expect(html).toContain('href="/app/dashboards"');
     expect(html).toContain('href="/app/controls"');
-    expect(html).toContain('href="/app/developers/sessions"');
     expect(html).toContain('<strong>Project keys</strong>');
+  });
+  it('uses the Agent usage title and a focused Admin sidebar',()=>{
+    expect(render('/app/developers/usage')).toContain('<strong>Agent usage</strong>');
+    const admin=render('/app/admin');
+    expect(admin).toContain('Governance');
+    expect(admin).toContain('<strong>Settings</strong>');
+    expect(admin).not.toContain('reference-group-traffic');
   });
   it('shows setup progress from project and real connection evidence',()=>{
     expect(render()).toContain('1 of 2');

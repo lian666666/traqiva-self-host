@@ -2,7 +2,7 @@
   "schema": 1,
   "template": "traqiva-self-host",
   "history_exported": false,
-  "generated_at": "2026-10-22T16:28:38.493Z",
+  "generated_at": "2026-10-22T16:47:26.840Z",
   "files": [
     {
       "path": ".gitattributes",
@@ -231,8 +231,8 @@
     },
     {
       "path": "platform/docs/CAPABILITIES.md",
-      "bytes": 29551,
-      "sha256": "d9dc05a255cfdeca096b32d8502f1643d372e226c2f336c4d1cf531f11093ddb"
+      "bytes": 33092,
+      "sha256": "a10201bec470dcfea9853f747303b947c748e82fd6cadfaed3ffa814529baf2d"
     },
     {
       "path": "platform/docs/GITHUB_AUTH.md",
@@ -4360,6 +4360,11 @@
       "sha256": "28cce68a43fb892523f09a57121e887875767a7fa1e6ceaf02d877376a2a35d8"
     },
     {
+      "path": "platform/server/agent-usage.ts",
+      "bytes": 7609,
+      "sha256": "179c0444a7f302f96a7600761fbabbbc8877ca8ae798f2c4665172d90731d62b"
+    },
+    {
       "path": "platform/server/assistant.ts",
       "bytes": 5520,
       "sha256": "df4ecdc15e80838810cea5217a40bcdbad0dfd23b4fc663e5ac4cadc8414b02a"
@@ -4386,8 +4391,8 @@
     },
     {
       "path": "platform/server/index.ts",
-      "bytes": 53824,
-      "sha256": "4bfd053f40b06803d05a5ebb9ef5f33bc731ebf5c72a1d9fee32426a45f108c5"
+      "bytes": 53918,
+      "sha256": "0883933c4c66a83f53d97bbfcce6bd118f9e96fa5e419dd824da79886d4b99b3"
     },
     {
       "path": "platform/server/json-fields.ts",
@@ -4426,8 +4431,8 @@
     },
     {
       "path": "platform/src/App.tsx",
-      "bytes": 3433,
-      "sha256": "c439c35fe0a7e53e1e16bbd200e96456b3c05c03e8a88c68059329752659a48c"
+      "bytes": 3475,
+      "sha256": "96b43cba21c09a6bf32f0b224ee2f81b72f82c33bd5106899820bc12f13bae35"
     },
     {
       "path": "platform/src/Auth.tsx",
@@ -4635,9 +4640,34 @@
       "sha256": "2e94b302a4217ad931fb61d8d7754c49159a643a08ba63edb26658135028bdb1"
     },
     {
+      "path": "platform/src/pages/admin-settings.css",
+      "bytes": 9567,
+      "sha256": "907adc21a704059acc61e544d6697944e95e6aad0b7080ea607eb564798ff99b"
+    },
+    {
       "path": "platform/src/pages/Admin.tsx",
-      "bytes": 6670,
-      "sha256": "63c70cd76a9fc91449d89263da0203860acf24c991eaf28e3e4ff83b64bf3f39"
+      "bytes": 14622,
+      "sha256": "1e930c83d14c57bcdd76e42bfe180c7747537e4ebc9560be8cb23291d4e96170"
+    },
+    {
+      "path": "platform/src/pages/adminSettings.ts",
+      "bytes": 760,
+      "sha256": "f2279d542dc01d0f14214640a897c7068121345d014150e2f673e161311ba78b"
+    },
+    {
+      "path": "platform/src/pages/agent-usage.css",
+      "bytes": 10513,
+      "sha256": "0377d0c56d0f0e9f34e4574194b0bcfd4aae26e6b9e2bf162f70b5c8117f43ce"
+    },
+    {
+      "path": "platform/src/pages/AgentUsage.tsx",
+      "bytes": 11655,
+      "sha256": "5ad26e5d3b6f1c329c3e42d9f018ae2648bf4aa7e36a42728017ab6b39a98f7c"
+    },
+    {
+      "path": "platform/src/pages/agentUsageData.ts",
+      "bytes": 2043,
+      "sha256": "668e03bfb9cf1ecc7ebfc57d8389c07b5ff4bb762ccd0123d044e87ce0db16b9"
     },
     {
       "path": "platform/src/pages/Ask.tsx",
@@ -4705,9 +4735,19 @@
       "sha256": "744bb53747b5ac9a62aba96eb85629ce826eb6de012ad11314422ba0e7df79b7"
     },
     {
+      "path": "platform/src/pages/inbox.css",
+      "bytes": 7922,
+      "sha256": "97c02e792d863edf57e9c3b0c86bbf4da21d2a27ac9e3a2cb55d614b0d4cbbd0"
+    },
+    {
       "path": "platform/src/pages/Inbox.tsx",
-      "bytes": 1581,
-      "sha256": "73509bd5f8a52e91187fb6b69d6b19b9227322b781637e0801be418fdb92a787"
+      "bytes": 8754,
+      "sha256": "20a68a575ef98ec488d089fc3b33658eee8fc77ef73f0e040fa1ea84a4afb566"
+    },
+    {
+      "path": "platform/src/pages/inboxReports.ts",
+      "bytes": 3135,
+      "sha256": "c8d0cb4205d7d5fed8b92f95439048d519b26c8ec4c085f0513965384d63a0c1"
     },
     {
       "path": "platform/src/pages/Traces.tsx",
@@ -4741,13 +4781,13 @@
     },
     {
       "path": "platform/src/shell-reference.css",
-      "bytes": 12084,
-      "sha256": "5847762d1d8f3f49309683524b3ce9b16beb53bcdce4ce8520d6cda0d6cc1a22"
+      "bytes": 13096,
+      "sha256": "a5b86b9391c14d4cbc839f94521d73f8576c5f382dfbabf1af8847598c282241"
     },
     {
       "path": "platform/src/Shell.tsx",
-      "bytes": 17848,
-      "sha256": "3fe2affd15e77fe487f62b6b9eff11d89918b1d0e137fbcfa9204c935a20cb5c"
+      "bytes": 18505,
+      "sha256": "2349fd39fdb9f163824f85ba9faf2aad5dff4b44074c97fa8f01f75e20cdd0b7"
     },
     {
       "path": "platform/src/styles.css",
@@ -4768,6 +4808,26 @@
       "path": "platform/src/useConnectionStatus.ts",
       "bytes": 1932,
       "sha256": "f415277c21c6b1eeed4f46432b1717cf6dc3b12f1c51cf0a7ea238d5ff922fea"
+    },
+    {
+      "path": "platform/tests/admin-settings-ui.test.ts",
+      "bytes": 3974,
+      "sha256": "d09ca08a842efbc49b194097d8649cd728ffd2987bec0067582f673567d3bbda"
+    },
+    {
+      "path": "platform/tests/admin-settings.test.ts",
+      "bytes": 1930,
+      "sha256": "5833fe97830241ec9c353b4ad896bbb49ef3826927c88c476f991899a8e365ba"
+    },
+    {
+      "path": "platform/tests/agent-usage-ui.test.ts",
+      "bytes": 6962,
+      "sha256": "3efbb954bf397f9f7688e92217f87c162e8267db99e0ef632d4805d28aebaeec"
+    },
+    {
+      "path": "platform/tests/backend-agent-usage.test.ts",
+      "bytes": 11906,
+      "sha256": "5226ddfec9594d2716e37829123ecff490b698fb8979591da981a662c2723ef8"
     },
     {
       "path": "platform/tests/backend-api.test.ts",
@@ -4831,8 +4891,8 @@
     },
     {
       "path": "platform/tests/coding-workspace-pages-ui.test.ts",
-      "bytes": 3254,
-      "sha256": "6b526fc65695a5aa841544b5d6b6b95edfa01ce0d113ebc62dbbbf74a217f901"
+      "bytes": 3249,
+      "sha256": "f80fe7c9d3431c82a586406bce32179c8a7efa9508e7b400e939aa7fedffdcb6"
     },
     {
       "path": "platform/tests/developer-sessions-ui.test.ts",
@@ -4848,6 +4908,16 @@
       "path": "platform/tests/google-auth-ui.test.ts",
       "bytes": 1889,
       "sha256": "9e46686e2d3a1a43cd0cc6ecf5413dc3c3cbf8ad155b0f5337ac2c79ec4f5292"
+    },
+    {
+      "path": "platform/tests/inbox-reports-ui.test.ts",
+      "bytes": 3492,
+      "sha256": "c0138da4ee933664318fe9b32adaea39ecfa36a7332b0e18356bb479688742ff"
+    },
+    {
+      "path": "platform/tests/inbox-reports.test.ts",
+      "bytes": 3789,
+      "sha256": "26d49f7dacc652f27ebce31d12eca3236a9e6a02f39c7604a9854150ba598028"
     },
     {
       "path": "platform/tests/landing-quickstart.test.ts",
@@ -4901,8 +4971,8 @@
     },
     {
       "path": "platform/tests/shell-layout-ui.test.ts",
-      "bytes": 2857,
-      "sha256": "097a3f925a19654764884e1da5b5861ef0d9a35d3908b5cea0b324e377ca2fd1"
+      "bytes": 3312,
+      "sha256": "478da02bf191d733896622af337d572fde6457950371f3e172e726443bcace04"
     },
     {
       "path": "platform/tests/six-controls-ui.test.ts",

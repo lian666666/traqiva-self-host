@@ -1,0 +1,71 @@
+.admin-settings-page{padding:8px 0 28px;color:var(--text);min-width:0}
+.admin-settings-title{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.admin-settings-tabs{display:flex;align-items:center;gap:27px;border-bottom:1px solid var(--border);margin:0 0 30px;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;white-space:nowrap;min-height:42px}
+.admin-settings-tabs>a,.admin-settings-tabs>button{display:inline-flex;align-items:center;font-size:13px;font-weight:450;min-height:42px;padding:0 0 15px;border-bottom:2px solid transparent;color:var(--muted);margin-bottom:-1px;flex-shrink:0}
+.admin-settings-tabs>a[aria-current=page]{border-bottom-color:var(--text);color:var(--text);font-weight:550}
+.admin-settings-tabs>button:disabled{opacity:.55;cursor:not-allowed}
+.admin-general-layout{display:flex;flex-direction:column;gap:22px;max-width:800px;margin-left:clamp(0px,6vw,112px);min-width:0}
+.admin-settings-subnav{display:flex;flex-direction:row;align-self:flex-start;gap:0;padding:3px;background:var(--subtle);border-radius:7px;max-width:100%;overflow-x:auto;scrollbar-width:thin}
+.admin-settings-subnav>a,.admin-settings-subnav>button{display:inline-flex;align-items:center;justify-content:center;font-size:13px;text-align:left;min-height:29px;padding:5px 10px;border-radius:5px;color:var(--muted);font-weight:450;white-space:nowrap}
+.admin-settings-subnav>a[aria-current=page]{background:var(--surface);color:var(--text);font-weight:500;box-shadow:0 1px 3px #00000014}
+.admin-settings-subnav>button:disabled{cursor:not-allowed;opacity:.55}
+.admin-settings-stack{display:flex;flex-direction:column;gap:22px;min-width:0}
+.admin-settings-card{border:1px solid var(--border);border-radius:9px;background:var(--surface);overflow:hidden;min-width:0}
+.admin-settings-card>header{padding:23px 25px 17px}
+.admin-settings-card h2{font-size:17px;letter-spacing:-.02em;font-weight:550;line-height:1.4;margin:0 0 7px}
+.admin-settings-card>header p{font-size:12px;line-height:1.7;color:var(--muted);margin:0}
+.admin-organization-row{display:grid;grid-template-columns:160px minmax(0,1fr);align-items:start;gap:18px;padding:19px 25px;border-top:1px solid var(--border);font-size:13px}
+.admin-organization-row.admin-name-row{border-top:0;padding-top:13px}
+.admin-row-label{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:500;line-height:1.5;padding-top:8px;color:var(--text)}
+.admin-row-label>svg{color:var(--muted)}
+.admin-name-form{display:flex;gap:9px;align-items:flex-start;flex-wrap:wrap;min-width:0}
+.admin-name-form>input{flex:1;min-width:100px;width:0;font-size:12px;min-height:35px;padding:7px 10px;border:1px solid var(--border);border-radius:5px;background:var(--surface);color:var(--text)}
+.admin-settings-page .button{font-size:12px;min-height:35px;padding:7px 13px;line-height:1.5;gap:7px;border-radius:5px;white-space:nowrap;font-weight:500}
+.admin-name-form>.notice{width:100%;margin:3px 0 0;font-size:11px}
+.admin-copy-value{display:flex;align-items:center;gap:9px;min-height:32px;min-width:0}
+.admin-copy-value>code{font-size:12px;overflow-wrap:anywhere;line-height:1.6;min-width:0}
+.admin-copy-value>.icon-button{width:26px;height:28px;min-height:28px;flex-shrink:0;color:var(--muted)}
+.admin-row-value{min-width:0}
+.admin-row-value>small{display:block;font-size:10px;color:var(--muted);margin-top:6px;line-height:1.7}
+.admin-mode-badge{display:inline-flex;align-items:center;white-space:nowrap;font-size:11px;border:1px solid var(--border);background:var(--subtle);border-radius:4px;padding:4px 8px;line-height:1.4;color:var(--text)}
+.admin-organization-row:last-child .admin-row-label{padding-top:4px}
+.admin-github-card>header{display:flex;align-items:center;justify-content:space-between;gap:18px;padding-bottom:20px}
+.admin-github-card h2{display:flex;align-items:center;gap:9px;font-size:15px}
+.admin-github-card header p{font-size:12px}
+.admin-github-status{display:flex;align-items:flex-start;gap:14px;border-top:1px solid var(--border);padding:17px 25px}
+.admin-github-status>p{font-size:11px;line-height:1.8;margin:0;color:var(--muted);max-width:550px}
+.admin-security-content,.admin-projects-card,.admin-team-card{max-width:940px;margin-left:0}
+.admin-security-content .google-account-panel{margin:0;padding:23px 25px;border-radius:9px}
+.admin-security-content .google-account-panel p{font-size:12px;line-height:1.8;max-width:650px}
+.admin-security-content .google-account-heading h3{font-size:14px}
+.admin-security-content .google-account-panel .button{width:auto}
+.admin-security-content>.notice{margin:0;font-size:12px;line-height:1.8}
+.admin-account-identity{display:flex;align-items:center;gap:12px;padding:20px 25px;border-top:1px solid var(--border)}
+.admin-account-identity>.avatar{width:34px;height:34px;font-size:12px;background:var(--subtle);color:var(--text);flex-shrink:0}
+.admin-account-identity>div{display:flex;flex-direction:column;gap:4px;flex:1;min-width:0}
+.admin-account-identity strong{font-size:12px;font-weight:500;overflow-wrap:anywhere}
+.admin-account-identity>div>span{font-size:11px;color:var(--muted);overflow-wrap:anywhere}
+.admin-project-row{display:flex;align-items:center;gap:18px;justify-content:space-between;padding:20px 25px;border-top:1px solid var(--border)}
+.admin-project-row>div{display:flex;flex-direction:column;gap:7px;min-width:0}
+.admin-project-row strong{font-size:13px;font-weight:500;overflow-wrap:anywhere}
+.admin-project-row code{font-size:10px;color:var(--muted);overflow-wrap:anywhere}
+.admin-settings-card>footer{padding:17px 25px;border-top:1px solid var(--border);font-size:11px;line-height:1.8;color:var(--muted)}
+.admin-settings-card>footer>.text-button{font-size:12px}
+.admin-card-empty{font-size:12px;line-height:1.8;color:var(--muted);padding:12px 25px 25px;margin:0}
+.admin-team-card>header{display:flex;align-items:center;justify-content:space-between;gap:15px}
+.admin-system-card .settings-section{padding:20px 25px;margin:0;border-bottom:0;border-top:1px solid var(--border)}
+.admin-system-card h3{font-size:13px;font-weight:550;margin:0 0 17px}
+.admin-system-card .settings-section>p{font-size:12px;line-height:1.7;margin-bottom:17px}
+.admin-system-card .field{color:var(--text);font-size:12px;margin-bottom:0}
+.admin-system-card .field small{font-size:11px}
+.admin-system-card .field input,.admin-system-card .field select{background:var(--surface);color:var(--text);border-color:var(--border);font-size:12px}
+.admin-system-card .radio-option.selected{border-color:var(--muted);background:var(--subtle)}
+.admin-system-card .radio-option strong{font-size:12px}
+.admin-system-card .radio-option span{font-size:11px}
+.admin-system-card .settings-save{padding:18px 25px;border-top:1px solid var(--border)}
+.admin-system-card>.notice{margin:15px 25px;font-size:12px}
+.admin-billing-content .page-intro{margin-bottom:0}.admin-billing-content .page-intro h1{font-size:21px}.admin-billing-content .billing-summary{padding-top:25px}
+@media(min-width:1500px){.admin-settings-card>header{padding:25px 28px 20px}.admin-organization-row{padding:21px 28px;grid-template-columns:185px minmax(0,1fr)}}
+@media(max-width:1100px){.admin-settings-tabs{gap:22px}.admin-general-layout{margin-left:0;gap:20px}.admin-organization-row{grid-template-columns:125px minmax(0,1fr);gap:15px;padding:17px 20px}.admin-settings-card>header{padding:21px 20px 16px}.admin-github-card>header{align-items:flex-start}.admin-github-card header p{font-size:11px}.admin-github-status{padding:17px 20px;flex-direction:column;gap:10px}}
+@media(max-width:760px){.admin-settings-page{padding-top:4px}.admin-settings-title{font-size:23px;margin-bottom:16px}.admin-settings-tabs{gap:23px;margin-bottom:23px;min-height:39px}.admin-settings-tabs>a,.admin-settings-tabs>button{font-size:12px;min-height:39px;padding-bottom:12px}.admin-general-layout{gap:19px;max-width:none}.admin-settings-subnav>a,.admin-settings-subnav>button{font-size:12px;padding:5px 10px}.admin-general-layout>.admin-settings-stack,.admin-system-card{width:100%}.admin-organization-row{grid-template-columns:120px minmax(0,1fr)}.admin-settings-card h2{font-size:16px}.admin-settings-card>header p{font-size:11px}.admin-github-card>header{flex-direction:column;gap:15px}.admin-github-card>header>.button{align-self:flex-start}.admin-security-content .google-account-panel{padding:20px}.admin-account-identity{padding:18px 20px;flex-wrap:wrap}.admin-project-row{padding:18px 20px}.admin-settings-card>footer{padding:15px 20px}.admin-team-card>header{align-items:flex-start;flex-direction:column}.admin-system-card .settings-section{padding:20px}.admin-system-card .settings-save{padding:17px 20px}.admin-billing-content .billing-summary{padding-top:23px}}
+@media(max-width:440px){.admin-settings-card>header{padding:19px 17px 15px}.admin-organization-row{display:flex;flex-direction:column;gap:8px;padding:16px 17px}.admin-row-label{padding-top:0}.admin-name-form,.admin-row-value{width:100%}.admin-name-form>input{min-width:0}.admin-settings-stack{gap:18px}.admin-github-status{padding:16px 17px}.admin-account-identity>.admin-mode-badge{margin-left:46px}.admin-project-row{align-items:flex-start;flex-direction:column;gap:12px}.admin-security-content .google-account-panel{padding:19px 17px}.admin-security-content .google-account-panel .button{width:100%}.admin-system-card .settings-section{padding:19px 17px}.admin-system-card .settings-save{padding:16px 17px}.admin-system-card .radio-option{padding:13px}.admin-settings-card>footer{padding:15px 17px}}

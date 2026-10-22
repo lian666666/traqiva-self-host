@@ -43,7 +43,7 @@ describe('Coding workspace pages', () => {
   });
   it('shows the honest empty state when only hidden builder notifications remain', () => {
     state.items = [{ id: 'eval', type: 'eval', title: 'Old evaluation result', created_at: '2026-10-22T00:00:00Z' }];
-    expect(render(Inbox)).toContain('You’re all caught up');
+    expect(render(Inbox)).toContain('Nothing needs you');
   });
   it('retains the independent builder content for a later release', () => {
     state.builder = true;
