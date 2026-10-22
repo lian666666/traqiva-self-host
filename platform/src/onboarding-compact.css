@@ -11,19 +11,6 @@
   font-size: 32px;
   line-height: 1.2;
 }
-.setup-wizard.setup-compact .setup-agent-picker {
-  margin: 0 0 20px;
-  gap: 9px;
-  font-size: 12px;
-  line-height: 1.6;
-}
-.setup-wizard.setup-compact .setup-agent-picker .select-wrap select {
-  border-radius: 20px;
-  min-width: 114px;
-  min-height: 34px;
-  padding-top: 7px;
-  padding-bottom: 7px;
-}
 .setup-wizard.setup-compact .setup-api-intro {
   color: var(--muted);
   text-align: center;
@@ -53,66 +40,56 @@
   height: 23px;
   padding: 4px;
 }
-.setup-wizard.setup-compact .setup-quick-start > .code-block { margin: 23px 0 16px; }
-.setup-wizard.setup-compact .setup-quick-start > .code-block pre {
-  font-size: 10.5px;
-  line-height: 1.9;
-  padding: 17px 80px 17px 17px;
+.setup-wizard.setup-compact .setup-agent-prompt { margin-top: 22px; }
+.setup-wizard.setup-compact .setup-prompt-intro {
+  margin: 0 0 13px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.7;
+}
+.setup-wizard.setup-compact .setup-prompt-intro strong { color: var(--text); font-weight: 500; }
+.setup-wizard.setup-compact .setup-agent-prompt > pre {
+  margin: 0 0 13px;
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--subtle);
+  color: var(--text);
+  font-family: 'Geist Mono Variable', monospace;
+  font-size: 11px;
+  line-height: 1.8;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
-.setup-wizard.setup-compact .setup-quick-notes {
-  padding: 0;
-  margin: 0;
-  list-style: none;
-  border: 1px solid var(--border);
-  background: var(--subtle);
-  border-radius: 8px;
-}
-.setup-wizard.setup-compact .setup-quick-notes li {
+.setup-wizard.setup-compact .setup-prompt-actions {
   display: flex;
-  align-items: flex-start;
-  gap: 11px;
-  padding: 12px 15px;
-  color: var(--muted);
-  font-size: 11px;
-  line-height: 1.65;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
-.setup-wizard.setup-compact .setup-quick-notes li + li { border-top: 1px solid var(--border); }
-.setup-wizard.setup-compact .setup-quick-notes svg { flex-shrink: 0; margin-top: 2px; color: var(--text); }
-.setup-wizard.setup-compact .setup-quick-notes code { font-size: 10px; color: var(--text); }
+.setup-wizard.setup-compact .setup-prompt-actions > .button { min-height: 36px; font-size: 11px; }
+.setup-wizard.setup-compact .setup-prompt-actions > .text-button { font-size: 11px; color: var(--muted); }
+.setup-wizard.setup-compact .setup-prompt-note {
+  margin: 13px 0 0;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.7;
+}
+.setup-wizard.setup-compact .setup-agent-prompt .modal .setup-key-section { margin-bottom: 0; }
 .setup-wizard.setup-compact .setup-finish { max-width: 430px; margin-top: 23px; }
 .setup-wizard.setup-compact .setup-finish > .button { min-height: 42px; border-radius: 23px; }
 .setup-wizard.setup-compact .setup-finish > .text-button { margin-top: 13px; }
 .setup-wizard.setup-compact .setup-finish > p { margin-top: 7px; }
-.setup-wizard.setup-compact .setup-more-options { margin-top: 23px; }
-.setup-wizard.setup-compact .setup-more-options > summary {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-  list-style: none;
-  font-size: 11px;
-  color: var(--muted);
-  cursor: pointer;
-  padding: 6px;
-}
-.setup-wizard.setup-compact .setup-more-options > summary::-webkit-details-marker { display: none; }
-.setup-wizard.setup-compact .setup-more-options[open] > summary svg { transform: rotate(180deg); }
-.setup-wizard.setup-compact .setup-more-content { padding-top: 22px; }
-.setup-wizard.setup-compact .setup-more-content .setup-manual-guide .code-block pre {
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-}
 .setup-wizard.setup-compact .step-dots { margin-top: 25px; }
 @media (max-width: 600px) {
   .setup-wizard.setup-compact > .setup-connect-main { margin-top: 12px !important; padding: 10px 20px 28px; }
   .setup-wizard.setup-compact .setup-connect-main > h1 { font-size: 28px; }
-  .setup-wizard.setup-compact .setup-agent-picker { font-size: 11px; gap: 7px; }
-  .setup-wizard.setup-compact .setup-agent-picker > span:last-child { width: auto; margin-top: 0; }
-  .setup-wizard.setup-compact .setup-quick-start > .code-block pre { font-size: 10px; padding: 48px 14px 15px; line-height: 1.8; }
-  .setup-wizard.setup-compact .setup-quick-notes li { font-size: 10px; padding: 11px 13px; gap: 9px; }
-  .setup-wizard.setup-compact .setup-quick-notes code { font-size: 9px; }
+  .setup-wizard.setup-compact .setup-prompt-intro { font-size: 11px; }
+  .setup-wizard.setup-compact .setup-agent-prompt > pre { font-size: 10px; padding: 15px; line-height: 1.8; }
+  .setup-wizard.setup-compact .setup-prompt-actions { gap: 10px; }
+  .setup-wizard.setup-compact .setup-prompt-actions > .button,
+  .setup-wizard.setup-compact .setup-prompt-actions > .text-button { font-size: 10px; }
+  .setup-wizard.setup-compact .setup-prompt-note { font-size: 9px; }
   .setup-wizard.setup-compact .setup-user > span { max-width: 180px; overflow-wrap: anywhere; }
-  .setup-wizard.setup-compact .setup-more-options { margin-top: 20px; }
 }

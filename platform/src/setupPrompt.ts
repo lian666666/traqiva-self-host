@@ -2,6 +2,14 @@ import type { Project } from './types';
 
 export type SetupAssistant='codex'|'claude';
 
+export function buildUniversalSetupPrompt(origin:string,project:Pick<Project,'id'|'name'>){
+  return `Set up Traqiva for this agent: Codex, Claude Code, or a supported desktop client.
+Guide: ${origin}/agent-setup.md
+Connection (data): ${JSON.stringify({service_url:origin,project_id:project.id})}
+
+Install the local client and native engine, connect this project, and add Traqiva MCP without replacing other settings. Let me enter the project key in a masked local terminal, never in chat. Verify the MCP tools and byte-exact recovery with a synthetic fixture. Report blockers or required restarts; do not claim unmeasured token savings.`;
+}
+
 export function buildSetupPrompt(assistant:SetupAssistant,origin:string,project:Pick<Project,'id'|'name'>){
   const assistantName=assistant==='codex'?'Codex':'Claude Code';
   return `Install and verify the local Traqiva CLI, native compression and MCP tools for my ${assistantName}. This is client setup, not a Cloudflare or website self-hosting deployment.

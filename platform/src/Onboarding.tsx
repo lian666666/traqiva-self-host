@@ -1,17 +1,14 @@
 import { useEffect,useState,type FormEvent } from 'react';
 import { Link,Navigate,useNavigate,useSearchParams } from 'react-router-dom';
-import { ArrowRight,Check,ChevronDown,Code2,LogOut,RefreshCw,ShieldCheck,Terminal } from 'lucide-react';
+import { ArrowRight,Check,LogOut,RefreshCw,ShieldCheck,Terminal } from 'lucide-react';
 import { api,date,json,useApp } from './api';
-import { Code,ErrorNotice,Logo,Select,Spinner } from './ui';
+import { ErrorNotice,Logo,Spinner } from './ui';
 import { oauthAuthError } from './googleAuth';
 import { canFinishSetup,setupProjectFor,setupStageFor,TERMS_VERSION } from './setupState';
 import { useConnectionStatus } from './useConnectionStatus';
 import type { Project,SetupGoal } from './types';
-import type { SetupAssistant } from './setupPrompt';
-import AssistantSetupCard from './components/AssistantSetupCard';
+import AgentSetupPrompt from './components/AgentSetupPrompt';
 import SetupConsent from './components/SetupConsent';
-import SetupProjectKey from './components/SetupProjectKey';
-import CompactAgentSetup from './components/CompactAgentSetup';
 import FreePlanStep from './components/FreePlanStep';
 import { AGENT_BUILDER_ENABLED } from './features/agentBuilder';
 import { BuilderApiSetup,builderSetupGoal } from './features/agentBuilder/BuilderSetup';
@@ -21,16 +18,16 @@ import './onboarding-plan.css';
 export default function Onboarding(){
   const {session,loading,error:sessionError,reload,setProject}=useApp(),navigate=useNavigate();const [params]=useSearchParams();
   const stage=setupStageFor(session),setupProject=session?setupProjectFor(session):null,termsAccepted=session?.terms?.accepted===true;
-  const [goals,setGoals]=useState<SetupGoal[]>(['coding']),[name,setName]=useState(setupProject?.name||'My project'),[busy,setBusy]=useState(''),[error,setError]=useState(''),[editingGoals,setEditingGoals]=useState(false),[consentOpen,setConsentOpen]=useState(false),[assistant,setAssistant]=useState<SetupAssistant>('codex'),[tab,setTab]=useState('cli');
+  const [goals,setGoals]=useState<SetupGoal[]>(['coding']),[name,setName]=useState(setupProject?.name||'My project'),[busy,setBusy]=useState(''),[error,setError]=useState(''),[editingGoals,setEditingGoals]=useState(false),[consentOpen,setConsentOpen]=useState(false);
   const connection=useConnectionStatus(stage,setupProject?.id||null,termsAccepted);
   const shownStage=editingGoals?'goals':stage;
   const codingGoal=!AGENT_BUILDER_ENABLED||session?.setup?.goals.includes('coding')===true;
-  const projectId=setupProject?.id||'<PROJECT_ID>',origin=location.origin;
+  const origin=location.origin;
   useEffect(()=>{document.title='Set up your workspace — Traqiva';},[]);
   useEffect(()=>{const saved=session?.setup?.goals.filter(goal=>AGENT_BUILDER_ENABLED||goal==='coding');setGoals(saved?.length?saved:['coding']);},[session?.setup?.stage]);
   useEffect(()=>{setName(setupProject?.name||'My project');},[setupProject?.id,stage]);
   useEffect(()=>{if(setupProject)setProject(setupProject);},[setupProject?.id]);
-  useEffect(()=>{if(stage==='connect'){setTab(!AGENT_BUILDER_ENABLED||session?.setup?.goals.includes('coding')?'cli':'api');if(!termsAccepted)setConsentOpen(true);}},[stage,termsAccepted]);
+  useEffect(()=>{if(stage==='connect'&&!termsAccepted)setConsentOpen(true);},[stage,termsAccepted]);
 
   async function saveGoals(){setBusy('goals');setError('');try{await api('/api/onboarding/goals',json({goals}));await reload();setEditingGoals(false);}catch(e){setError((e as Error).message);}finally{setBusy('');}}
   async function saveProject(event:FormEvent){event.preventDefault();setBusy('project');setError('');try{const result=await api<{project:Project}>('/api/onboarding/project',json({name:name.trim()}));await reload();setProject(result.project);}catch(e){setError((e as Error).message);}finally{setBusy('');}}
@@ -54,17 +51,11 @@ export default function Onboarding(){
 
       {shownStage==='connect'&&<div className="setup-connect-content">
         {!termsAccepted?<section className="setup-consent-required"><ShieldCheck size={28}/><h2>Review your workspace terms</h2><p>Accept the current terms before creating a key or connecting an agent.</p><button className="button primary" onClick={()=>setConsentOpen(true)}>Review terms<ArrowRight size={15}/></button></section>:<>
-          {codingGoal?<div className="setup-agent-picker"><span>I use</span><Select value={assistant} onChange={value=>setAssistant(value as SetupAssistant)} label="Coding assistant"><option value="codex">Codex</option><option value="claude">Claude Code</option></Select><span>for <strong>{setupProject?.name}</strong></span></div>:<p className="setup-api-intro">Connect <strong>{setupProject?.name}</strong> using your own provider account.</p>}
-          <div className="setup-status-wrap"><div className={`setup-connection-state ${connection.status?.connected?'connected':''}`} role="status" title={connection.status?.connected?`${connection.status.method==='traffic'?'Actual request traffic was received.':connection.status.method==='compression'?'A compression event was received.':'Your project key was used to connect.'}${connection.status.last_activity_at?` · ${date(connection.status.last_activity_at)}`:''}`:!connection.online?'Checks resume when you’re online.':'Updates after a real project connection.'}><span className="setup-connection-dot"/><strong>{connection.status?.connected?'Project connected':!connection.online?'You’re offline':connection.checking?'Checking your connection…':codingGoal?'Waiting for your terminal':'Waiting for your connection'}</strong><button className="icon-button" aria-label="Check connection now" onClick={connection.refresh} disabled={connection.checking||!connection.online}>{connection.checking?<Spinner/>:<RefreshCw size={14}/>}</button></div></div>
+          {!codingGoal&&<p className="setup-api-intro">Connect <strong>{setupProject?.name}</strong> using your own provider account.</p>}
+          <div className="setup-status-wrap"><div className={`setup-connection-state ${connection.status?.connected?'connected':''}`} role="status" title={connection.status?.connected?`${connection.status.method==='traffic'?'Actual request traffic was received.':connection.status.method==='compression'?'A compression event was received.':'Your project key was used to connect.'}${connection.status.last_activity_at?` · ${date(connection.status.last_activity_at)}`:''}`:!connection.online?'Checks resume when you’re online.':'Updates after a real project connection.'}><span className="setup-connection-dot"/><strong>{connection.status?.connected?'Project connected':!connection.online?'You’re offline':connection.checking?'Checking your connection…':codingGoal?'Waiting for your agent':'Waiting for your connection'}</strong><button className="icon-button" aria-label="Check connection now" onClick={connection.refresh} disabled={connection.checking||!connection.online}>{connection.checking?<Spinner/>:<RefreshCw size={14}/>}</button></div></div>
           <ErrorNotice message={connection.error} retry={connection.refresh}/>
-          {codingGoal?<CompactAgentSetup assistant={assistant} origin={origin} projectId={projectId}/>:<BuilderApiSetup origin={origin}/>}
+          {codingGoal?setupProject&&<AgentSetupPrompt key={setupProject.id} origin={origin} project={setupProject}/>:<BuilderApiSetup origin={origin}/>}
           <div className="setup-finish"><button className="button primary full-width" disabled={!canFinishSetup(connection.status,termsAccepted)||!!busy} onClick={()=>void finish(false)}>{busy==='complete'?<Spinner/>:<>Continue to workspace<ArrowRight size={16}/></>}</button><button className="text-button" disabled={!!busy} onClick={()=>void finish(true)}>{busy==='skip'?<Spinner/>:'Skip for now'}</button><p>Skipping opens an empty workspace. You can connect later.</p></div>
-          <details className="setup-more-options"><summary>More setup options<ChevronDown size={14}/></summary><div className="setup-more-content">
-            {setupProject&&<SetupProjectKey key={setupProject.id} projectId={setupProject.id}/>}
-            {setupProject&&<AssistantSetupCard origin={origin} project={setupProject} assistant={assistant} onAssistantChange={setAssistant} showAssistantSelector={!codingGoal} compact/>}
-            <div className="tabs setup-connection-tabs"><button className={tab==='cli'?'active':''} onClick={()=>setTab('cli')}><Terminal size={15}/>Coding agent</button>{AGENT_BUILDER_ENABLED&&<button className={tab==='api'?'active':''} onClick={()=>setTab('api')}><Code2 size={15}/>API / SDK</button>}</div>
-            {tab==='cli'||!AGENT_BUILDER_ENABLED?<div className="setup-manual-guide"><h2>Set up from your terminal</h2><p>Requires Node.js 22.13 or newer. These commands install the local client, not a new website.</p><Code>{`npm install --global ${origin}/cli.tgz`}</Code><p>Replace YOUR_PROJECT_KEY privately in a local terminal. Never paste it into an AI chat or source code.</p><Code>{`traqiva connect --url ${origin} --project ${projectId} --key YOUR_PROJECT_KEY\ntraqiva status`}</Code><p>Install the native engine, then print the MCP configuration for your assistant.</p><Code>{`traqiva engine install --url ${origin}\ntraqiva engine status\ntraqiva setup --agent ${assistant} --print`}</Code><div className="notice subtle"><ShieldCheck size={17}/><span>The setup command prints configuration; merge only the Traqiva MCP entry and preserve existing settings. Restart your assistant if needed. Tools run when called; this does not intercept an existing desktop chat or prove token savings.</span></div><Link className="text-button" to="/deploy" target="_blank">Host the website yourself<ArrowRight size={13}/></Link></div>:<BuilderApiSetup origin={origin}/>}
-          </div></details>
         </>}
       </div>}
       <div className="step-dots">{['goals','project','connect'].map(value=><span className={value===shownStage?'active':''} key={value}/>)}</div>

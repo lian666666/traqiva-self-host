@@ -4,7 +4,6 @@ import { MemoryRouter } from 'react-router-dom';
 import { beforeEach,describe,expect,it,vi } from 'vitest';
 import type { ConnectionStatus,Session } from '../src/types';
 import Onboarding from '../src/Onboarding';
-import CompactAgentSetup from '../src/components/CompactAgentSetup';
 
 const state=vi.hoisted(()=>({session:null as Session|null,status:null as ConnectionStatus|null,online:true,checking:false,error:''}));
 vi.mock('../src/api',()=>({
@@ -14,7 +13,6 @@ vi.mock('../src/api',()=>({
 vi.mock('../src/useConnectionStatus',()=>({useConnectionStatus:()=>({status:state.status,online:state.online,checking:state.checking,error:state.error,refresh:()=>{}})}));
 
 function renderSetup(){return renderToStaticMarkup(createElement(MemoryRouter,{initialEntries:['/onboarding']},createElement(Onboarding)));}
-function primarySetup(html:string){return html.split('<details class="setup-more-options"')[0];}
 
 beforeEach(()=>{
   vi.stubGlobal('location',{origin:'https://traqiva.example.test'});
@@ -23,17 +21,23 @@ beforeEach(()=>{
 });
 
 describe('Compact coding-agent onboarding',()=>{
-  it('keeps one terminal block in the main view and puts longer setup options behind closed details',()=>{
-    const html=renderSetup(),primary=primarySetup(html);
-    expect(html).toContain('<details class="setup-more-options">');
-    expect(html).not.toContain('<details class="setup-more-options" open');
-    expect(primary.match(/class="code-block"/g)).toHaveLength(1);
-    expect(primary).toContain('Set up your coding agent.');
-    expect(primary).toContain('Waiting for your terminal');
-    expect(primary).not.toContain('Create a project key');
-    expect(primary).not.toContain('Let your AI handle setup');
-    expect(html).toContain('Create a project key');
+  it('shows a copyable AI setup prompt immediately with a compact private-key entry point',()=>{
+    const html=renderSetup();
+    expect(html).toContain('Set up your coding agent.');
+    expect(html).toContain('Waiting for your agent');
+    expect(html).toMatch(/<pre[^>]*>[\s\S]*https:\/\/traqiva\.example\.test\/agent-setup\.md[\s\S]*<\/pre>/);
+    expect(html).toContain('project-test');
+    expect(html).toContain('Codex');
+    expect(html).toContain('Claude Code');
     expect(html).toContain('Copy setup prompt');
+    expect(html).toMatch(/<button[^>]*>[\s\S]*?Project key<\/button>/);
+    expect(html).not.toContain('Create a project key');
+    expect(html).not.toContain('<details');
+    expect(html).not.toContain('More setup options');
+    expect(html).not.toContain('Coding assistant');
+    expect(html).not.toContain('Set up from your terminal');
+    expect(html).not.toContain('npm install');
+    expect(html).not.toContain('traqiva connect');
     expect(html).not.toContain('API / SDK');
   });
 
@@ -54,26 +58,30 @@ describe('Compact coding-agent onboarding',()=>{
     const html=renderSetup();
     expect(html).toContain('Review your workspace terms');
     expect(html).not.toContain('Create a project key');
+    expect(html).not.toContain('Project key');
+    expect(html).not.toContain('Copy setup prompt');
+    expect(html).not.toContain('/agent-setup.md');
     expect(html).not.toContain('Continue to workspace');
     expect(html).not.toContain('traqiva connect');
   });
 
   it('keeps offline and retry feedback visible without claiming a connection',()=>{
     state.online=false;state.error='Connection check failed';
-    const primary=primarySetup(renderSetup());
-    expect(primary).toContain('You’re offline');
-    expect(primary).toContain('Connection check failed');
-    expect(primary).toContain('Try again');
-    expect(primary).not.toContain('Project connected');
+    const html=renderSetup();
+    expect(html).toContain('You’re offline');
+    expect(html).toContain('Connection check failed');
+    expect(html).toContain('Try again');
+    expect(html).not.toContain('Project connected');
   });
 
   it('does not expose a deferred API setup through a legacy application-only goal',()=>{
     state.session!.setup!.goals=['observe'];
-    const primary=primarySetup(renderSetup());
-    expect(primary).toContain('Set up your coding agent.');
-    expect(primary).not.toContain('Connect your application.');
-    expect(primary).not.toContain('Point your API client to Traqiva');
-    expect(primary).not.toContain('baseURL:');
+    const html=renderSetup();
+    expect(html).toContain('Set up your coding agent.');
+    expect(html).toContain('Copy setup prompt');
+    expect(html).not.toContain('Connect your application.');
+    expect(html).not.toContain('Point your API client to Traqiva');
+    expect(html).not.toContain('baseURL:');
   });
 
   it('starts at an explicit first step with only the current coding-agent product',()=>{
@@ -87,14 +95,4 @@ describe('Compact coding-agent onboarding',()=>{
     expect(html).not.toContain('Start on Free');
   });
 
-  it.each(['codex','claude'] as const)('uses the selected %s integration in one supported command sequence',assistant=>{
-    const html=renderToStaticMarkup(createElement(CompactAgentSetup,{assistant,origin:'https://traqiva.example.test',projectId:'project-test'}));
-    expect(html).toContain('npm install --global https://traqiva.example.test/cli.tgz');
-    expect(html).toContain('traqiva connect --url https://traqiva.example.test --project project-test --key YOUR_PROJECT_KEY');
-    expect(html).toContain('traqiva engine install --url https://traqiva.example.test');
-    expect(html).toContain(`traqiva setup --agent ${assistant} --print`);
-    expect(html).not.toContain('&lt;PRIVATE_PROJECT_KEY&gt;');
-    expect(html).toContain(assistant==='codex'?'settings to Codex':'settings to Claude Code');
-    expect(html).toContain('Tools run when called.');
-  });
 });

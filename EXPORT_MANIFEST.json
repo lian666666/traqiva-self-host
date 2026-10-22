@@ -2,7 +2,7 @@
   "schema": 1,
   "template": "traqiva-self-host",
   "history_exported": false,
-  "generated_at": "2026-10-22T16:16:21.927Z",
+  "generated_at": "2026-10-22T16:28:38.493Z",
   "files": [
     {
       "path": ".gitattributes",
@@ -231,8 +231,8 @@
     },
     {
       "path": "platform/docs/CAPABILITIES.md",
-      "bytes": 28049,
-      "sha256": "f7305528ac68943031338a602f29682304f63b5bc566e059afff99dc056e708d"
+      "bytes": 29551,
+      "sha256": "d9dc05a255cfdeca096b32d8502f1643d372e226c2f336c4d1cf531f11093ddb"
     },
     {
       "path": "platform/docs/GITHUB_AUTH.md",
@@ -343,6 +343,11 @@
       "path": "platform/public/_headers",
       "bytes": 509,
       "sha256": "3fb5572c18dfcaa5b22492cc3b1b257e4510b49be90ce6651ee2cfff5458fb5f"
+    },
+    {
+      "path": "platform/public/agent-setup.md",
+      "bytes": 6254,
+      "sha256": "88459ca607902b45e3bec41eae8b518e7539c9d1afa2acf7f83561a1ae20c7f0"
     },
     {
       "path": "platform/public/cli.tgz",
@@ -4430,6 +4435,11 @@
       "sha256": "2fae8378d467703061978e3571b1658b8e77036944c52851da2abbffe5026e3b"
     },
     {
+      "path": "platform/src/components/AgentSetupPrompt.tsx",
+      "bytes": 1345,
+      "sha256": "ee3bd6b32e9101dcb572ad4298420bca96949a626525bf4a4fe18bf1a9de93ca"
+    },
+    {
       "path": "platform/src/components/AssistantSetupCard.tsx",
       "bytes": 3280,
       "sha256": "4ee5277cbb51bfd2de031a2fe1e2a583301ff754409ba668290f98106f5f2e26"
@@ -4471,8 +4481,8 @@
     },
     {
       "path": "platform/src/components/SetupProjectKey.tsx",
-      "bytes": 1957,
-      "sha256": "b2ee9a0a46b9ed8228ef6c79a766b94b3842841222c6aa44451eac230fc73c53"
+      "bytes": 2032,
+      "sha256": "55d8cefa5f60c7ae0e4b712ad7a437a0a94f9a10901a0575c0e66d1330e48367"
     },
     {
       "path": "platform/src/demo/demo-overview.css",
@@ -4611,8 +4621,8 @@
     },
     {
       "path": "platform/src/onboarding-compact.css",
-      "bytes": 4446,
-      "sha256": "3b3a45e4255c35d14a3f94662547be4e9db92f53da24376031fa162cd907271a"
+      "bytes": 3618,
+      "sha256": "b42d0bb84b51ce8fb84478b3580e5117f1d0fa7dbf37d235258162c72776339b"
     },
     {
       "path": "platform/src/onboarding-plan.css",
@@ -4621,8 +4631,8 @@
     },
     {
       "path": "platform/src/Onboarding.tsx",
-      "bytes": 11468,
-      "sha256": "5850dfdcf41ac7b2fe60e4f7056b932393ef0fa39af853c8421b5cb0486e13a4"
+      "bytes": 8805,
+      "sha256": "2e94b302a4217ad931fb61d8d7754c49159a643a08ba63edb26658135028bdb1"
     },
     {
       "path": "platform/src/pages/Admin.tsx",
@@ -4721,8 +4731,8 @@
     },
     {
       "path": "platform/src/setupPrompt.ts",
-      "bytes": 3999,
-      "sha256": "9dbdbf365d297a821b357243f43cd58610eab528b09df2f2dc3bf96378f6d1b3"
+      "bytes": 4642,
+      "sha256": "578f7f46984ba6c64f209a3979b6cae9519e888bfcae136f36bfc6e44a83c0d0"
     },
     {
       "path": "platform/src/setupState.ts",
@@ -4851,8 +4861,8 @@
     },
     {
       "path": "platform/tests/onboarding-compact-ui.test.ts",
-      "bytes": 5869,
-      "sha256": "118803b7f718f31055619736989fd004da98492211a947054d44277910a13728"
+      "bytes": 5221,
+      "sha256": "d1f3601c9a0ac3a6be9e23550c4c2595fa44e93d8755788a1f391545adb80401"
     },
     {
       "path": "platform/tests/onboarding-free-plan-ui.test.ts",
@@ -4903,6 +4913,11 @@
       "path": "platform/tests/trace-routing-ui.test.ts",
       "bytes": 2807,
       "sha256": "66a160db6c6c89104523260a5caed546e76b432b5e02c92fc449172edfaf620a"
+    },
+    {
+      "path": "platform/tests/universal-setup-prompt.test.ts",
+      "bytes": 2098,
+      "sha256": "d6f91a5c22a8cc224a7e8d454820e89d550fe102f742786f2e6e6b6622aefbf6"
     },
     {
       "path": "platform/tsconfig.json",
