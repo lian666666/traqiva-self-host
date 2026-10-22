@@ -16,7 +16,7 @@ function renderSetup(){return renderToStaticMarkup(createElement(MemoryRouter,{i
 
 beforeEach(()=>{
   vi.stubGlobal('location',{origin:'https://traqiva.example.test'});
-  state.session={user:{id:'u-setup',name:'Alex',email:'alex@example.test'},workspace:null,projects:[{id:'project-test',name:'My project'}],activeProject:{id:'project-test',name:'My project'},setup:{stage:'connect',goals:['coding'],project_id:'project-test'},terms:{version:'test',accepted:true,accepted_at:'2026-10-21T12:00:00Z'}};
+  state.session={user:{id:'u-setup',name:'Alex',email:'alex@example.test'},workspace:null,projects:[{id:'project-test',name:'Traqiva'}],activeProject:{id:'project-test',name:'Traqiva'},setup:{stage:'connect',goals:['coding'],project_id:'project-test'},terms:{version:'test',accepted:true,accepted_at:'2026-10-21T12:00:00Z'}};
   state.status={connected:false,method:null,last_activity_at:null};state.online=true;state.checking=false;state.error='';
 });
 

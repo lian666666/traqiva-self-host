@@ -18,14 +18,14 @@ import './onboarding-plan.css';
 export default function Onboarding(){
   const {session,loading,error:sessionError,reload,setProject}=useApp(),navigate=useNavigate();const [params]=useSearchParams();
   const stage=setupStageFor(session),setupProject=session?setupProjectFor(session):null,termsAccepted=session?.terms?.accepted===true;
-  const [goals,setGoals]=useState<SetupGoal[]>(['coding']),[name,setName]=useState(setupProject?.name||'My project'),[busy,setBusy]=useState(''),[error,setError]=useState(''),[editingGoals,setEditingGoals]=useState(false),[consentOpen,setConsentOpen]=useState(false);
+  const [goals,setGoals]=useState<SetupGoal[]>(['coding']),[name,setName]=useState(setupProject?.name||'Traqiva'),[busy,setBusy]=useState(''),[error,setError]=useState(''),[editingGoals,setEditingGoals]=useState(false),[consentOpen,setConsentOpen]=useState(false);
   const connection=useConnectionStatus(stage,setupProject?.id||null,termsAccepted);
   const shownStage=editingGoals?'goals':stage;
   const codingGoal=!AGENT_BUILDER_ENABLED||session?.setup?.goals.includes('coding')===true;
   const origin=location.origin;
   useEffect(()=>{document.title='Set up your workspace — Traqiva';},[]);
   useEffect(()=>{const saved=session?.setup?.goals.filter(goal=>AGENT_BUILDER_ENABLED||goal==='coding');setGoals(saved?.length?saved:['coding']);},[session?.setup?.stage]);
-  useEffect(()=>{setName(setupProject?.name||'My project');},[setupProject?.id,stage]);
+  useEffect(()=>{setName(setupProject?.name||'Traqiva');},[setupProject?.id,stage]);
   useEffect(()=>{if(setupProject)setProject(setupProject);},[setupProject?.id]);
   useEffect(()=>{if(stage==='connect'&&!termsAccepted)setConsentOpen(true);},[stage,termsAccepted]);
 

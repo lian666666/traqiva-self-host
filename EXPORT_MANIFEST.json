@@ -2,7 +2,7 @@
   "schema": 1,
   "template": "traqiva-self-host",
   "history_exported": false,
-  "generated_at": "2026-10-22T17:36:41.362Z",
+  "generated_at": "2026-10-22T17:57:14.189Z",
   "files": [
     {
       "path": ".gitattributes",
@@ -343,6 +343,11 @@
       "path": "platform/migrations/0009_ask_conversations.sql",
       "bytes": 1317,
       "sha256": "b4ad6f4204ecf20dfee435146fda22366f034b27af45619362b81f03c7ac8227"
+    },
+    {
+      "path": "platform/migrations/0010_default_project_name.sql",
+      "bytes": 221,
+      "sha256": "c132b87a48813746d1334e8f6fd85b6ebb58bcb35e1b737732c2e7c08631c9ba"
     },
     {
       "path": "platform/package-lock.json",
@@ -4411,13 +4416,13 @@
     },
     {
       "path": "platform/server/github.ts",
-      "bytes": 11503,
-      "sha256": "85aa5986998e64cb82646592319015e6fd2962178d1b58a3734fbce23a74dd7a"
+      "bytes": 11500,
+      "sha256": "229f084916e8f13869636d91e80f0baac7f6359111296eb0cf80f1226cc27b31"
     },
     {
       "path": "platform/server/google.ts",
-      "bytes": 12369,
-      "sha256": "83df922c1d25765679823707194a8663b080ddfd1864816af6c378f49348b596"
+      "bytes": 12366,
+      "sha256": "aa62d8d86ccf3110f8a6584e0a5781748eebc146d5300bc4083fdc1af9678faa"
     },
     {
       "path": "platform/server/hosted-ask.ts",
@@ -4431,8 +4436,8 @@
     },
     {
       "path": "platform/server/index.ts",
-      "bytes": 56247,
-      "sha256": "bf9a7a10c73b45d48dbc206f6b8bf71a9ef60740604f6e3a88a698054072e03c"
+      "bytes": 56244,
+      "sha256": "fd2741d0f8247dcb1568be7eb5210d3047665351b3d679793e045e1e62c58b67"
     },
     {
       "path": "platform/server/json-fields.ts",
@@ -4711,8 +4716,8 @@
     },
     {
       "path": "platform/src/Onboarding.tsx",
-      "bytes": 8805,
-      "sha256": "2e94b302a4217ad931fb61d8d7754c49159a643a08ba63edb26658135028bdb1"
+      "bytes": 8799,
+      "sha256": "f01d1fbdc9522fd8e871ff45373cc4594403852fae0a233312954d091baab14f"
     },
     {
       "path": "platform/src/pages/admin-settings.css",
@@ -4961,8 +4966,8 @@
     },
     {
       "path": "platform/tests/backend-google.test.ts",
-      "bytes": 21482,
-      "sha256": "fbd9c8b7c81b5b12677c7a24b1dd38257fe02f4268c2e668662e1e4a976cc032"
+      "bytes": 21479,
+      "sha256": "71b80ea8d78578b258b86609b5521b5f2a9c07a431547eee8efc94c4cd8a57bd"
     },
     {
       "path": "platform/tests/backend-hosted-ask.test.ts",
@@ -4971,8 +4976,8 @@
     },
     {
       "path": "platform/tests/backend-onboarding.test.ts",
-      "bytes": 14361,
-      "sha256": "f7a2b2d7278a9b6bd5bc82504774f6d7f9d1259892dbb58a6e05dfe5a020923d"
+      "bytes": 14358,
+      "sha256": "21839c9f2ce32bd443a520663676be2705f71b9f2d1d25a31ae2584caa5b2ba9"
     },
     {
       "path": "platform/tests/backend-product-flow.test.ts",
@@ -5061,8 +5066,8 @@
     },
     {
       "path": "platform/tests/onboarding-compact-ui.test.ts",
-      "bytes": 5221,
-      "sha256": "d1f3601c9a0ac3a6be9e23550c4c2595fa44e93d8755788a1f391545adb80401"
+      "bytes": 5215,
+      "sha256": "aa9a35df470114e69803bbfe257dca6881072c700bb98d90bbaa794d93621ccd"
     },
     {
       "path": "platform/tests/onboarding-free-plan-ui.test.ts",

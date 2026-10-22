@@ -147,7 +147,7 @@ app.post('/api/auth/register', async c => {
       c.env.DB.prepare('INSERT INTO users(id,name,email,password_hash,password_salt,password_iterations,created_at) VALUES(?,?,?,?,?,?,?)').bind(userId, name, email, hash.hash, hash.salt, hash.iterations, at),
       c.env.DB.prepare('INSERT INTO workspaces(id,name,created_at) VALUES(?,?,?)').bind(workspaceId, `${name}'s workspace`, at),
       c.env.DB.prepare('INSERT INTO members(workspace_id,user_id,role) VALUES(?,?,?)').bind(workspaceId, userId, 'owner'),
-      c.env.DB.prepare('INSERT INTO projects(id,workspace_id,name,created_at) VALUES(?,?,?,?)').bind(projectId, workspaceId, 'My project', at),
+      c.env.DB.prepare('INSERT INTO projects(id,workspace_id,name,created_at) VALUES(?,?,?,?)').bind(projectId, workspaceId, 'Traqiva', at),
     ]);
   } catch { throw new ApiError(409, 'Registration could not be completed. This email may already be registered.'); }
   await createSession(c, userId);

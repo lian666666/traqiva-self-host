@@ -94,7 +94,7 @@ describe('Google authorization code OIDC with real signatures and SQL state', ()
     const sessionCookie = cookieParts(response).find(value => value.startsWith('traqiva_session='))!;
     const session = await (await request('/api/session', sessionCookie)).json() as any;
     expect(session.user).toMatchObject({ name: 'Google User', email: 'google@example.test', google_linked: true });
-    expect(session.projects).toHaveLength(1); expect(session.activeProject.name).toBe('My project');
+    expect(session.projects).toHaveLength(1); expect(session.activeProject.name).toBe('Traqiva');
     expect(session.setup).toEqual({ stage: 'goals', goals: [], project_id: null });
     expect((db.raw.prepare('SELECT * FROM user_onboarding').get() as any).flow_version).toBe(2);
     expect(db.raw.prepare('SELECT role FROM members').get()).toEqual({ role: 'owner' });

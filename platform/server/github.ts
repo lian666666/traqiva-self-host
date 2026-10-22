@@ -129,7 +129,7 @@ export function registerGithubAuth(app: Hono<AppEnv>, auth: Auth) {
           c.env.DB.prepare('INSERT INTO users(id,name,email,password_hash,password_salt,password_iterations,password_enabled,created_at) VALUES(?,?,?,?,?,?,0,?)').bind(userId, identity.name, identity.email, password.hash, password.salt, password.iterations, at),
           c.env.DB.prepare('INSERT INTO workspaces(id,name,created_at) VALUES(?,?,?)').bind(workspaceId, `${identity.name}'s workspace`, at),
           c.env.DB.prepare("INSERT INTO members(workspace_id,user_id,role) VALUES(?,?,'owner')").bind(workspaceId, userId),
-          c.env.DB.prepare("INSERT INTO projects(id,workspace_id,name,created_at) VALUES(?,?,'My project',?)").bind(id(), workspaceId, at),
+          c.env.DB.prepare("INSERT INTO projects(id,workspace_id,name,created_at) VALUES(?,?,'Traqiva',?)").bind(id(), workspaceId, at),
           c.env.DB.prepare("INSERT INTO oauth_identities(provider,subject,user_id,created_at) VALUES('github',?,?,?)").bind(identity.subject, userId, at),
         ]);
       } catch {

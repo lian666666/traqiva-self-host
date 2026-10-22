@@ -85,7 +85,7 @@ describe('durable onboarding, versioned workspace consent and real connection ev
     const a = await chooseProject(one.cookie, 'Real project'), b = await request('/api/onboarding/project', one.cookie, { name: 'Real project' });
     expect((await b.json() as any).project.id).toBe(a.project.id);
     expect(db.raw.prepare('SELECT count(*) AS n FROM projects WHERE workspace_id=?').get(one.data.workspace.id)).toEqual({ n: 1 });
-    expect(db.raw.prepare('SELECT name FROM projects WHERE id=?').get(two.data.activeProject.id)).toEqual({ name: 'My project' });
+    expect(db.raw.prepare('SELECT name FROM projects WHERE id=?').get(two.data.activeProject.id)).toEqual({ name: 'Traqiva' });
     expect((await (await request('/api/session', one.cookie)).json() as any).activeProject.id).toBe(a.project.id);
   });
   it('requires an affirmative current-version owner consent, stores actor/time and audits it', async () => {
