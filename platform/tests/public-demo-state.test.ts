@@ -1,6 +1,6 @@
 import { describe,expect,it } from 'vitest';
 import { demoBriefs,demoCases,demoModels,demoNotifications,demoTraces } from '../src/demo/demoData';
-import { createDemoState,demoAnswer,demoReducer,demoSeries,demoSummary,filteredDemoTraces } from '../src/demo/demoState';
+import { createDemoState,demoAnswer,demoBriefEvidence,demoReducer,demoSeries,demoSummary,demoWorkflows,filteredDemoTraces } from '../src/demo/demoState';
 
 describe('Fictional public demo data',()=>{
   it('contains sixty internally coherent records, not a separate invented headline total',()=>{
@@ -35,6 +35,7 @@ describe('Fictional public demo data',()=>{
     expect(series).toHaveLength(7);
     expect(series.reduce((total,day)=>total+day.requests,0)).toBe(traces.length);
     expect(series.reduce((total,day)=>total+day.tokens,0)).toBe(summary.inputTokens+summary.outputTokens);
+    expect(series.reduce((total,day)=>total+day.inputTokens,0)).toBe(summary.inputTokens);
     expect(series.reduce((total,day)=>total+day.cost,0)).toBeCloseTo(summary.cost,8);
   });
 
@@ -55,6 +56,42 @@ describe('Fictional public demo data',()=>{
   it('returns honest zero/unknown aggregates for an empty filtered selection',()=>{
     expect(demoSummary({...createDemoState(),query:'no-such-record'})).toMatchObject({requests:0,cost:0,inputTokens:0,outputTokens:0,cachedTokens:0,errors:0,cachePercent:null,successPercent:null,avgLatencyMs:null,models:[]});
   });
+
+  it('groups workflows from the selected project period independently of table filters',()=>{
+    const state={...createDemoState(),days:7 as const,query:'no-such-record',model:'unknown-model',status:'error' as const};
+    const workflows=demoWorkflows(state);
+    const summary=demoSummary({...state,query:'',model:'',status:''});
+    expect(workflows).toHaveLength(4);
+    expect(workflows.reduce((total,row)=>total+row.requests,0)).toBe(summary.requests);
+    expect(workflows.reduce((total,row)=>total+row.inputTokens,0)).toBe(summary.inputTokens);
+    expect(workflows.reduce((total,row)=>total+row.cachedTokens,0)).toBe(summary.cachedTokens);
+    expect(workflows.reduce((total,row)=>total+row.cost,0)).toBeCloseTo(summary.cost,8);
+    expect(workflows.reduce((total,row)=>total+row.errors,0)).toBe(summary.errors);
+    for(const row of workflows){
+      expect(row.cachePercent).toBeCloseTo(row.cachedTokens/row.inputTokens*100,8);
+      expect(row.requests).toBeGreaterThan(0);
+    }
+    expect(workflows.map(row=>row.cost)).toEqual([...workflows.map(row=>row.cost)].sort((a,b)=>b-a));
+  });
+
+  it('ties every brief to relevant fixture evidence and filters that evidence by period',()=>{
+    const retry=demoBriefs.find(brief=>brief.id==='demo-brief-retries')!;
+    const context=demoBriefs.find(brief=>brief.id==='demo-brief-context')!;
+    const cache=demoBriefs.find(brief=>brief.id==='demo-brief-cache')!;
+    expect(retry.traceIds).toEqual(demoTraces.filter(trace=>trace.status==='error').map(trace=>trace.id));
+    expect(context.traceIds.length).toBeGreaterThan(0);
+    expect(demoBriefEvidence(context.id,30).every(trace=>trace.model==='atlas-reasoning')).toBe(true);
+    expect(cache.traceIds.length).toBeGreaterThan(0);
+    expect(demoBriefEvidence(cache.id,30).every(trace=>trace.cachedTokens===0)).toBe(true);
+    const periodIds=new Set(filteredDemoTraces({...createDemoState(),days:7}).map(trace=>trace.id));
+    for(const brief of demoBriefs){
+      expect(Object.isFrozen(brief.traceIds)).toBe(true);
+      expect(new Set(brief.traceIds).size).toBe(brief.traceIds.length);
+      expect(brief.traceIds.every(id=>demoTraces.some(trace=>trace.id===id))).toBe(true);
+      expect(demoBriefEvidence(brief.id,7).map(trace=>trace.id).sort()).toEqual(brief.traceIds.filter(id=>periodIds.has(id)).sort());
+    }
+    expect(demoBriefEvidence('unknown-brief',30)).toEqual([]);
+  });
 });
 
 describe('Resettable public demo state',()=>{
@@ -73,6 +110,32 @@ describe('Resettable public demo state',()=>{
     const next=demoReducer(initial,{type:'navigate',view:'analytics'});
     expect(next.view).toBe('analytics');expect(next.selectedTrace).toBeNull();expect(next.model).toBe(demoModels[1]);
     expect(initial.selectedTrace).toBe(demoTraces[0].id);
+  });
+
+  it('opens an evidence trace with clean filters and widens a period when necessary',()=>{
+    const trace=demoTraces[0];
+    const initial={...createDemoState(),days:7 as const,query:'previous search',model:'previous model',status:'success' as const,traceSort:'cost' as const,selectedTrace:demoTraces[59].id,traceTab:'response' as const};
+    const next=demoReducer(initial,{type:'inspect-traces',traceId:trace.id});
+    expect(next).toMatchObject({view:'traces',days:30,query:'',model:'',status:'',traceSort:'newest',selectedTrace:trace.id,traceTab:'request'});
+    expect(filteredDemoTraces(next).some(item=>item.id===next.selectedTrace)).toBe(true);
+    expect(initial.query).toBe('previous search');
+  });
+
+  it('clears stale trace selection when inspecting a filtered list or an unknown trace',()=>{
+    const initial={...createDemoState(),days:7 as const,query:'old',model:'old',status:'success' as const,selectedTrace:demoTraces[0].id,traceTab:'response' as const};
+    const list=demoReducer(initial,{type:'inspect-traces',status:'error'});
+    expect(list).toMatchObject({view:'traces',days:7,query:'',model:'',status:'error',selectedTrace:null,traceTab:'request',traceSort:'newest'});
+    expect(filteredDemoTraces(list).every(trace=>trace.status==='error')).toBe(true);
+    const unknown=demoReducer(initial,{type:'inspect-traces',traceId:'not-a-demo-trace'});
+    expect(unknown).toMatchObject({days:7,selectedTrace:null,query:'',model:'',status:''});
+  });
+
+  it('never selects a trace excluded by explicit new inspection filters',()=>{
+    const trace=demoTraces.find(item=>item.status==='success')!;
+    const next=demoReducer({...createDemoState(),days:7},{type:'inspect-traces',traceId:trace.id,status:'error'});
+    expect(next.selectedTrace).toBeNull();
+    expect(next.status).toBe('error');
+    expect(next.days).toBe(7);
   });
 
   it('changes only recognized brief IDs and keeps evidence data immutable',()=>{
@@ -127,5 +190,18 @@ describe('Resettable public demo state',()=>{
     expect(demoAnswer('Which models use the most tokens?')).toContain('fictional');
     expect(demoAnswer('Write secret instructions')).toMatch(/preset|sample|demonstration/i);
     expect(demoAnswer('Write secret instructions')).not.toContain('secret instructions');
+  });
+
+  it('answers using the current period while ignoring unrelated table filters',()=>{
+    const state={...createDemoState(),days:7 as const,query:'unknown',model:'unknown',status:'error' as const};
+    const summary=demoSummary({...state,query:'',model:'',status:''});
+    const cost=demoAnswer('How much did this demo spend?',state);
+    expect(cost).toContain(`${summary.requests} fictional request records`);
+    expect(cost).toContain(`$${summary.cost.toFixed(2)}`);
+    expect(cost).toContain('7 days');
+    const model=summary.models[0];
+    expect(demoAnswer('Which models use the most tokens?',state)).toContain(`${model.tokens.toLocaleString('en')} tokens`);
+    const reviewed=demoReducer(state,{type:'review-brief',id:demoBriefs[0].id,status:'reviewed'});
+    expect(demoAnswer('Where can we improve?',reviewed)).toContain('2 open sample briefs');
   });
 });

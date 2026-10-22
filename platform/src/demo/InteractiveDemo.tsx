@@ -8,6 +8,7 @@ import { DemoTraffic } from './DemoTraffic';
 import { DemoEvaluate } from './DemoEvaluate';
 import { DemoWorkspace } from './DemoWorkspace';
 import './demo.css';
+import './demo-overview.css';
 
 export const demoTitles:Record<DemoView,string>={home:'Home',gateway:'Gateway',analytics:'Analytics',traces:'Traces',dashboards:'Dashboards',improvements:'Improvements',experiments:'Experiments',datasets:'Datasets',scorers:'Scorers',monitors:'Monitors',reviews:'Reviews',scenarios:'Scenarios','quality-gates':'Quality gates',governance:'Governance',settings:'Settings',sessions:'Developer sessions',ask:'Ask Traqiva',inbox:'Inbox'};
 type NavigationItem={view:DemoView;icon:typeof Home};
@@ -23,8 +24,8 @@ export default function InteractiveDemo({standalone=false,initialView='home'}:{s
   const main=useRef<HTMLDivElement>(null),frame=useRef<HTMLDivElement>(null),navOpener=useRef<HTMLButtonElement>(null),navClose=useRef<HTMLButtonElement>(null),projectOpener=useRef<HTMLButtonElement>(null);
   function go(view:DemoView){dispatch({type:'navigate',view});setNavigation(false);setWorkspace(false);if(navigation)requestAnimationFrame(()=>main.current?.focus({preventScroll:true}));}
   function closeNavigation(){setNavigation(false);requestAnimationFrame(()=>navOpener.current?.focus());}
-  function reset(){dispatch({type:'reset'});setMore(false);setWorkspace(false);setNavigation(false);setGroups({Traffic:true,Improve:true,Evaluate:true,Admin:true});}
-  useEffect(()=>{main.current?.scrollTo({top:0});},[state.view]);
+  function reset(){dispatch({type:'reset'});setMore(false);setWorkspace(false);setNavigation(false);setGroups({Traffic:true,Improve:true,Evaluate:true,Admin:true});main.current?.scrollTo({top:0});}
+  useEffect(()=>{if(!state.selectedTrace)main.current?.scrollTo({top:0});},[state.view,state.selectedTrace]);
   useEffect(()=>{
     if(!navigation&&!workspace)return;
     if(navigation)navClose.current?.focus();

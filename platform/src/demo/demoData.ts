@@ -3,7 +3,7 @@ export type DemoView='home'|'gateway'|'analytics'|'traces'|'dashboards'|'improve
 export type DemoTrace={
   id:string;workflow:string;model:string;provider:string;status:'success'|'error';inputTokens:number;outputTokens:number;cachedTokens:number;cost:number;latencyMs:number;startedAt:string;sessionId:string;repository:string;request:Record<string,unknown>;response:Record<string,unknown>;
 };
-export type DemoBrief={id:string;title:string;summary:string;evidence:string;nextStep:string;potentialDaily:number|null;kind:string};
+export type DemoBrief={id:string;title:string;summary:string;evidence:string;nextStep:string;potentialDaily:number|null;kind:string;traceIds:readonly string[]};
 export type DemoCase={id:string;input:string;expected:string;actual:string};
 export type DemoNotification={id:string;title:string;body:string;view:DemoView};
 
@@ -47,9 +47,9 @@ export const demoTraces:readonly DemoTrace[]=freeze(Array.from({length:60},(_,in
 
 export const demoModels:readonly string[]=freeze([...new Set(demoTraces.map(trace=>trace.model))]);
 export const demoBriefs:readonly DemoBrief[]=freeze([
-  {id:'demo-brief-retries',title:'Give repeated failures a retry boundary',summary:'Four sample requests ended in the same simulated rate-limit response.',evidence:'In this fictional 60-request dataset, 4 requests have an error status. Inspect those traces before changing a retry policy.',nextStep:'Review the failed samples, then compare a bounded backoff policy against the same evaluation cases.',potentialDaily:null,kind:'Reliability'},
-  {id:'demo-brief-context',title:'Review the largest context blocks',summary:'Some requests carry materially more input than the rest of the sample workload.',evidence:'The atlas-reasoning examples include an additional 2,600 input tokens. This is fixture design, not proof that those tokens can safely be removed.',nextStep:'Inspect the request payload and test a smaller context against the expected outputs before applying a change.',potentialDaily:null,kind:'Input efficiency'},
-  {id:'demo-brief-cache',title:'Check which prefixes could remain stable',summary:'Cache usage varies across the sample requests.',evidence:'Sample records explicitly report both input and cached token counts. The chart derives its share from those same counts.',nextStep:'Compare stable prefixes and their reported usage. A cache percentage alone does not establish invoice savings.',potentialDaily:null,kind:'Cache visibility'},
+  {id:'demo-brief-retries',title:'Give repeated failures a retry boundary',summary:'Four sample requests ended in the same simulated rate-limit response.',evidence:'In this fictional 60-request dataset, 4 requests have an error status. Inspect those traces before changing a retry policy.',nextStep:'Review the failed samples, then compare a bounded backoff policy against the same evaluation cases.',potentialDaily:null,kind:'Reliability',traceIds:demoTraces.filter(trace=>trace.status==='error').map(trace=>trace.id)},
+  {id:'demo-brief-context',title:'Review the largest context blocks',summary:'Some requests carry materially more input than the rest of the sample workload.',evidence:'The atlas-reasoning examples include an additional 2,600 input tokens. This is fixture design, not proof that those tokens can safely be removed.',nextStep:'Inspect the request payload and test a smaller context against the expected outputs before applying a change.',potentialDaily:null,kind:'Input efficiency',traceIds:demoTraces.filter(trace=>trace.model==='atlas-reasoning').map(trace=>trace.id)},
+  {id:'demo-brief-cache',title:'Check which prefixes could remain stable',summary:'Cache usage varies across the sample requests.',evidence:'Sample records explicitly report both input and cached token counts. The chart derives its share from those same counts.',nextStep:'Compare stable prefixes and their reported usage. A cache percentage alone does not establish invoice savings.',potentialDaily:null,kind:'Cache visibility',traceIds:demoTraces.filter(trace=>trace.cachedTokens===0).map(trace=>trace.id)},
 ]);
 
 export const demoCases:readonly DemoCase[]=freeze([
