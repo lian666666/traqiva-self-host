@@ -2,7 +2,7 @@
   "schema": 1,
   "template": "traqiva-self-host",
   "history_exported": false,
-  "generated_at": "2026-10-22T16:04:24.970Z",
+  "generated_at": "2026-10-22T16:16:21.927Z",
   "files": [
     {
       "path": ".gitattributes",
@@ -231,8 +231,8 @@
     },
     {
       "path": "platform/docs/CAPABILITIES.md",
-      "bytes": 26255,
-      "sha256": "bc649e04d4b0169aeb20b9c6cdf0158e2b86af49d91ef346ff0b4894a8671765"
+      "bytes": 28049,
+      "sha256": "f7305528ac68943031338a602f29682304f63b5bc566e059afff99dc056e708d"
     },
     {
       "path": "platform/docs/GITHUB_AUTH.md",
@@ -4441,8 +4441,13 @@
     },
     {
       "path": "platform/src/components/FreePlanStep.tsx",
-      "bytes": 2249,
-      "sha256": "f77d93b885443855e855980251115a2f57cbe732527f0d791162b4befebe8e55"
+      "bytes": 2110,
+      "sha256": "6b455e880375cdc224e01e7c262acef7bff9da31612228664cc175cbf76e9738"
+    },
+    {
+      "path": "platform/src/components/FreePlanTerms.tsx",
+      "bytes": 454,
+      "sha256": "9edb81c4a706267c2a7f220230989336de4d2d96a122b7cc013973d2f7a9bc72"
     },
     {
       "path": "platform/src/components/GitHubMark.tsx",
@@ -4561,8 +4566,8 @@
     },
     {
       "path": "platform/src/landing.css",
-      "bytes": 36027,
-      "sha256": "85d32c2461108ac60358a1620a3ae01c05689dba4426ae94d16dfba16385f037"
+      "bytes": 37415,
+      "sha256": "645913fac3eda9a44b26bab5094c152eb7062d2b64a0af0df2f36c3b10f9b5e2"
     },
     {
       "path": "platform/src/landing/content.ts",
@@ -4601,8 +4606,8 @@
     },
     {
       "path": "platform/src/Marketing.tsx",
-      "bytes": 17480,
-      "sha256": "8661e1afc2097e94e3a7227614455ae08ae606f5ae52aa4ac30d2aa4e22d0e51"
+      "bytes": 17407,
+      "sha256": "cecc7faecaab59ee0a54e10e12a2df1d650d2158ade8912e9dbac0f832ee89bb"
     },
     {
       "path": "platform/src/onboarding-compact.css",
@@ -4611,8 +4616,8 @@
     },
     {
       "path": "platform/src/onboarding-plan.css",
-      "bytes": 3306,
-      "sha256": "5ee40f6e891ebab6deca188dcf53bf0049ffb1dd642f4b8f38f2f096559fc648"
+      "bytes": 4245,
+      "sha256": "0c0bfac93fb313268fcca3cb46b19bfd4c0ef37214001fc1dab517daa0d0a15c"
     },
     {
       "path": "platform/src/Onboarding.tsx",
@@ -4621,8 +4626,8 @@
     },
     {
       "path": "platform/src/pages/Admin.tsx",
-      "bytes": 5870,
-      "sha256": "7d80a24704c28c7d6db5a5fb981ca9c128f9c5d0f2b26f749332d793ff0b8811"
+      "bytes": 6670,
+      "sha256": "63c70cd76a9fc91449d89263da0203860acf24c991eaf28e3e4ff83b64bf3f39"
     },
     {
       "path": "platform/src/pages/Ask.tsx",
@@ -4698,6 +4703,11 @@
       "path": "platform/src/pages/Traces.tsx",
       "bytes": 7281,
       "sha256": "7cb44a1f0376aca9fae3759bd5921641217326d7b1083517d5f1e89da0890a6b"
+    },
+    {
+      "path": "platform/src/pricing.ts",
+      "bytes": 848,
+      "sha256": "f89ccd9785b6a8f5572f190ce362b75da76cd1c437e68a4a2defafbfa2e45af1"
     },
     {
       "path": "platform/src/public-documents.css",
@@ -4795,14 +4805,19 @@
       "sha256": "b12ab1ed880894a4b179776a2d306e9944f20363f4ac0f8ae11754a49cab32bb"
     },
     {
+      "path": "platform/tests/billing-plan-ui.test.ts",
+      "bytes": 1593,
+      "sha256": "dfb63dcc851608a18724ab99db726d755c65ada95f76a78a32701b3fabc731c4"
+    },
+    {
       "path": "platform/tests/coding-only-connect-ui.test.ts",
       "bytes": 1021,
       "sha256": "05b9e191205e1420d8ba09727b9f0cdf62cded8fce4e43d168f739d9ae93779b"
     },
     {
       "path": "platform/tests/coding-product-surfaces-ui.test.ts",
-      "bytes": 2765,
-      "sha256": "331dcfea8af392a1e9c083491bcfc8d4b74ffe76ea448e4c9621faf6f653eeed"
+      "bytes": 2809,
+      "sha256": "dea9d3bda4318728b415e90a2d4aa3799f28d0dc69300e30eb06e69cceae7f02"
     },
     {
       "path": "platform/tests/coding-workspace-pages-ui.test.ts",
@@ -4830,14 +4845,19 @@
       "sha256": "9eabbba87df9e299ca9f1931adad7fb6b2c4d94f5c4424e7edd87a3b21a94f2c"
     },
     {
+      "path": "platform/tests/marketing-pricing-ui.test.ts",
+      "bytes": 2898,
+      "sha256": "a3f848eb80c8b750ea11bb495ea0baffd1896e5a1bc3ce7c1d2642e57900fb49"
+    },
+    {
       "path": "platform/tests/onboarding-compact-ui.test.ts",
       "bytes": 5869,
       "sha256": "118803b7f718f31055619736989fd004da98492211a947054d44277910a13728"
     },
     {
       "path": "platform/tests/onboarding-free-plan-ui.test.ts",
-      "bytes": 2715,
-      "sha256": "7c7e42f2af4b2957c4d769a0955fed738f198162928fbc6acec3611bb8c3f023"
+      "bytes": 3300,
+      "sha256": "3f2fd349bb802ae4ed57e200b9272b3559ab3cd36be78f4402553239e9a8fa26"
     },
     {
       "path": "platform/tests/public-demo-builder-enabled.test.ts",

@@ -8,6 +8,14 @@ The current product is for coding agents. `src/features/agentBuilder.ts` holds t
 
 Onboarding flow version 2 starts new registrations at Step 1. Migration `0007` only adds an internal version column. On the next authenticated session read, an older unfinished flow returns once to Step 1 while keeping its project, traffic and consent. Current confirmed progress resumes after refresh/login, and completed accounts continue to their workspace. An unfinished disabled application-builder goal must be reconfirmed as a coding setup. Project setup cannot bypass this confirmation.
 
+## Hosted pricing policy preview
+
+Onboarding, homepage Pricing and Billing share the policy in `src/pricing.ts`: Free $0 without a card, one person; planned monthly allowances of 100K events, 600 agent-run minutes, 25K routing decisions and $10 of Traqiva AI. The planned overage policy pauses an exhausted product until the next month; a future card option uses standard rates with a $50 monthly cap per product, and one gateway event per started 64 KB sent. A seven-day Team trial is listed as coming soon.
+
+These are explicitly labeled **planned**, not active entitlements or an available balance. This release has no hosted quota ledger, run-minute meter, sponsored AI credit, card collection, automatic pausing, paid subscription or Team trial implementation. Current workspace access remains free, model calls use the caller's own provider account, and local CLI compression has no hosted-plan allowance. The disabled Builder product stays hidden. No payment processor, provider credentials or consent terms changed as part of this presentation update.
+
+The pricing presentation update passed 251 application tests, lint, TypeScript, production build and 14 self-host/distribution tests. Local Vite/Worker browser checks used the isolated synthetic account: Stage 1 → revised Stage 2 → Account settings open/close → Start on Free → Stage 3 → explicit skip → Billing. The same policy appeared on the homepage and Billing; Team remained disabled. Desktop and a 390×844 content viewport showed readable tables without horizontal overflow. Plain-page warning/error logs were empty. The temporary viewport harness was removed before building. No real payment, sponsored AI call, trial activation or quota-exhaustion test was performed because these services are not implemented.
+
 ## Six efficiency controls in CLI 0.2.0
 
 These are the implemented equivalents of the six requested capability categories, not a claim to reproduce Caveman's private services. Local controls are stored on the user's device; the web application cannot read their status. Auto and Waste checks are independent per-project settings on the Worker.

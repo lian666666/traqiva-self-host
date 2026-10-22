@@ -17,15 +17,26 @@ beforeEach(() => {
   state.session = { user: { id: 'free-user', name: 'Alex', email: 'alex@example.test' }, workspace: null, projects: [{ id: 'existing-project', name: 'Existing project' }], activeProject: { id: 'existing-project', name: 'Existing project' }, setup: { stage: 'project', goals: ['coding'], project_id: 'existing-project' }, terms: { version: 'test', accepted: false, accepted_at: null } };
 });
 describe('Stage two free workspace', () => {
-  it('shows the concise free plan and actual provider-cost boundary instead of a required naming form', () => {
+  it('shows the requested pricing policy while keeping unavailable credits and paid actions explicit', () => {
     const html = render();
     expect(html).toContain('Start on Free');
     expect(html).toContain('$0. No card.');
     expect(html).toContain('Account settings');
     expect(html).not.toContain('Give your project a home.');
     expect(html).not.toContain('autoFocus');
-    expect(html).not.toContain('25K');
-    expect(html).not.toContain('600 minutes');
+    expect(html).toContain('100K events');
+    expect(html).toContain('600 minutes of agent runs');
+    expect(html).toContain('25K routing decisions');
+    expect(html).toContain('$10 of Traqiva AI');
+    expect(html).toContain('at most $50 a month per product');
+    expect(html).toContain('one event per started 64 KB');
+    expect(html).toContain('One person.');
+    expect(html).toContain('Plan preview.');
+    expect(html).toContain('not active yet');
+    expect(html).toMatch(/<button[^>]*disabled[^>]*>Try Team free for 7 days/);
+    expect(html).not.toContain('Caveman');
+    expect(html).not.toContain('quality checks');
+    expect(html).not.toContain('evals');
     expect(html).not.toContain('Start free trial');
     expect(html.toLowerCase()).toContain('billed separately');
     expect(html).not.toContain('name="card');

@@ -35,7 +35,8 @@ describe('Coding-agent product launch surfaces', () => {
   it('describes only the currently available coding workspace in the free-plan step', () => {
     const html = render(createElement(FreePlanStep, { email: 'alex@example.invalid', name: 'My coding project', busy: false, saving: false, onNameChange: vi.fn(), onSubmit: vi.fn(), onBack: vi.fn() }));
     expect(html).toContain('Start on Free');
-    expect(html).toContain('Coding-agent');
+    expect(html).toContain('100K events');
+    expect(html).toContain('Plan preview.');
     expect(html).not.toContain('evaluations');
   });
   it('retains the isolated builder offers for a future release switch', () => {

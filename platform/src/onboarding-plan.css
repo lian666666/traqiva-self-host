@@ -36,8 +36,18 @@
 }
 .free-plan-details > div:last-child { border-bottom: 1px solid var(--border); }
 .free-plan-details dt { color: var(--muted); }
+.free-plan-details dt small { display: block; font-size: 10px; line-height: 1.6; font-weight: 400; }
 .free-plan-details dd { margin: 0; font-weight: 500; }
-.free-plan-settings { display: flex; justify-content: center; margin: 21px 0 42px; }
+.free-plan-settings { display: flex; flex-wrap: wrap; gap: 12px 25px; align-items: center; justify-content: center; margin: 21px 0 18px; color: var(--muted); font-size: 13px; }
+.free-plan-settings > span { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px; }
+.free-plan-settings .text-button { color: var(--muted); font-size: inherit; }
+.free-plan-settings small { font-size: 10px; margin-left: 4px; }
+.plan-policy-status { color: var(--muted); font-size: 11px; line-height: 1.65; margin: 0 0 28px; text-align: left; }
+.billing-plan-preview { padding: 25px; max-width: 760px; }
+.billing-plan-preview h2 { font-size: 18px; margin: 0 0 18px; }
+.billing-plan-preview .plan-policy-status { margin-top: 18px; margin-bottom: 12px; }
+.billing-plan-preview > p { color: var(--muted); font-size: 12px; line-height: 1.7; }
+.billing-plan-preview .text-button { font-size: 12px; margin-top: 6px; }
 .setup-wizard.setup-plan .free-plan-settings > .text-button { color: var(--muted); font-size: 13px; }
 .setup-wizard.setup-plan .free-plan-start { display: flex; width: 450px; max-width: 100%; min-height: 49px; border-radius: 28px; margin: 0 auto; font-size: 14px; }
 .setup-wizard.setup-plan .free-plan-back { display: flex; margin: 18px auto 0; color: var(--muted); font-size: 14px; }
