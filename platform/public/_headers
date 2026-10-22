@@ -8,5 +8,8 @@
 /downloads/*
   Cache-Control: no-cache
 
+/cli.tgz
+  Cache-Control: no-cache
+
 /licenses/*
   Cache-Control: no-cache

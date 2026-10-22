@@ -7,9 +7,11 @@ import { engineStatus, installEngine } from '../lib/native.mjs';
 import { compressArtifact, recoverArtifact } from '../lib/operations.mjs';
 import { installNativeProxy, nativeProxyStatus } from '../lib/proxy-native.mjs';
 import { launchAgent } from '../lib/agent.mjs';
+import { runQuickstart } from '../lib/quickstart.mjs';
 
 const help = `Traqiva ${VERSION} — API-key gateway bridge and recoverable artifact compression
 
+traqiva init [--url ORIGIN]
 traqiva connect --url ORIGIN --project ID --key PROJECT_INGEST_KEY
 traqiva status
 traqiva record TRACE.json
@@ -29,7 +31,8 @@ Connection is stored locally in ~/.traqiva/config.json (0600 where supported;
 Windows profile ACLs apply).
 TRAQIVA_HOME selects an isolated configuration directory.
 Provider API keys are forwarded per request, never saved by the bridge.
-The optional native engine is installed only by the explicit install command.
+The optional native engine is installed by an explicit install command or a
+confirmed interactive setup. Run traqiva init for the local setup wizard.
 It compresses artifacts locally with exact recovery; cloud mode is lossless JSON.
 The experimental native agent launcher uses child-only settings, not the current
 desktop chat. Subscription routing was verified; the tested task compressed zero
@@ -55,8 +58,15 @@ const output = (value) => process.stdout.write(JSON.stringify(value, null, 2) + 
 
 async function main() {
   const [command, ...args] = process.argv.slice(2);
+  if (!command && process.stdin.isTTY && process.stdout.isTTY) { await runQuickstart(); return; }
   if (!command || ['--help', '-h', 'help'].includes(command)) { process.stdout.write(help); return; }
   if (command === '--version') { process.stdout.write(VERSION + '\n'); return; }
+  if (command === 'init') {
+    const { flags, positional } = parse(args, ['url']);
+    if (positional.length) throw new Error('Use traqiva init [--url ORIGIN].');
+    await runQuickstart(flags.url ? { origin: flags.url } : {});
+    return;
+  }
   if (command === 'setup') {
     const { flags, positional } = parse(args, ['agent', 'print']);
     if (positional.length || !['codex', 'claude'].includes(flags.agent) || !flags.print) throw new Error('Use setup --agent codex|claude --print. Agent files are never changed automatically.');

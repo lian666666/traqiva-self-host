@@ -2,7 +2,7 @@
   "schema": 1,
   "template": "traqiva-self-host",
   "history_exported": false,
-  "generated_at": "2026-10-21T22:20:11.363Z",
+  "generated_at": "2026-10-22T07:35:40.757Z",
   "files": [
     {
       "path": ".gitattributes",
@@ -51,8 +51,8 @@
     },
     {
       "path": "platform/cli/bin/traqiva.mjs",
-      "bytes": 9239,
-      "sha256": "db3e3b523cad10ec724885a63b40c0bd965105a11b4a569600b1905eed2ee694"
+      "bytes": 9737,
+      "sha256": "718bb60c47847f3df01b76c7e19fd358b0e9af43445f95627b1df8e76678e3b9"
     },
     {
       "path": "platform/cli/lib/agent.mjs",
@@ -62,7 +62,12 @@
     {
       "path": "platform/cli/lib/client.mjs",
       "bytes": 6566,
-      "sha256": "166acb762d576bab586bdfa3767103d001bc8462ed35ba5856bc4bb15e10cf2f"
+      "sha256": "006ea5340e890ac71b79c2e7bf4b5b4c4e624013e88e1f611393b5f2b7c32773"
+    },
+    {
+      "path": "platform/cli/lib/commands.mjs",
+      "bytes": 3106,
+      "sha256": "061152cde1dc6475b27b94e3aa9e9ccc724af60f7d82b539db1a1af5c7b83eed"
     },
     {
       "path": "platform/cli/lib/mcp.mjs",
@@ -90,6 +95,11 @@
       "sha256": "3ec76c0c71898be3f6c2ad7faab76a6cbc2c04ff63b9c3f62ebf6d9f87c9d5f1"
     },
     {
+      "path": "platform/cli/lib/quickstart.mjs",
+      "bytes": 9586,
+      "sha256": "e7434454b28b160965e640f306377efb6b3df184dcc071b075f5d519d29d80ea"
+    },
+    {
       "path": "platform/cli/LICENSE",
       "bytes": 11358,
       "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
@@ -101,13 +111,13 @@
     },
     {
       "path": "platform/cli/package.json",
-      "bytes": 686,
-      "sha256": "0c5f7189a0cd60cd9c8edb9eb51d14eb7851336296eacc5bdabfda9c6f382998"
+      "bytes": 754,
+      "sha256": "651182384410dc98b5bd1f74e3267c5d4f2b2604bc4214828fae2ff7ff0b3d92"
     },
     {
       "path": "platform/cli/README.md",
-      "bytes": 10862,
-      "sha256": "db6a4e673f93bf25348bc43685605c3138bafdd9e547bf754855e107a4eecd88"
+      "bytes": 13333,
+      "sha256": "39998922af3d018815de31f347ea47149c0ebfad371a5afeb3369898af6a405c"
     },
     {
       "path": "platform/cli/tests/agent.test.mjs",
@@ -125,6 +135,11 @@
       "sha256": "1c1caa24f307e6eaf0f135f3439fe56e225be50040c0950a7cbe65e11a811554"
     },
     {
+      "path": "platform/cli/tests/commands.test.mjs",
+      "bytes": 4865,
+      "sha256": "a62a7fbc24ff89a78cecb87d7c7d66a80c9eab27f28b3bb86eef32d55051ef55"
+    },
+    {
       "path": "platform/cli/tests/live-codex-smoke.mjs",
       "bytes": 4452,
       "sha256": "4ed5370f49f9cff95581b903c897bbc1637ee5f7524da0e9d19695a165e6d5a2"
@@ -140,14 +155,19 @@
       "sha256": "921270ee71e45f1c0f7163c078af998e4c8d8628e32ea299ec0f15953a9852a5"
     },
     {
+      "path": "platform/cli/tests/quickstart.test.mjs",
+      "bytes": 11106,
+      "sha256": "36bd2b38c1dc3512aed45741afcabcbba3e9f72eee1378ed92a4d2dfc2af5cad"
+    },
+    {
       "path": "platform/cli/tests/token-usage-ab.mjs",
       "bytes": 10855,
       "sha256": "f8c1362577b669d7e58d469a1732b529733edb1f7434ef1924eee76a9b595176"
     },
     {
       "path": "platform/docs/CAPABILITIES.md",
-      "bytes": 11911,
-      "sha256": "e78686ff41f5dc512e1859ce760c2d6e4234712126c6c1ba071bf184f5a1a276"
+      "bytes": 14074,
+      "sha256": "71bdb83e8c8642888f0841735391efb1c2164d995bfe02e28d684a7d8a0505b8"
     },
     {
       "path": "platform/docs/GITHUB_AUTH.md",
@@ -246,8 +266,13 @@
     },
     {
       "path": "platform/public/_headers",
-      "bytes": 473,
-      "sha256": "598a4b80a464ceedcd8ee147f7ec3c3d65ba493197f9e16f87e0908cbbd6cd23"
+      "bytes": 509,
+      "sha256": "3fb5572c18dfcaa5b22492cc3b1b257e4510b49be90ce6651ee2cfff5458fb5f"
+    },
+    {
+      "path": "platform/public/cli.tgz",
+      "bytes": 28490,
+      "sha256": "1a881daf5c19ac82d6c460b73f0d2329f5d09b28bc4055c86529646c79183b58"
     },
     {
       "path": "platform/public/downloads/engine-manifest.json",
@@ -271,8 +296,13 @@
     },
     {
       "path": "platform/public/downloads/traqiva-cli-0.1.0.tgz",
-      "bytes": 23834,
-      "sha256": "7e9cea0d12d3470a2433e22dea8779054bd9ded38b2ed106d6f9477dc58293c7"
+      "bytes": 23841,
+      "sha256": "247099839c1124ff7ec5ec1f5c9193f67dff9083169cf4848336f16949cae317"
+    },
+    {
+      "path": "platform/public/downloads/traqiva-cli-0.1.1.tgz",
+      "bytes": 28490,
+      "sha256": "1a881daf5c19ac82d6c460b73f0d2329f5d09b28bc4055c86529646c79183b58"
     },
     {
       "path": "platform/public/downloads/traqiva-engine-0.1.0-darwin-arm64.gz",
@@ -4221,13 +4251,18 @@
     },
     {
       "path": "platform/scripts/pack-cli.mjs",
-      "bytes": 751,
-      "sha256": "6d0ec8820931f023fed35e169a2bc2ea4827f65765900633934cf1798bc18492"
+      "bytes": 1159,
+      "sha256": "1e9199cede0808524c254d95fb126eefb96bdc319a868407afc7e0dfb3cd88de"
     },
     {
       "path": "platform/scripts/self-host.mjs",
       "bytes": 11795,
       "sha256": "114614d098c3f0ede72ebd95ba2c87892f63e8f6515b7c074570fa3a6614c6d8"
+    },
+    {
+      "path": "platform/scripts/tests/cli-distribution.test.mjs",
+      "bytes": 6024,
+      "sha256": "ce79e380371866239f93ab860ba75af9ff39f6c24f34be208ea019d9409a6ecd"
     },
     {
       "path": "platform/scripts/tests/self-host.test.mjs",
@@ -4396,18 +4431,18 @@
     },
     {
       "path": "platform/src/landing.css",
-      "bytes": 35705,
-      "sha256": "3e635281c39df07d7b16b7b74b9267c70f0fabc47db968da8b1149aed0e97c5a"
+      "bytes": 36027,
+      "sha256": "85d32c2461108ac60358a1620a3ae01c05689dba4426ae94d16dfba16385f037"
     },
     {
       "path": "platform/src/landing/content.ts",
-      "bytes": 1161,
-      "sha256": "0c057d7c68909f22e96f4ec37b329633a6c64010fcc4f24bab9a6bce306a4a3c"
+      "bytes": 1013,
+      "sha256": "bbcabccfce9698a1c94d5de8bc976d1c5dd3b9ed10c3fbd914e8536b0fe8d1fc"
     },
     {
       "path": "platform/src/landing/GetStartedPanel.tsx",
-      "bytes": 3631,
-      "sha256": "0c6bd36bcfb5336dddd5f39cb4891bd1fdde70def0abeacd238deec52f9de6ed"
+      "bytes": 3659,
+      "sha256": "2c410bbdd2a3e6049ad0d793a933c00ce9f7cd3849ab092156e80fc3189f62af"
     },
     {
       "path": "platform/src/landing/landing-demo.css",
@@ -4620,6 +4655,11 @@
       "sha256": "9e46686e2d3a1a43cd0cc6ecf5413dc3c3cbf8ad155b0f5337ac2c79ec4f5292"
     },
     {
+      "path": "platform/tests/landing-quickstart.test.ts",
+      "bytes": 872,
+      "sha256": "9eabbba87df9e299ca9f1931adad7fb6b2c4d94f5c4424e7edd87a3b21a94f2c"
+    },
+    {
       "path": "platform/tests/onboarding-compact-ui.test.ts",
       "bytes": 5270,
       "sha256": "f8d4378a468c34fa24e2cb815b56e4090119019bcfc5b3614641f17890f89dff"
@@ -4651,8 +4691,8 @@
     },
     {
       "path": "platform/vite.config.ts",
-      "bytes": 762,
-      "sha256": "ebccef9b8cdbd171f41246ac2671841c55ad364480bfe0a6eee8c965854a159b"
+      "bytes": 896,
+      "sha256": "242114750e2f7f91c3c1c2bee487cb041e24dbd4450177d9296cee324ce736bb"
     },
     {
       "path": "platform/vitest.config.ts",

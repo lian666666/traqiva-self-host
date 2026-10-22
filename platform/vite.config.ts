@@ -19,6 +19,8 @@ export default defineConfig({
         },
       },
       '/v1': 'http://127.0.0.1:8789',
+      // Vite treats .gz as content encoding; let Workers serve the exact archive bytes.
+      '/downloads': 'http://127.0.0.1:8789',
     },
   },
   build: { outDir: 'dist', sourcemap: false },

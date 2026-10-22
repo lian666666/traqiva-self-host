@@ -1,15 +1,31 @@
-# Traqiva CLI 0.1.0
+# Traqiva CLI 0.1.1
 
 A small, independently implemented Node.js client for your Traqiva deployment and optional native compression runtime. Node.js 22.13 or newer; no package dependencies. The package name is `traqiva-cli-local`, and the installed command is `traqiva`.
 
-This version supplies a real API-key gateway bridge, trace ingestion, optional local native compression with exact recovery, a cloud lossless JSON fallback, an MCP interface and an experimental native coding-agent launcher. Native binaries are separately source-built from the Apache-2.0 Caveman local runtime and downloaded only by explicit install commands. It does not alter global agent settings or claim verified token/billing savings.
+This version supplies an interactive local setup wizard, a real API-key gateway bridge, trace ingestion, optional local native compression with exact recovery, a cloud lossless JSON fallback, an MCP interface and an experimental native coding-agent launcher. Native binaries are separately source-built from the Apache-2.0 Caveman local runtime. They download only after an explicit install command or confirmed wizard step. MCP registration is optional and uses the assistant's official CLI; provider/model settings are not changed. No verified token/billing savings are promised.
+
+## Quick start
+
+```sh
+npx --yes --no-audit https://YOUR-TRAQIVA.workers.dev/cli.tgz
+```
+
+In an interactive terminal, choose **Codex**, **Claude Code**, or **Local files**. Select automatic MCP registration or printed settings, then confirm installation once. Local compression needs no account or provider key. Node.js 22.13 or newer is required. `--no-audit` applies only to this invocation of this dependency-free package, avoiding an unrelated registry-audit request; it changes no npm settings and does not disable the native archive/executable checks. For another deployment:
+
+```sh
+npx --yes --no-audit https://YOUR-TRAQIVA.workers.dev/cli.tgz init --url https://YOUR-TRAQIVA.workers.dev
+```
+
+The wizard installs the checksum-verified native engine and a persistent, allowlisted client under `~/.traqiva/client/0.1.1/`. MCP settings reference this stable client, not the disposable `npx` cache. Automatic registration uses `codex mcp add` or `claude mcp add --scope user`. On Windows it prefers native `.exe` clients or resolves known official npm wrappers to their JavaScript entry points through Node, without executing a command shell. `TRAQIVA_CODEX_BIN` and `TRAQIVA_CLAUDE_BIN` can explicitly select a native executable or `.js`/`.mjs` entry. Existing `traqiva` MCP entries are preserved. If the assistant is missing, settings cannot be checked, registration fails, or you choose manual setup, the wizard prints a configuration and says that action is required. It does not claim an agent or cloud project is connected. Restart your assistant or open a new session after registration; tools act when called.
+
+No-argument execution with piped input prints help and writes nothing. `traqiva init` requires an interactive terminal, does not accept a noninteractive yes flag, and makes no installation or MCP changes if confirmation is declined. It does not launch a model, change providers, select cheaper models, or take over an existing desktop chat. To explicitly repeat the wizard after installation, run `traqiva init [--url ORIGIN]`.
 
 ## Install the deployment's package
 
-Download `traqiva-cli-0.1.0.tgz` from your deployment's `/downloads/` page, then:
+Download `traqiva-cli-0.1.1.tgz` from your deployment's `/downloads/` page, then:
 
 ```sh
-npm install --global ./traqiva-cli-0.1.0.tgz
+npm install --global ./traqiva-cli-0.1.1.tgz
 traqiva --help
 ```
 
@@ -136,6 +152,6 @@ cd platform/cli
 npm pack --pack-destination ../public/downloads
 ```
 
-The generated name is `traqiva-cli-local-0.1.0.tgz`; the web distribution renames it to `traqiva-cli-0.1.0.tgz`. The tarball includes only `bin/`, `lib/`, README and license/notice files, not local settings, test fixtures or credentials. Test fixtures use temporary `TRAQIVA_HOME` directories and a loopback mock service; they make no model-provider calls and do not change host agent configuration.
+The generated name is `traqiva-cli-local-0.1.1.tgz`; the web distribution renames it to `traqiva-cli-0.1.1.tgz` and supplies the short `/cli.tgz` URL. The tarball includes only `bin/`, `lib/`, README and license/notice files, not local settings, test fixtures or credentials. Test fixtures use temporary `TRAQIVA_HOME` directories, fake assistant subprocesses and a loopback mock service; they make no model-provider calls and do not change host agent configuration. Automatic MCP registration was exercised with isolated fake assistant CLIs; real Codex/Claude registration was not executed for this release. The native installation and compression tests are recorded separately.
 
 The CLI source is independent implementation under Apache-2.0. The accompanying platform research distinguishes the reusable Apache-licensed Caveman local core from its separate proprietary Cloud service. No Caveman brand assets or binary runtime are bundled in this npm tarball; the optional native downloads carry their source provenance and all required license texts.
