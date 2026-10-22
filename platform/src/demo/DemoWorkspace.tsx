@@ -2,6 +2,7 @@ import { useEffect,useState,type FormEvent,type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight,ArrowUpRight,Check,Inbox,MessageCircle,Send,Shield,Terminal,X } from 'lucide-react';
 import { LANDING_CLI_DOCS } from '../landing/content';
+import { AGENT_BUILDER_ENABLED } from '../features/agentBuilder';
 import { demoBriefs,demoNotifications,demoQuestions,demoTraces,type DemoTrace } from './demoData';
 import { demoAnswer,demoBriefEvidence } from './demoState';
 import { DemoHome } from './DemoHome';
@@ -20,7 +21,7 @@ function DemoImprovements({state,dispatch,go}:DemoViewProps){
   const evidence=selected?demoBriefEvidence(selected.id,state.days):[];
   const status=selected?state.briefStatus[selected.id]||'open':'open';
   return <div className="demo-improvements">
-    <ViewHeading title="Improvements" detail="Find a problem, inspect its requests, then test a change.">
+    <ViewHeading title="Improvements" detail={AGENT_BUILDER_ENABLED?'Find a problem, inspect its requests, then test a change.':'Find a problem and inspect the coding-agent requests behind it.'}>
       <select className="demo-select" aria-label="Demo time range" value={state.days} onChange={event=>dispatch({type:'set',key:'days',value:Number(event.target.value) as 7|30})}><option value={7}>Last 7 sample days</option><option value={30}>Last 30 sample days</option></select>
     </ViewHeading>
     <div className="demo-tabs" role="group" aria-label="Filter sample briefs">{(['open','reviewed','dismissed','all'] as const).map(value=><button key={value} aria-pressed={filter===value} className={filter===value?'active':''} onClick={()=>setFilter(value)}>{value==='all'?'All briefs':value[0].toUpperCase()+value.slice(1)}</button>)}</div>
@@ -40,9 +41,9 @@ function DemoImprovements({state,dispatch,go}:DemoViewProps){
             <span><span className={`demo-badge ${trace.status==='success'?'green':'red'}`}>{trace.status}</span><small>{demoNumber(trace.inputTokens+trace.outputTokens)} tokens</small></span><ArrowUpRight size={15}/>
           </button>):<p className="demo-evidence-empty">No matching requests in this period. Choose 30 sample days to inspect the full finding.</p>}</div>
         </DemoPanel>
-        <DemoPanel title="Next step"><p>{selected.nextStep}</p><button className="demo-button" onClick={()=>go('experiments')}>Test a change<ArrowRight size={14}/></button></DemoPanel>
+        <DemoPanel title="Next step"><p>{selected.nextStep}</p>{AGENT_BUILDER_ENABLED?<button className="demo-button" onClick={()=>go('experiments')}>Test a change<ArrowRight size={14}/></button>:<button className="demo-button" disabled={!evidence.length} onClick={()=>dispatch({type:'inspect-traces',traceId:evidence[0]?.id})}>Inspect matching requests<ArrowRight size={14}/></button>}</DemoPanel>
         <div className="demo-actions">{status!=='reviewed'&&<button className="demo-button primary" onClick={()=>dispatch({type:'review-brief',id:selected.id,status:'reviewed'})}><Check size={14}/>Mark reviewed</button>}{status!=='dismissed'&&<button className="demo-button" onClick={()=>dispatch({type:'review-brief',id:selected.id,status:'dismissed'})}>Dismiss</button>}{status!=='open'&&<button className="demo-button" onClick={()=>dispatch({type:'review-brief',id:selected.id,status:'open'})}>Reopen sample</button>}</div>
-        <p className="demo-preview-note">Review status stays in this demo. Testing runs local exact-match cases; it does not change a live agent or establish savings.</p>
+        <p className="demo-preview-note">{AGENT_BUILDER_ENABLED?'Review status stays in this demo. Testing runs local exact-match cases; it does not change a live agent or establish savings.':'Review status stays in this demo. Inspecting fictional requests does not change your coding agent or establish savings.'}</p>
       </article>
     </div>:<DemoPanel title={`No ${filter==='all'?'sample':filter} briefs`}><p>Choose another filter to review earlier decisions. Reset demo restores the original sample.</p><button className="demo-button" onClick={()=>setFilter('all')}>Show all briefs<ArrowRight size={14}/></button></DemoPanel>}
   </div>;

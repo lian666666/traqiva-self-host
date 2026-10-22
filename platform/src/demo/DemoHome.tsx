@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ArrowRight, ArrowUpRight, Check, ChevronRight, MessageCircle, ScanLine } from 'lucide-react';
 import { demoBriefs, demoQuestions } from './demoData';
+import { AGENT_BUILDER_ENABLED } from '../features/agentBuilder';
 import { demoAnswer, demoBriefEvidence, demoSeries, demoSummary, demoWorkflows } from './demoState';
 import { DemoMetricDialog } from './DemoMetricDialog';
 import { DemoChart, DemoMetric, demoCompactNumber, demoHeadlineMoney, demoMoney, demoNumber, type DemoViewProps } from './demoUi';
@@ -34,7 +35,7 @@ export function DemoHome({ state, dispatch, go }: DemoViewProps) {
 
   return <div className="demo-home">
     <header className="demo-view-heading">
-      <div><h1>Good morning, Demo</h1><p>See what your agents spend. Find what to improve.</p></div>
+      <div><h1>Good morning, Demo</h1><p>See what your coding agents spend. Find what to improve.</p></div>
       <label className="demo-select-label"><select aria-label="Sample time range" value={state.days} onChange={event => dispatch({ type: 'set', key: 'days', value: event.target.value === '7' ? 7 : 30 })}><option value={7}>Last 7 days</option><option value={30}>Last 30 days</option></select></label>
     </header>
 
@@ -52,7 +53,7 @@ export function DemoHome({ state, dispatch, go }: DemoViewProps) {
       <button className="demo-home-card demo-findings-card" onClick={() => go('improvements')} aria-label={`${next.length} open findings. Review evidence.`}>
         <div className="demo-card-top"><DemoMetric label="Open findings" value={demoNumber(next.length)}/><ScanLine size={16}/></div>
         <div className="demo-findings-tags">{next.length ? next.map(brief => <span key={brief.id}>{brief.kind}</span>) : <span><Check size={13}/>All findings reviewed</span>}</div>
-        <span className="demo-card-caption">From observation to a testable change <span>Review the evidence <ArrowRight size={11}/></span></span>
+        <span className="demo-card-caption">Find what to inspect in your coding workflow <span>Review the evidence <ArrowRight size={11}/></span></span>
       </button>
       <button className="demo-home-card" onClick={() => setMetric('requests')} aria-label="Requests: details">
         <div className="demo-card-top"><DemoMetric label="Requests" value={demoNumber(summary.requests)}/><ArrowUpRight size={15}/></div>
@@ -69,7 +70,7 @@ export function DemoHome({ state, dispatch, go }: DemoViewProps) {
     <div className="demo-home-questions" aria-label="Sample questions">{demoQuestions.map(question => <button key={question} onClick={() => ask(question)}><MessageCircle size={12}/>{question}</button>)}</div>
 
     <section className="demo-next">
-      <header><div><h2>Where to look next</h2><p>Read the finding. Inspect a request. Test the change.</p></div><button onClick={() => go('improvements')}>{next.length} open · All findings<ArrowRight size={13}/></button></header>
+      <header><div><h2>Where to look next</h2><p>{AGENT_BUILDER_ENABLED?'Read the finding. Inspect a request. Test the change.':'Read the finding. Inspect its coding-agent requests.'}</p></div><button onClick={() => go('improvements')}>{next.length} open · All findings<ArrowRight size={13}/></button></header>
       {next.length ? <div className="demo-next-list">{next.map(brief => {
         const evidenceCount = demoBriefEvidence(brief.id, state.days).length;
         return <button key={brief.id} onClick={() => openBrief(brief.id)}><span className="demo-finding-dot"/><div><span className="demo-brief-kind">{brief.kind}</span><strong>{brief.title}</strong></div><span className="demo-evidence-count">{evidenceCount} request{evidenceCount === 1 ? '' : 's'}</span><ChevronRight size={15}/></button>;
@@ -85,7 +86,7 @@ export function DemoHome({ state, dispatch, go }: DemoViewProps) {
       </button>)}
     </section>
 
-    <section className="demo-quality-callout"><span className="demo-quality-icon"><Check size={18}/></span><div><h2>A cheaper answer still needs to be a good answer.</h2><p>Run the sample cases. Edit an answer and see the check change.</p></div><button className="demo-button" onClick={() => go('experiments')}>Try a quality check<ArrowRight size={13}/></button></section>
+    {AGENT_BUILDER_ENABLED&&<section className="demo-quality-callout"><span className="demo-quality-icon"><Check size={18}/></span><div><h2>A cheaper answer still needs to be a good answer.</h2><p>Run the sample cases. Edit an answer and see the check change.</p></div><button className="demo-button" onClick={() => go('experiments')}>Try a quality check<ArrowRight size={13}/></button></section>}
     {metric && <DemoMetricDialog metric={metric} state={state} onClose={() => setMetric(null)} onInspect={inspectMetric} onAnalytics={() => { setMetric(null); go('analytics'); }}/>}
   </div>;
 }

@@ -16,6 +16,9 @@ describe('Fictional public demo data',()=>{
     expect(summary.models.reduce((total,model)=>total+model.requests,0)).toBe(60);
     expect(summary.possibleSavings).toBeNull();
     expect(summary.openBriefs).toBe(demoBriefs.length);
+    expect([...new Set(demoTraces.map(trace=>trace.workflow))]).toEqual(['Repository exploration','Test failure triage','Code refactoring','Release notes']);
+    expect(demoTraces.every(trace=>trace.repository==='northstar-demo/workbench')).toBe(true);
+    expect(JSON.stringify(demoTraces)).not.toMatch(/support assistant|invoice extraction|sample order/i);
   });
 
   it('does not allow fixture or nested payload mutation across demo visitors',()=>{
@@ -110,6 +113,13 @@ describe('Resettable public demo state',()=>{
     const next=demoReducer(initial,{type:'navigate',view:'analytics'});
     expect(next.view).toBe('analytics');expect(next.selectedTrace).toBeNull();expect(next.model).toBe(demoModels[1]);
     expect(initial.selectedTrace).toBe(demoTraces[0].id);
+  });
+  it('normalizes deferred module navigation and direct state assignments to the coding overview',()=>{
+    const initial=createDemoState();
+    for(const view of ['experiments','datasets','scorers','monitors','reviews','scenarios','quality-gates'] as const){
+      expect(demoReducer(initial,{type:'navigate',view}).view).toBe('home');
+      expect(demoReducer(initial,{type:'set',key:'view',value:view}).view).toBe('home');
+    }
   });
 
   it('opens an evidence trace with clean filters and widens a period when necessary',()=>{

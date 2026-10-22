@@ -54,6 +54,6 @@ export default function Auth({signup=false}:{signup?:boolean}){
       <div className="auth-switch">{signup?'Have an account?':'New here?'} <Link to={signup?'/login':'/signup'}>{signup?'Sign in':'Create an account'}</Link></div>
       <p className="privacy-note"><ShieldCheck size={14}/>Your prompts are never used to train our models.</p>
     </div>
-    <footer className="auth-footer">Traqiva · AI observability, with clarity.</footer>
+    <footer className="auth-footer">Traqiva · Coding agents, with clarity.</footer>
   </div>;
 }

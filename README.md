@@ -1,6 +1,8 @@
-# Traqiva — self-hosted agent observability and local compression
+# Traqiva — coding-agent insights and local compression
 
-A white-theme dashboard, API gateway, request traces, exact-match evaluations and local recoverable compression. Run your own Cloudflare Worker and D1 database. This repository contains application source, the independent Node CLI, selected Apache-2.0 native runtime source and separate platform downloads. It contains no hosted deployment's accounts, database, users or provider keys.
+A white-theme workspace for coding sessions, recorded requests, token usage and local recoverable compression. Run your own Cloudflare Worker and D1 database. This repository contains application source, the independent Node CLI, selected Apache-2.0 native runtime source and separate platform downloads. It contains no hosted deployment's accounts, database, users or provider keys.
+
+This release focuses on coding agents. Application-builder setup and evaluations are retained as an independent, disabled capability; they are absent from the current interface and evaluation APIs are unavailable. See the [release capability switch](platform/docs/CAPABILITIES.md#current-release-scope) before enabling them in a future deployment.
 
 ## Deploy your own instance
 

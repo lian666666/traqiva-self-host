@@ -4,6 +4,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { app } from '../server/index';
 import type { Database, Env, Statement } from '../server/types';
 
+// These retained multi-goal/evaluation contracts exercise the future capability.
+// The public coding-only release is covered without a flag mock separately.
+vi.mock('../src/features/agentBuilder', async importOriginal => ({
+  ...await importOriginal<typeof import('../src/features/agentBuilder')>(),
+  AGENT_BUILDER_ENABLED: true,
+}));
+
 class SqliteStatement implements Statement {
   values: unknown[] = [];
   constructor(public owner: SqliteDatabase, public sql: string) {}

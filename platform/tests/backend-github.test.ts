@@ -106,6 +106,8 @@ describe('GitHub OAuth authorization code flow with SQL state and verified email
     const session = await (await request('/api/session', cookie)).json() as any;
     expect(session.user).toMatchObject({ name: 'GitHub User', email, github_linked: true, google_linked: false });
     expect(session.projects).toHaveLength(1); expect(session.setup.stage).toBe('goals');
+    expect(session.setup.goals).toEqual([]);
+    expect((db.raw.prepare('SELECT * FROM user_onboarding').get() as any).flow_version).toBe(2);
     expect(db.raw.prepare('SELECT provider,subject,user_id FROM oauth_identities').get()).toEqual({ provider: 'github', subject: '73001', user_id: session.user.id });
     expect(db.raw.prepare('SELECT password_enabled FROM users').get()).toEqual({ password_enabled: 0 });
     const form = new URLSearchParams(fetcher.mock.calls[0][1]?.body as string);

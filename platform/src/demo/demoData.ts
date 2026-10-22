@@ -1,4 +1,5 @@
 /** Isolated, fictional examples for the public product tour. Never customer traffic. */
+import { AGENT_BUILDER_ENABLED } from '../features/agentBuilder';
 export type DemoView='home'|'gateway'|'analytics'|'traces'|'dashboards'|'improvements'|'experiments'|'datasets'|'scorers'|'monitors'|'reviews'|'scenarios'|'quality-gates'|'governance'|'settings'|'sessions'|'ask'|'inbox';
 export type DemoTrace={
   id:string;workflow:string;model:string;provider:string;status:'success'|'error';inputTokens:number;outputTokens:number;cachedTokens:number;cost:number;latencyMs:number;startedAt:string;sessionId:string;repository:string;request:Record<string,unknown>;response:Record<string,unknown>;
@@ -17,12 +18,12 @@ function freeze<T>(value:T):Readonly<T>{
 
 export const demoAnchor='2026-10-21T18:00:00.000Z';
 const anchorDay=Date.parse('2026-10-21T00:00:00.000Z');
-const workflows=['Support assistant','Invoice extraction','Knowledge search','Release summary'];
+const workflows=['Repository exploration','Test failure triage','Code refactoring','Release notes'];
 const models=['atlas-small','atlas-balanced','atlas-reasoning'];
 const scenarios=[
-  {input:'Where is my sample order DEMO-1042?',output:'The sample order is in transit. This is a fictional demonstration response.'},
-  {input:'Extract the total from sample invoice DEMO-082: EUR 184.50.',output:'{"currency":"EUR","total":184.50}'},
-  {input:'Find the retention rule in the fictional Northstar handbook.',output:'The sample handbook retains request metadata for 30 days.'},
+  {input:'Find the fictional workbench authentication entry point and its tests.',output:'The sample authentication handler is in src/auth.ts and its tests are in tests/auth.test.ts. These paths are fictional.'},
+  {input:'Explain the sample unit-test failure: expected status 200, received 401.',output:'The fictional test omitted its session fixture. Inspect the test setup before changing the handler.'},
+  {input:'Suggest a smaller interface for the fictional workbench configuration module.',output:'Separate configuration parsing from validation, then preserve existing behavior with focused tests.'},
   {input:'Summarize the fictional release notes for v0.8.',output:'The sample release adds project-level filters and a clearer request timeline.'},
 ];
 
@@ -39,15 +40,15 @@ export const demoTraces:readonly DemoTrace[]=freeze(Array.from({length:60},(_,in
     workflow:workflows[index%workflows.length],model:models[modelIndex],provider:'Fictional provider',status,
     inputTokens,outputTokens,cachedTokens,cost,latencyMs:status==='error'?2400:420+(index%11)*115+modelIndex*290,
     startedAt:new Date(anchorDay-(29-day)*86400000+(variant?15:9)*3600000).toISOString(),
-    sessionId:`demo-session-${String(Math.floor(index/5)+1).padStart(2,'0')}`,repository:'northstar-demo/assistant',
-    request:{model:models[modelIndex],messages:[{role:'system',content:'You are a fictional support assistant in the Traqiva interactive demo. These records are synthetic.'},{role:'user',content:scenario.input}],metadata:{session_id:`demo-session-${String(Math.floor(index/5)+1).padStart(2,'0')}`,demo:true}},
+    sessionId:`demo-session-${String(Math.floor(index/5)+1).padStart(2,'0')}`,repository:'northstar-demo/workbench',
+    request:{model:models[modelIndex],messages:[{role:'system',content:'You are a fictional coding agent in the Traqiva interactive demo. These records are synthetic.'},{role:'user',content:scenario.input}],metadata:{session_id:`demo-session-${String(Math.floor(index/5)+1).padStart(2,'0')}`,demo:true}},
     response:status==='error'?{error:{type:'sample_rate_limit',message:'Simulated rate-limit response; no provider was contacted.'}}:{message:{role:'assistant',content:scenario.output},usage:{input_tokens:inputTokens,output_tokens:outputTokens,cached_tokens:cachedTokens},demo:true},
   };
 }));
 
 export const demoModels:readonly string[]=freeze([...new Set(demoTraces.map(trace=>trace.model))]);
 export const demoBriefs:readonly DemoBrief[]=freeze([
-  {id:'demo-brief-retries',title:'Give repeated failures a retry boundary',summary:'Four sample requests ended in the same simulated rate-limit response.',evidence:'In this fictional 60-request dataset, 4 requests have an error status. Inspect those traces before changing a retry policy.',nextStep:'Review the failed samples, then compare a bounded backoff policy against the same evaluation cases.',potentialDaily:null,kind:'Reliability',traceIds:demoTraces.filter(trace=>trace.status==='error').map(trace=>trace.id)},
+  {id:'demo-brief-retries',title:'Give repeated failures a retry boundary',summary:'Four sample requests ended in the same simulated rate-limit response.',evidence:'In this fictional 60-request dataset, 4 requests have an error status. Inspect those traces before changing a retry policy.',nextStep:AGENT_BUILDER_ENABLED?'Review the failed samples, then compare a bounded backoff policy against the same evaluation cases.':'Inspect the failed coding-agent requests and their session context before changing a retry policy.',potentialDaily:null,kind:'Reliability',traceIds:demoTraces.filter(trace=>trace.status==='error').map(trace=>trace.id)},
   {id:'demo-brief-context',title:'Review the largest context blocks',summary:'Some requests carry materially more input than the rest of the sample workload.',evidence:'The atlas-reasoning examples include an additional 2,600 input tokens. This is fixture design, not proof that those tokens can safely be removed.',nextStep:'Inspect the request payload and test a smaller context against the expected outputs before applying a change.',potentialDaily:null,kind:'Input efficiency',traceIds:demoTraces.filter(trace=>trace.model==='atlas-reasoning').map(trace=>trace.id)},
   {id:'demo-brief-cache',title:'Check which prefixes could remain stable',summary:'Cache usage varies across the sample requests.',evidence:'Sample records explicitly report both input and cached token counts. The chart derives its share from those same counts.',nextStep:'Compare stable prefixes and their reported usage. A cache percentage alone does not establish invoice savings.',potentialDaily:null,kind:'Cache visibility',traceIds:demoTraces.filter(trace=>trace.cachedTokens===0).map(trace=>trace.id)},
 ]);
@@ -58,8 +59,9 @@ export const demoCases:readonly DemoCase[]=freeze([
   {id:'demo-case-3',input:'Return the sample retention window, in days.',expected:'30',actual:'30 days'},
 ]);
 export const demoQuestions:readonly string[]=freeze(['How much did this demo spend?','Which models use the most tokens?','Where can we improve this workflow?']);
-export const demoNotifications:readonly DemoNotification[]=freeze([
+const allDemoNotifications:DemoNotification[]=[
   {id:'demo-notice-brief',title:'Three sample briefs are ready',body:'Explore the evidence and mark a suggestion as reviewed. Changes stay in this demo.',view:'improvements'},
   {id:'demo-notice-quality',title:'One sample answer needs a closer look',body:'The retention case returns an extra word. Run the exact-match check to inspect the mismatch.',view:'experiments'},
   {id:'demo-notice-trace',title:'A simulated request failed',body:'Filter the traces by error to inspect the fictional rate-limit response.',view:'traces'},
-]);
+];
+export const demoNotifications:readonly DemoNotification[]=freeze(allDemoNotifications.filter(item=>AGENT_BUILDER_ENABLED||item.id!=='demo-notice-quality'));

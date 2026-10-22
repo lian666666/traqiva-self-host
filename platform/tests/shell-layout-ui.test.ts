@@ -32,12 +32,16 @@ describe('Reference workspace layout',()=>{
     expect(html).not.toContain('href="/app/developers/repositories"');
     expect(html).not.toContain('href="/app/developers/delivery"');
   });
-  it('keeps observability routes available outside the developer product',()=>{
+  it('keeps shared coding traffic tools while hiding the disabled builder product',()=>{
     const html=render('/app/gateway');
-    expect(html).toContain('Agents you build');
+    expect(html).toContain('Coding agents you use');
+    expect(html).not.toContain('Agents you build');
+    expect(html).not.toContain('href="/app/evals"');
     expect(html).toContain('href="/app/traces"');
     expect(html).toContain('href="/app/dashboards"');
-    expect(html).toContain('<strong>Gateway</strong>');
+    expect(html).toContain('href="/app/controls"');
+    expect(html).toContain('href="/app/developers/sessions"');
+    expect(html).toContain('<strong>Project keys</strong>');
   });
   it('shows setup progress from project and real connection evidence',()=>{
     expect(render()).toContain('1 of 2');

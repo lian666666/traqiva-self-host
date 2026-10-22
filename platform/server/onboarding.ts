@@ -1,6 +1,7 @@
 import type { Context, Hono } from 'hono';
 import { ApiError, id, now, readJson, stringField } from './security';
 import type { Env, Row } from './types';
+import { AGENT_BUILDER_ENABLED, ONBOARDING_FLOW_VERSION } from '../src/features/agentBuilder';
 
 export const TERMS_VERSION = '2026-10-20.1';
 type Setup = { stage: 'goals' | 'project' | 'connect' | 'complete'; goals: Array<'coding' | 'observe'>; project_id: string | null };
@@ -11,7 +12,17 @@ const one = (env: Env, sql: string, ...args: unknown[]) => env.DB.prepare(sql).b
 
 export async function onboardingFor(env: Env, userId: string): Promise<Setup> {
   const at = now();
-  await env.DB.prepare('INSERT OR IGNORE INTO user_onboarding(user_id,created_at,updated_at) VALUES(?,?,?)').bind(userId, at, at).run();
+  await env.DB.prepare('INSERT OR IGNORE INTO user_onboarding(user_id,flow_version,created_at,updated_at) VALUES(?,?,?,?)').bind(userId, ONBOARDING_FLOW_VERSION, at, at).run();
+  // Only stale or disabled-goal setups are changed. The conditional update is
+  // atomic, so a second session read cannot reset newly confirmed progress.
+  await env.DB.prepare(`UPDATE user_onboarding SET
+    stage=CASE WHEN stage<>'complete' THEN 'goals' ELSE stage END,
+    goals_json=CASE WHEN stage<>'complete' THEN '[]'
+      WHEN ?=0 AND EXISTS(SELECT 1 FROM json_each(goals_json) WHERE value='observe') THEN '["coding"]'
+      ELSE goals_json END,
+    flow_version=?,updated_at=?
+    WHERE user_id=? AND (flow_version<? OR (?=0 AND EXISTS(SELECT 1 FROM json_each(goals_json) WHERE value='observe')))`)
+    .bind(AGENT_BUILDER_ENABLED ? 1 : 0, ONBOARDING_FLOW_VERSION, at, userId, ONBOARDING_FLOW_VERSION, AGENT_BUILDER_ENABLED ? 1 : 0).run();
   const row = (await one(env, 'SELECT stage,goals_json,project_id FROM user_onboarding WHERE user_id=?', userId))!;
   return { stage: row.stage, goals: JSON.parse(row.goals_json), project_id: row.project_id };
 }
@@ -56,14 +67,15 @@ export function registerOnboarding(app: Hono<AppEnv>, auth: Auth) {
   });
   app.post('/api/onboarding/goals', async c => {
     const { user, workspace } = await context(c), body = await readJson(c.req.raw), goals = body.goals;
-    if (!Array.isArray(goals) || goals.length < 1 || goals.length > 2 || new Set(goals).size !== goals.length || goals.some(goal => !['coding', 'observe'].includes(goal))) throw new ApiError(400, 'Select one or both goals: coding, observe.');
+    const allowedGoals = AGENT_BUILDER_ENABLED ? ['coding', 'observe'] : ['coding'];
+    if (!Array.isArray(goals) || goals.length < 1 || goals.length > allowedGoals.length || new Set(goals).size !== goals.length || goals.some(goal => !allowedGoals.includes(goal))) throw new ApiError(400, AGENT_BUILDER_ENABLED ? 'Select one or both goals: coding, observe.' : 'Select the coding-agent setup goal.');
     await c.env.DB.prepare("UPDATE user_onboarding SET goals_json=?,stage=CASE WHEN stage='goals' THEN 'project' ELSE stage END,updated_at=? WHERE user_id=?").bind(JSON.stringify(goals), now(), user.id).run();
     await setupAudit(c.env, user.id, workspace.id, null, 'onboarding.goals', { goals });
     return c.json({ setup: await onboardingFor(c.env, user.id) });
   });
   app.post('/api/onboarding/project', async c => {
     const { user, workspace, setup } = await context(c), body = await readJson(c.req.raw), name = stringField(body.name, 'name', 100);
-    if (!setup.goals.length) throw new ApiError(409, 'Select your goals before choosing a project.');
+    if (setup.stage === 'goals' || !setup.goals.length) throw new ApiError(409, 'Select your goals before choosing a project.');
     let project = setup.project_id ? await one(c.env, 'SELECT * FROM projects WHERE id=? AND workspace_id=?', setup.project_id, workspace.id) : null;
     project ??= await one(c.env, 'SELECT * FROM projects WHERE workspace_id=? ORDER BY created_at,id LIMIT 1', workspace.id);
     const member = await one(c.env, 'SELECT role FROM members WHERE workspace_id=? AND user_id=?', workspace.id, user.id);

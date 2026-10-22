@@ -2,6 +2,8 @@ import { useEffect,useReducer,useRef,useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeftRight,ArrowRight,BarChart3,Check,ChevronDown,Database,Expand,FlaskConical,FolderGit2,Home,Inbox,LayoutDashboard,ListTree,Menu,MessageCircle,Moon,MoreHorizontal,RotateCcw,Settings2,ShieldCheck,SlidersHorizontal,Sun,Terminal,X } from 'lucide-react';
 import { Logo } from '../ui';
+import { AGENT_BUILDER_ENABLED } from '../features/agentBuilder';
+import { availableDemoView } from './demoFeatures';
 import { createDemoState,demoReducer } from './demoState';
 import type { DemoView } from './demoData';
 import { DemoTraffic } from './DemoTraffic';
@@ -19,10 +21,10 @@ const evalViews=new Set<DemoView>([...evaluations,...advanced].map(item=>item.vi
 const trafficViews=new Set<DemoView>(traffic.map(item=>item.view));
 
 export default function InteractiveDemo({standalone=false,initialView='home'}:{standalone?:boolean;initialView?:DemoView}){
-  const [state,dispatch]=useReducer(demoReducer,initialView,view=>({...createDemoState(),view}));
+  const [state,dispatch]=useReducer(demoReducer,initialView,view=>({...createDemoState(),view:availableDemoView(view)}));
   const [navigation,setNavigation]=useState(false),[more,setMore]=useState(false),[workspace,setWorkspace]=useState(false),[groups,setGroups]=useState({Traffic:true,Improve:true,Evaluate:true,Admin:true});
   const main=useRef<HTMLDivElement>(null),frame=useRef<HTMLDivElement>(null),navOpener=useRef<HTMLButtonElement>(null),navClose=useRef<HTMLButtonElement>(null),projectOpener=useRef<HTMLButtonElement>(null);
-  function go(view:DemoView){dispatch({type:'navigate',view});setNavigation(false);setWorkspace(false);if(navigation)requestAnimationFrame(()=>main.current?.focus({preventScroll:true}));}
+  function go(view:DemoView){dispatch({type:'navigate',view:availableDemoView(view)});setNavigation(false);setWorkspace(false);if(navigation)requestAnimationFrame(()=>main.current?.focus({preventScroll:true}));}
   function closeNavigation(){setNavigation(false);requestAnimationFrame(()=>navOpener.current?.focus());}
   function reset(){dispatch({type:'reset'});setMore(false);setWorkspace(false);setNavigation(false);setGroups({Traffic:true,Improve:true,Evaluate:true,Admin:true});main.current?.scrollTo({top:0});}
   useEffect(()=>{if(!state.selectedTrace)main.current?.scrollTo({top:0});},[state.view,state.selectedTrace]);
@@ -44,12 +46,12 @@ export default function InteractiveDemo({standalone=false,initialView='home'}:{s
     <aside className="demo-sidebar" aria-label="Demo navigation" role={navigation?'dialog':undefined} aria-modal={navigation?true:undefined}>
       <div className="demo-project"><Logo compact/><button ref={projectOpener} type="button" className="demo-project-toggle" onClick={()=>setWorkspace(!workspace)} aria-expanded={workspace}><span><strong>{state.projectName}</strong><small>sample-prod</small></span><ChevronDown size={11}/></button><button ref={navClose} type="button" className="demo-mobile-close demo-icon" aria-label="Close demo navigation" onClick={closeNavigation}><X size={16}/></button>{workspace&&<div className="demo-project-menu"><span>Fictional workspace</span><button type="button" onClick={()=>go('settings')}><Settings2 size={13}/>Project settings</button><button type="button" onClick={reset}><RotateCcw size={13}/>Reset sample project</button></div>}</div>
       <div className="demo-shortcuts" aria-label="Demo spaces">{([{view:'home',icon:Home},{view:'sessions',icon:Terminal},{view:'ask',icon:MessageCircle},{view:'inbox',icon:Inbox}] as NavigationItem[]).map(({view,icon:Icon})=><button key={view} type="button" title={demoTitles[view]} aria-label={`Demo ${demoTitles[view]}`} aria-pressed={state.view===view} onClick={()=>go(view)}><Icon size={15}/>{view==='inbox'&&<small>{state.notifications.length}</small>}</button>)}</div>
-      <nav className="demo-navigation" aria-label="Demo modules">{item({view:'home',icon:Home})}{group('Traffic',traffic)}{group('Improve',[{view:'improvements',icon:SlidersHorizontal},{view:'sessions',icon:Terminal}])}{group('Evaluate',evaluations)}{group('Admin',[{view:'governance',icon:ShieldCheck},{view:'settings',icon:Settings2}])}</nav>
+      <nav className="demo-navigation" aria-label="Demo modules">{item({view:'home',icon:Home})}{group('Traffic',traffic)}{group('Improve',[{view:'improvements',icon:SlidersHorizontal},{view:'sessions',icon:Terminal}])}{AGENT_BUILDER_ENABLED&&group('Evaluate',evaluations)}{group('Admin',[{view:'governance',icon:ShieldCheck},{view:'settings',icon:Settings2}])}</nav>
       <Link className="demo-setup-link" to="/signup">Set up your own project<ArrowRight size={14}/></Link>
     </aside>
     <div className="demo-main" inert={navigation?true:undefined}><header className="demo-header"><button ref={navOpener} type="button" className="demo-mobile-open demo-icon" onClick={()=>setNavigation(true)} aria-label="Open demo navigation" aria-expanded={navigation}><Menu size={17}/></button><strong aria-live="polite">{demoTitles[state.view]}</strong><span className="demo-sample-label"><i/>Sample project</span><div><button type="button" className="demo-icon" title="Reset demo" aria-label="Reset demo" onClick={reset}><RotateCcw size={14}/></button><button type="button" className="demo-icon" title={`Use ${state.theme==='light'?'dark':'light'} demo theme`} aria-label={`Use ${state.theme==='light'?'dark':'light'} demo theme`} onClick={()=>dispatch({type:'set',key:'theme',value:state.theme==='light'?'dark':'light'})}>{state.theme==='light'?<Moon size={14}/>:<Sun size={14}/>}</button>{!standalone&&<Link className="demo-icon" to={`/demo?view=${state.view}`} title="Open demo full screen" aria-label="Open demo full screen"><Expand size={14}/></Link>}</div></header>
       <div ref={main} className="demo-content" role="region" tabIndex={-1} aria-label={`${demoTitles[state.view]} demo content`}>
-        {trafficViews.has(state.view)?<DemoTraffic {...props}/>:evalViews.has(state.view)?<DemoEvaluate {...props}/>:<DemoWorkspace {...props}/>}
+        {trafficViews.has(state.view)?<DemoTraffic {...props}/>:AGENT_BUILDER_ENABLED&&evalViews.has(state.view)?<DemoEvaluate {...props}/>:<DemoWorkspace {...props}/>}
       </div>
       <footer className="demo-footer"><span><i/>Interactive demo · fictional data</span><span>Changes reset on reload</span></footer>
     </div>

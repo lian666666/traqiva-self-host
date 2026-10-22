@@ -34,7 +34,7 @@ describe('Compact coding-agent onboarding',()=>{
     expect(primary).not.toContain('Let your AI handle setup');
     expect(html).toContain('Create a project key');
     expect(html).toContain('Copy setup prompt');
-    expect(html).toContain('API / SDK');
+    expect(html).not.toContain('API / SDK');
   });
 
   it('requires real connection evidence before enabling continue and still allows skipping',()=>{
@@ -67,12 +67,24 @@ describe('Compact coding-agent onboarding',()=>{
     expect(primary).not.toContain('Project connected');
   });
 
-  it('keeps the API connection example visible for an API-only setup goal',()=>{
+  it('does not expose a deferred API setup through a legacy application-only goal',()=>{
     state.session!.setup!.goals=['observe'];
     const primary=primarySetup(renderSetup());
-    expect(primary).toContain('Connect your application.');
-    expect(primary).toContain('Point your API client to Traqiva');
-    expect(primary).toContain('baseURL:');
+    expect(primary).toContain('Set up your coding agent.');
+    expect(primary).not.toContain('Connect your application.');
+    expect(primary).not.toContain('Point your API client to Traqiva');
+    expect(primary).not.toContain('baseURL:');
+  });
+
+  it('starts at an explicit first step with only the current coding-agent product',()=>{
+    state.session!.setup={stage:'goals',goals:[],project_id:null};
+    const html=renderSetup();
+    expect(html.replace(/<[^>]*>/g,'')).toContain('Step 1 of 3');
+    expect(html).toContain('What do you want to do?');
+    expect(html).toContain('Spend less on coding agents');
+    expect(html).not.toContain('Build more efficient agents');
+    expect(html).not.toContain('Choose one or both');
+    expect(html).not.toContain('Start on Free');
   });
 
   it.each(['codex','claude'] as const)('uses the selected %s integration in one supported command sequence',assistant=>{

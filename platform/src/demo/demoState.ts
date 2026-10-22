@@ -1,4 +1,5 @@
 import { demoAnchor,demoBriefs,demoCases,demoNotifications,demoTraces,type DemoCase,type DemoTrace,type DemoView } from './demoData';
+import { availableDemoView } from './demoFeatures';
 export type { DemoView } from './demoData';
 export type DemoState={
   view:DemoView;days:7|30;query:string;model:string;status:''|'success'|'error';traceSort:'newest'|'cost'|'tokens';
@@ -16,8 +17,8 @@ export function createDemoState():DemoState{
 export function demoReducer(state:DemoState,action:DemoAction):DemoState{
   switch(action.type){
     case 'reset':return createDemoState();
-    case 'set':return {...state,[action.key]:action.value,...(action.key==='caseSensitive'||action.key==='evaluationCases'?{evaluationResults:null}:{})};
-    case 'navigate':return {...state,view:action.view,selectedTrace:null};
+    case 'set':return {...state,[action.key]:action.key==='view'?availableDemoView(action.value):action.value,...(action.key==='caseSensitive'||action.key==='evaluationCases'?{evaluationResults:null}:{})};
+    case 'navigate':return {...state,view:availableDemoView(action.view),selectedTrace:null};
     case 'inspect-traces':{
       const next:DemoState={...state,view:'traces',query:action.query??'',model:action.model??'',status:action.status??'',traceSort:'newest',traceTab:'request',selectedTrace:null};
       const target=demoTraces.find(trace=>trace.id===action.traceId);

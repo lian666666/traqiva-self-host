@@ -11,17 +11,34 @@ function renderWorkspace(state: DemoState) {
   return renderToStaticMarkup(createElement(MemoryRouter, null, createElement(DemoWorkspace, {state, dispatch: () => {}, go: () => {}})));
 }
 function renderTraffic(state: DemoState) {
-  return renderToStaticMarkup(createElement(DemoTraffic, {state, dispatch: () => {}, go: () => {}}));
+  return renderToStaticMarkup(createElement(MemoryRouter, null, createElement(DemoTraffic, {state, dispatch: () => {}, go: () => {}})));
 }
 
 describe('Public demo evidence journey', () => {
-  it('links an improvement to the actual matching sample traces and an evaluation next step', () => {
+  it('links an improvement to actual matching coding-agent traces without a deferred evaluation next step', () => {
     const html = renderWorkspace({...createDemoState(), view: 'improvements'});
     expect(html).toContain('aria-label="Inspect demo-trace-001"');
     expect(html).toContain('4 matching requests');
-    expect(html).toContain('Test a change');
+    expect(html).toContain('Inspect matching requests');
+    expect(html).not.toContain('Test a change');
+    expect(html).not.toContain('exact-match cases');
     expect(html).not.toContain('potential/day');
     expect(html).not.toContain('Potential per day');
+  });
+  it('shows a coding-agent connection path without SDK or project-key examples', () => {
+    const html=renderTraffic({...createDemoState(),view:'gateway'});
+    expect(html).toContain('Connect a coding agent');
+    expect(html).toContain('href="/signup"');
+    expect(html).not.toContain('Connect an SDK');
+    expect(html).not.toContain('JavaScript');
+    expect(html).not.toContain('demo_only_not_a_credential');
+  });
+  it('keeps quality dashboards and quality notifications out of the coding-agent release', () => {
+    const dashboard=renderTraffic({...createDemoState(),view:'dashboards'});
+    const inbox=renderWorkspace({...createDemoState(),view:'inbox'});
+    expect(dashboard).not.toContain('>Quality<');
+    expect(inbox).not.toContain('One sample answer needs a closer look');
+    expect(createDemoState().notifications).toHaveLength(2);
   });
 
   it('does not keep a reviewed brief open under an empty open filter', () => {

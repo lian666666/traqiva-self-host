@@ -2,6 +2,8 @@ import assert from 'node:assert/strict';
 import { randomBytes } from 'node:crypto';
 
 const base = process.env.TRAQIVA_TEST_URL || 'http://127.0.0.1:8789';
+// Opt in only against a deployment built with the deferred capability enabled.
+const testBuilder = process.env.TRAQIVA_TEST_BUILDER === '1';
 const suffix = Date.now().toString(36) + randomBytes(3).toString('hex');
 const password = randomBytes(24).toString('base64url');
 const checks = [];
@@ -21,8 +23,12 @@ async function register(label) {
   assert.equal(result.data.terms.accepted, false);
   const gated = await call('/api/overview?project=' + account.project, account);
   assert.equal(gated.status, 428, 'Business traffic must require the current workspace consent');
-  const goals = await call('/api/onboarding/goals', { ...account, method: 'POST', body: { goals: ['coding', 'observe'] } });
+  const goals = await call('/api/onboarding/goals', { ...account, method: 'POST', body: { goals: ['coding'] } });
   assert.equal(goals.status, 200);
+  assert.equal(goals.data.setup.stage, 'project');
+  assert.deepEqual(goals.data.setup.goals, ['coding']);
+  const savedGoals = await call('/api/session', account);
+  assert.equal(savedGoals.data.setup.stage, 'project', 'A current step-one confirmation must survive a fresh session read');
   const project = await call('/api/onboarding/project', { ...account, method: 'POST', body: { name: `QA ${label} project` } });
   assert.equal(project.status, 200);
   const retry = await call('/api/onboarding/project', { ...account, method: 'POST', body: { name: `QA ${label} project` } });
@@ -42,7 +48,7 @@ const a = await register('owner'), b = await register('isolated');
 checks.push('D1-backed registration and secure session cookie');
 const session = await call('/api/session', a);
 check('Session persists and default project belongs to owner', () => assert.equal(session.data.activeProject.id, a.project));
-check('Onboarding and current-version consent survive a fresh session read', () => { assert.equal(session.data.setup.stage, 'complete'); assert.deepEqual(session.data.setup.goals, ['coding', 'observe']); assert.equal(session.data.terms.accepted, true); });
+check('Coding onboarding and current-version consent survive a fresh session read', () => { assert.equal(session.data.setup.stage, 'complete'); assert.deepEqual(session.data.setup.goals, ['coding']); assert.equal(session.data.terms.accepted, true); });
 checks.push('Business APIs require explicit consent; skip cannot bypass it', 'Project setup retries preserve one initial project', 'Connection completion requires actual evidence or an explicit skip');
 const waiting = await call('/api/onboarding/status', a);
 check('Opening the setup status screen does not create connection evidence', () => assert.equal(waiting.data.connected, false));
@@ -79,10 +85,17 @@ const overview = await call('/api/overview?project=' + a.project, a);
 check('Analytics derives from stored traffic, with unknown pricing/savings absent', () => { assert.equal(overview.data.stats.requests, 1); assert.equal(overview.data.stats.input_tokens, 120); assert.equal(overview.data.stats.estimated_cost_usd, null); assert.equal(overview.data.stats.saved_tokens, null); });
 const summary = await call('/api/ask', { ...a, method: 'POST', body: { project_id: a.project, question: 'Summarize project traffic' } });
 check('Ask without a provider key reports computed statistics without claiming AI', () => { assert.equal(summary.status, 200); assert.equal(summary.data.method, 'rules'); assert.equal(summary.data.provider_called, false); assert.ok(summary.data.answer.includes('120')); });
-const suite = await call('/api/evals', { ...a, method: 'POST', body: { project_id: a.project, name: 'QA exact-match', cases: [{ input: 'one', expected: 'yes', actual: 'yes' }, { input: 'two', expected: 'no', actual: 'wrong' }] } });
-assert.equal(suite.status, 201);
-const run = await call('/api/evals/' + suite.data.suite.id + '/run', { ...a, method: 'POST', body: {} });
-check('Eval runs actual exact-match cases without claiming a model call', () => { assert.equal(run.data.run.total, 2); assert.equal(run.data.run.passed, 1); assert.equal(run.data.run.provider_called, false); });
+if (testBuilder) {
+  const suite = await call('/api/evals', { ...a, method: 'POST', body: { project_id: a.project, name: 'QA exact-match', cases: [{ input: 'one', expected: 'yes', actual: 'yes' }, { input: 'two', expected: 'no', actual: 'wrong' }] } });
+  assert.equal(suite.status, 201, 'TRAQIVA_TEST_BUILDER=1 requires an explicitly builder-enabled deployment');
+  const run = await call('/api/evals/' + suite.data.suite.id + '/run', { ...a, method: 'POST', body: {} });
+  check('Opt-in builder evaluation runs exact-match cases without a model call', () => { assert.equal(run.status, 200); assert.equal(run.data.run.total, 2); assert.equal(run.data.run.passed, 1); assert.equal(run.data.run.provider_called, false); });
+} else {
+  const suites = await call('/api/evals?project=' + a.project, a);
+  const create = await call('/api/evals', { ...a, method: 'POST', body: { project_id: a.project, name: 'QA deferred capability', cases: [{ input: 'one', expected: 'yes', actual: 'yes' }] } });
+  const run = await call('/api/evals/qa-deferred-capability/run', { ...a, method: 'POST', body: {} });
+  check('Deferred builder evaluation routes are unavailable; no evaluation is run', () => assert.deepEqual([suites.status, create.status, run.status], [404, 404, 404]));
+}
 const findings = await call('/api/improvements/analyze', { ...a, method: 'POST', body: { project_id: a.project } });
 check('Improvement analysis produces evidence from real unpriced traffic', () => { assert.equal(findings.status, 200); assert.ok(findings.data.items.some(item => item.kind === 'pricing')); });
 await call('/api/keys/' + keyResult.data.record.id, { ...a, method: 'DELETE' });
@@ -91,4 +104,4 @@ check('Revoked project key is rejected', () => assert.equal(revoked.status, 401)
 await call('/api/auth/logout', { ...a, method: 'POST', body: {} });
 const loggedOut = await call('/api/session', a);
 check('Logout invalidates the server session', () => assert.equal(loggedOut.data.user, null));
-console.log(JSON.stringify({ base, passed: checks.length, checks, note: 'Only isolated QA workspaces and explicitly synthetic records were created; passwords and API keys were never printed.' }, null, 2));
+console.log(JSON.stringify({ base, builder_expected: testBuilder, passed: checks.length, checks, note: 'Only isolated QA workspaces and explicitly synthetic records were created; passwords and API keys were never printed.' }, null, 2));

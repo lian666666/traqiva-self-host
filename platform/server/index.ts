@@ -11,6 +11,7 @@ import { registerDeveloperSessions } from './developer-sessions';
 import { AUTO_MODEL, autoSettings, routeAuto, validateAutoSettings } from './auto';
 import { sampledWasteRules, WASTE_SAMPLE_LIMIT, WASTE_WINDOW_DAYS } from './waste';
 import { autoRequestBody } from './json-fields';
+import { AGENT_BUILDER_ENABLED } from '../src/features/agentBuilder';
 
 export const app = new Hono<{ Bindings: Env; Variables: { user: Row } }>();
 const COOKIE = 'traqiva_session';
@@ -311,6 +312,7 @@ export function gradeCases(cases: Array<{ input: string; expected: string; actua
   const results = cases.map((item, index) => ({ index, passed: item.expected_digest && item.actual_digest ? item.expected_digest === item.actual_digest : item.expected === item.actual, input: item.input, expected: item.expected, actual: item.actual }));
   return { results, passed: results.filter(item => item.passed).length, total: results.length };
 }
+if (AGENT_BUILDER_ENABLED) {
 app.get('/api/evals', async c => {
   const { project } = await userProject(c, c.req.query('project'));
   const suites = (await dbAll(c.env, 'SELECT * FROM eval_suites WHERE project_id=? ORDER BY created_at DESC', project.id)).map(({ cases_json, ...row }) => ({ ...row, cases: JSON.parse(cases_json), case_count: JSON.parse(cases_json).length }));
@@ -339,6 +341,7 @@ app.post('/api/evals/:id/run', async c => {
   await audit(c.env, principal, 'eval.executed', { run_id: run.id, grader: 'exact_match', provider_called: false, passed: grade.passed, total: grade.total });
   return c.json({ run });
 });
+}
 export async function analyzeProject(env: Env, projectId: string) {
   if (!(await autoSettings(env, projectId)).waste_checks_enabled) return dbAll(env, 'SELECT * FROM improvements WHERE project_id=? ORDER BY created_at DESC', projectId);
   const stats = (await dbOne(env, "SELECT COUNT(*) AS requests,SUM(CASE WHEN status='error' THEN 1 ELSE 0 END) AS errors,SUM(CASE WHEN cost_usd IS NULL THEN 1 ELSE 0 END) AS unpriced,MAX(input_tokens) AS largest_input FROM traces WHERE project_id=?", projectId))!;

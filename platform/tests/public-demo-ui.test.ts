@@ -20,7 +20,8 @@ describe('Anonymous public demo', () => {
   });
   it('exposes the product modules as demo navigation rather than private app links', () => {
     const html = render();
-    for (const name of ['Home','Gateway','Analytics','Traces','Dashboards','Improvements','Experiments','Datasets','Scorers','Governance','Settings']) expect(html.includes(name)).toBe(true);
+    for (const name of ['Home','Gateway','Analytics','Traces','Dashboards','Improvements','Governance','Settings']) expect(html.includes(name)).toBe(true);
+    for (const name of ['Experiments','Datasets','Scorers','Quality gates','Try a quality check']) expect(html.includes(name)).toBe(false);
     expect(html.includes('href="/app/')).toBe(false);
     expect(html.includes('href="/signup"')).toBe(true);
   });
@@ -38,9 +39,18 @@ describe('Anonymous public demo', () => {
     expect(html).toContain(demoCompactNumber(summary.inputTokens));
     expect(html.replace(/<[^>]*>/g,'')).toContain('14 requests');
     for(const name of ['Spend: details','Input cached: details','Requests: details','Input tokens: details','3 open findings. Review evidence.'])expect(html).toContain(name);
-    expect(html).toContain('Inspect Invoice extraction requests');
+    expect(html).toContain('Inspect Test failure triage requests');
     expect(html).not.toContain('Cache coverage');
     expect(html).not.toContain('Potential per day');
+  });
+  it('does not expose a deferred module through a direct initial view', () => {
+    for (const initialView of ['experiments','datasets','scorers','monitors','reviews','scenarios','quality-gates'] as const) {
+      const html=renderToStaticMarkup(createElement(MemoryRouter,null,createElement(InteractiveDemo,{initialView})));
+      expect(html).toContain('Good morning, Demo');
+      expect(html).not.toContain('Run sample evaluation');
+      expect(html).not.toContain('Configure scorer');
+      expect(html).not.toContain('demo-notice-quality');
+    }
   });
   it('reflects reviewed findings in the overview instead of leaving a stale next action', () => {
     const state=demoBriefs.reduce((current,brief)=>demoReducer(current,{type:'review-brief',id:brief.id,status:'reviewed'}),createDemoState());

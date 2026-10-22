@@ -23,7 +23,7 @@ The script refuses an existing Worker or database by default. `--reuse-existing`
 
 Generated config/state files are ignored by Git. Keep them locally for repeat deployments; they contain resource identifiers, not provider keys. The template's `wrangler.jsonc` has no account or database ID and is not your production deployment record. Running `npm run deploy -- ...` in the exported template invokes the same explicit-target bootstrap.
 
-Open the printed URL, register an account, choose your goals and project, accept the displayed workspace terms, then connect an integration or explicitly skip that step. Generate a project key when connecting and test the integration you need. A deployed Worker is not proof a provider/model/agent has been connected. Email/password works independently of optional Google sign-in. Email verification, password reset delivery and SMTP are not implemented; registration itself does not prove email ownership.
+Open the printed URL, register an account, confirm the coding-agent goal at Step 1, configure the free workspace at Step 2, then review the terms and connect your coding agent at Step 3 (or explicitly skip connection). Generate a project key when connecting and test the integration you need. Application-builder setup is disabled in this release. A deployed Worker is not proof a provider/model/agent has been connected. Email/password works independently of optional Google sign-in. Email verification, password reset delivery and SMTP are not implemented; registration itself does not prove email ownership.
 
 ## GitHub Actions
 

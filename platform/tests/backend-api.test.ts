@@ -4,6 +4,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { app, scheduled } from '../server/index';
 import type { Database, Env, Statement } from '../server/types';
 
+// Retain coverage of the deferred builder implementation; release-off coverage
+// lives in backend-product-flow.test.ts and uses the actual default flag.
+vi.mock('../src/features/agentBuilder', async importOriginal => ({
+  ...await importOriginal<typeof import('../src/features/agentBuilder')>(),
+  AGENT_BUILDER_ENABLED: true,
+}));
+
 class SqliteStatement implements Statement {
   values: unknown[] = [];
   constructor(public owner: SqliteDatabase, public sql: string) {}

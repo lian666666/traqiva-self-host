@@ -95,6 +95,8 @@ describe('Google authorization code OIDC with real signatures and SQL state', ()
     const session = await (await request('/api/session', sessionCookie)).json() as any;
     expect(session.user).toMatchObject({ name: 'Google User', email: 'google@example.test', google_linked: true });
     expect(session.projects).toHaveLength(1); expect(session.activeProject.name).toBe('My project');
+    expect(session.setup).toEqual({ stage: 'goals', goals: [], project_id: null });
+    expect((db.raw.prepare('SELECT * FROM user_onboarding').get() as any).flow_version).toBe(2);
     expect(db.raw.prepare('SELECT role FROM members').get()).toEqual({ role: 'owner' });
     expect(db.raw.prepare('SELECT password_enabled FROM users').get()).toEqual({ password_enabled: 0 });
     expect(db.raw.prepare('SELECT count(*) AS n FROM traces').get()).toEqual({ n: 0 });

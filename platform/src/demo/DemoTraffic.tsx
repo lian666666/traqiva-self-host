@@ -1,10 +1,29 @@
 import { useEffect, useRef, useState } from 'react';
-import { ArrowRight, Check, ChevronDown, Code2, Eye, EyeOff, Search, X } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { ArrowRight, Check, ChevronDown, Code2, Eye, EyeOff, Search, Terminal, X } from 'lucide-react';
+import { AGENT_BUILDER_ENABLED } from '../features/agentBuilder';
 import { demoModels, demoTraces } from './demoData';
 import { demoSeries, demoSummary, filteredDemoTraces } from './demoState';
 import { DemoChart, DemoMetric, DemoPanel, demoMoney, demoNumber, type DemoViewProps } from './demoUi';
 
-function GatewayPreview({state,dispatch,go}:DemoViewProps){
+function CodingGatewayPreview({state,go}:DemoViewProps){
+  const summary=demoSummary({...state,query:'',model:'',status:''});
+  return <div className="demo-view-stack">
+    <div className="demo-view-heading"><div><h2>Gateway</h2><p>See requests from the coding agents you connect.</p></div><span className="demo-badge">Preview</span></div>
+    <div className="demo-stats-grid"><DemoMetric label="Example requests" value={demoNumber(summary.requests)}/><DemoMetric label="Workflows" value={String(new Set(demoTraces.map(trace=>trace.workflow)).size)}/><DemoMetric label="Project" value={state.projectName}/><DemoMetric label="Mode" value="Simulation"/></div>
+    <DemoPanel title="Connect a coding agent">
+      <div className="demo-connection-row"><Terminal size={26}/><div><strong>Your agent. Your coding workflow.</strong><p className="demo-subtle">Create a workspace, choose your coding agent, then follow its connection steps.</p></div><Link className="demo-button primary" to="/signup">Connect your agent<ArrowRight size={14}/></Link></div>
+      <p className="demo-preview-note">Only connected requests appear in a real workspace. This demo uses fictional records and does not intercept your existing chats.</p>
+    </DemoPanel>
+    <DemoPanel title="Inspect a sample session"><p className="demo-subtle">Follow repository exploration, test failure triage, refactoring, and release notes from each session to its requests.</p><div className="demo-actions"><button className="demo-button" onClick={()=>go('sessions')}>Explore sessions<ArrowRight size={14}/></button><button className="demo-button" onClick={()=>go('traces')}>Explore requests<ArrowRight size={14}/></button></div></DemoPanel>
+  </div>;
+}
+
+function GatewayPreview(props:DemoViewProps){
+  return AGENT_BUILDER_ENABLED?<BuilderGatewayPreview {...props}/>:<CodingGatewayPreview {...props}/>;
+}
+
+function BuilderGatewayPreview({state,dispatch,go}:DemoViewProps){
   const [language,setLanguage]=useState<'javascript'|'python'>('javascript');
   const summary=demoSummary({...state,query:'',model:'',status:''});
   const example=language==='javascript'
@@ -55,9 +74,10 @@ function TracesPreview({state,dispatch}:DemoViewProps){
 
 function DashboardsPreview({state,go}:DemoViewProps){
   const [dashboard,setDashboard]=useState<'traffic'|'models'|'quality'>('traffic');
+  const dashboards:('traffic'|'models'|'quality')[]=AGENT_BUILDER_ENABLED?['traffic','models','quality']:['traffic','models'];
   const summary=demoSummary({...state,query:'',model:'',status:''}),series=demoSeries(state.days),results=state.evaluationResults;
   const score=results?.length?Math.round(results.filter(result=>result.pass).length/results.length*100):null;
-  return <div className="demo-view-stack"><div className="demo-view-heading"><div><h2>Dashboards</h2><p>Switch between three views of the same sample project.</p></div><span className="demo-badge">Preview</span></div><div className="demo-tabs" aria-label="Sample dashboards">{(['traffic','models','quality'] as const).map(value=><button key={value} className={dashboard===value?'active':''} aria-pressed={dashboard===value} onClick={()=>setDashboard(value)}>{value[0].toUpperCase()+value.slice(1)}<ChevronDown size={12}/></button>)}</div>{dashboard==='traffic'?<><div className="demo-stats-grid"><DemoMetric label="Requests" value={demoNumber(summary.requests)}/><DemoMetric label="Success rate" value={summary.successPercent===null?'—':`${summary.successPercent.toFixed(1)}%`}/><DemoMetric label="Input cached" value={summary.cachePercent===null?'—':`${summary.cachePercent.toFixed(1)}%`}/><DemoMetric label="Priced cost" value={demoMoney(summary.cost)}/></div><DemoPanel title="Request volume"><DemoChart values={series.map(point=>point.requests)} label="Fictional request volume"/></DemoPanel></>:dashboard==='models'?<DemoPanel title="Tokens by model"><div className="demo-model-bars">{summary.models.map(row=><div key={row.model}><span>{row.model}</span><strong>{demoNumber(row.tokens)}</strong><progress aria-label={`${row.model} share of sample tokens`} max={Math.max(...summary.models.map(model=>model.tokens),1)} value={row.tokens}/></div>)}</div></DemoPanel>:<><div className="demo-stats-grid"><DemoMetric label="Sample cases" value={String(state.evaluationCases.length)}/><DemoMetric label="Latest match rate" value={score===null?'Not run':`${score}%`}/><DemoMetric label="Reviewed traces" value={String(state.reviewedTraces.length)}/><DemoMetric label="Scorer" value="Exact match"/></div><DemoPanel title="Quality checks"><div className="demo-connection-row"><Code2 size={24}/><div><strong>Test the sample answers yourself.</strong><p className="demo-subtle">Results are computed in this browser from the supplied cases.</p></div><button className="demo-button" onClick={()=>go('experiments')}>Open experiments<ArrowRight size={14}/></button></div></DemoPanel></>}</div>;
+  return <div className="demo-view-stack"><div className="demo-view-heading"><div><h2>Dashboards</h2><p>Switch between {AGENT_BUILDER_ENABLED?'three':'two'} views of the same sample project.</p></div><span className="demo-badge">Preview</span></div><div className="demo-tabs" aria-label="Sample dashboards">{dashboards.map(value=><button key={value} className={dashboard===value?'active':''} aria-pressed={dashboard===value} onClick={()=>setDashboard(value)}>{value[0].toUpperCase()+value.slice(1)}<ChevronDown size={12}/></button>)}</div>{dashboard==='traffic'?<><div className="demo-stats-grid"><DemoMetric label="Requests" value={demoNumber(summary.requests)}/><DemoMetric label="Success rate" value={summary.successPercent===null?'—':`${summary.successPercent.toFixed(1)}%`}/><DemoMetric label="Input cached" value={summary.cachePercent===null?'—':`${summary.cachePercent.toFixed(1)}%`}/><DemoMetric label="Priced cost" value={demoMoney(summary.cost)}/></div><DemoPanel title="Request volume"><DemoChart values={series.map(point=>point.requests)} label="Fictional request volume"/></DemoPanel></>:dashboard==='models'?<DemoPanel title="Tokens by model"><div className="demo-model-bars">{summary.models.map(row=><div key={row.model}><span>{row.model}</span><strong>{demoNumber(row.tokens)}</strong><progress aria-label={`${row.model} share of sample tokens`} max={Math.max(...summary.models.map(model=>model.tokens),1)} value={row.tokens}/></div>)}</div></DemoPanel>:AGENT_BUILDER_ENABLED?<><div className="demo-stats-grid"><DemoMetric label="Sample cases" value={String(state.evaluationCases.length)}/><DemoMetric label="Latest match rate" value={score===null?'Not run':`${score}%`}/><DemoMetric label="Reviewed traces" value={String(state.reviewedTraces.length)}/><DemoMetric label="Scorer" value="Exact match"/></div><DemoPanel title="Quality checks"><div className="demo-connection-row"><Code2 size={24}/><div><strong>Test the sample answers yourself.</strong><p className="demo-subtle">Results are computed in this browser from the supplied cases.</p></div><button className="demo-button" onClick={()=>go('experiments')}>Open experiments<ArrowRight size={14}/></button></div></DemoPanel></>:null}</div>;
 }
 
 export function DemoTraffic(props:DemoViewProps){

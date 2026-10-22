@@ -1,3 +1,4 @@
+import { AGENT_BUILDER_ENABLED } from '../features/agentBuilder';
 import { useState, type FormEvent } from 'react';
 import { Modal, Spinner } from '../ui';
 
@@ -17,7 +18,7 @@ export default function FreePlanStep({email,name,busy,saving,onNameChange,onSubm
     <form className="free-plan-step" onSubmit={onSubmit}>
       <dl className="free-plan-details">
         <div><dt>Today</dt><dd>$0. No card.</dd></div>
-        <div><dt>Included</dt><dd>Traces, usage analytics, evaluations, routing rules, waste checks and Ask.</dd></div>
+        <div><dt>Included</dt><dd>{AGENT_BUILDER_ENABLED?'Traces, usage analytics, evaluations, routing rules, waste checks and Ask.':'Coding-agent sessions, usage analytics, recoverable compression, efficiency controls and Ask.'}</dd></div>
         <div><dt>Provider usage</dt><dd>Use your own provider key. Model usage is billed separately by your provider.</dd></div>
         <div><dt>Who</dt><dd>Your personal workspace.</dd></div>
       </dl>

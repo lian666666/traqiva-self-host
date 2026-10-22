@@ -1,3 +1,5 @@
+.setup-wizard .coding-goal-grid { grid-template-columns: minmax(0, 1fr); max-width: 430px; margin: 0 auto; }
+.setup-wizard .coding-goal-grid .goal-option { min-height: 260px; }
 .setup-wizard.setup-compact > .setup-connect-main {
   max-width: 694px !important;
   margin-top: 20px !important;
