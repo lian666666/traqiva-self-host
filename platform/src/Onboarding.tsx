@@ -1,6 +1,6 @@
 import { useEffect,useState,type FormEvent } from 'react';
 import { Link,Navigate,useNavigate,useSearchParams } from 'react-router-dom';
-import { ArrowLeft,ArrowRight,Box,Check,ChevronDown,Code2,LogOut,RefreshCw,ShieldCheck,Terminal } from 'lucide-react';
+import { ArrowRight,Box,Check,ChevronDown,Code2,LogOut,RefreshCw,ShieldCheck,Terminal } from 'lucide-react';
 import { api,date,json,useApp } from './api';
 import { Code,ErrorNotice,Logo,Select,Spinner } from './ui';
 import { oauthAuthError } from './googleAuth';
@@ -12,7 +12,9 @@ import AssistantSetupCard from './components/AssistantSetupCard';
 import SetupConsent from './components/SetupConsent';
 import SetupProjectKey from './components/SetupProjectKey';
 import CompactAgentSetup from './components/CompactAgentSetup';
+import FreePlanStep from './components/FreePlanStep';
 import './onboarding-compact.css';
+import './onboarding-plan.css';
 
 function ApiSetupInstructions({sdk}:{sdk:string}){
   return <div className="setup-manual-guide"><h2>Point your API client to Traqiva</h2><p>Use your own provider account and model. Keep both API keys in your server environment, never browser code.</p><Code>{sdk}</Code><div className="notice subtle"><ShieldCheck size={17}/><span>Sending a provider request may incur that provider’s charges. Run it only when you choose to. A real Traces record and reported usage are needed before drawing conclusions about costs.</span></div></div>;
@@ -21,7 +23,7 @@ function ApiSetupInstructions({sdk}:{sdk:string}){
 export default function Onboarding(){
   const {session,loading,error:sessionError,reload,setProject}=useApp(),navigate=useNavigate();const [params]=useSearchParams();
   const stage=setupStageFor(session),setupProject=session?setupProjectFor(session):null,termsAccepted=session?.terms?.accepted===true;
-  const [goals,setGoals]=useState<SetupGoal[]>(['coding']),[name,setName]=useState(''),[busy,setBusy]=useState(''),[error,setError]=useState(''),[editingGoals,setEditingGoals]=useState(false),[consentOpen,setConsentOpen]=useState(false),[assistant,setAssistant]=useState<SetupAssistant>('codex'),[tab,setTab]=useState('cli');
+  const [goals,setGoals]=useState<SetupGoal[]>(['coding']),[name,setName]=useState(setupProject?.name||'My project'),[busy,setBusy]=useState(''),[error,setError]=useState(''),[editingGoals,setEditingGoals]=useState(false),[consentOpen,setConsentOpen]=useState(false),[assistant,setAssistant]=useState<SetupAssistant>('codex'),[tab,setTab]=useState('cli');
   const connection=useConnectionStatus(stage,setupProject?.id||null,termsAccepted);
   const shownStage=editingGoals?'goals':stage;
   const codingGoal=session?.setup?.goals.includes('coding')===true;
@@ -54,16 +56,16 @@ const result = await client.chat.completions.create({
   model: "YOUR_PROVIDER_MODEL",
   messages: [{ role: "user", content: "Hello, Traqiva." }]
 });`;
-  return <div className={`onboarding-page setup-wizard${shownStage==='connect'?' setup-compact':''}`}><header><Link to="/"><Logo/></Link><div className="setup-user"><span>Signed in as <strong>{session.user.email}</strong></span><button className="text-button" onClick={()=>void logout()} disabled={!!busy}>{busy==='logout'?<Spinner/>:<LogOut size={13}/>}Sign out</button></div></header>
+  return <div className={`onboarding-page setup-wizard${shownStage==='connect'?' setup-compact':''}${shownStage==='project'?' setup-plan':''}`}><header><Link to="/"><Logo/></Link><div className="setup-user"><span>Signed in as <strong>{session.user.email}</strong></span><button className="text-button" onClick={()=>void logout()} disabled={!!busy}>{busy==='logout'?<Spinner/>:<LogOut size={13}/>}Sign out</button></div></header>
     <main className={`onboarding-main ${shownStage==='connect'?'setup-connect-main':''}`}>
       <div className="onboarding-step">Step {shownStage==='goals'?1:shownStage==='project'?2:3} of 3</div>
-      <h1>{shownStage==='goals'?'What do you want to do?':shownStage==='project'?'Give your project a home.':session.setup?.goals.includes('coding')?'Set up your coding agent.':'Connect your application.'}</h1>
-      {shownStage!=='connect'&&<p>{shownStage==='goals'?'Choose one or both. Setup only asks for what you need.':'Keep your requests, evaluations, and insights together.'}</p>}
+      <h1>{shownStage==='goals'?'What do you want to do?':shownStage==='project'?'Start on Free':session.setup?.goals.includes('coding')?'Set up your coding agent.':'Connect your application.'}</h1>
+      {shownStage!=='connect'&&<p>{shownStage==='goals'?'Choose one or both. Setup only asks for what you need.':'Understand your agents’ usage and find ways to make them more efficient.'}</p>}
       <ErrorNotice message={error||oauthAuthError(params.get('oauth_error'),params.get('oauth_provider'))}/>
 
       {shownStage==='goals'&&<><div className="goal-grid">{[{id:'coding' as SetupGoal,icon:Terminal,title:'Spend less on coding agents',description:'Connect the coding agents you use. Inspect token usage and test recoverable context compression.'},{id:'observe' as SetupGoal,icon:Box,title:'Build more efficient agents',description:'Trace agents in your own code. Understand their quality, costs, and opportunities to improve.'}].map(goal=><button key={goal.id} aria-pressed={goals.includes(goal.id)} className={`goal-option ${goals.includes(goal.id)?'selected':''}`} onClick={()=>setGoals(values=>values.includes(goal.id)?values.filter(value=>value!==goal.id):[...values,goal.id])} disabled={!!busy}><span className="goal-check">{goals.includes(goal.id)&&<Check size={13}/>}</span><goal.icon size={42} strokeWidth={1.2}/><h3>{goal.title}</h3><p>{goal.description}</p></button>)}</div><button className="button primary onboarding-next" disabled={!goals.length||!!busy} onClick={()=>void saveGoals()}>{busy==='goals'?<Spinner/>:<>Continue<ArrowRight size={16}/></>}</button></>}
 
-      {shownStage==='project'&&<form className="onboarding-form" onSubmit={saveProject}><label className="field">Project name<input required maxLength={100} value={name} onChange={event=>setName(event.target.value)} autoFocus disabled={!!busy}/></label><div className="notice"><Code2 size={18}/><span>{setupProject?'This uses your existing project. Its data and identity stay intact.':'Start with one project. You can add more later.'}</span></div><button className="button primary full-width" disabled={!name.trim()||!!busy}>{busy==='project'?<Spinner/>:<>Continue<ArrowRight size={16}/></>}</button><button type="button" className="text-button onboarding-back" onClick={()=>setEditingGoals(true)} disabled={!!busy}><ArrowLeft size={14}/>Back to your goals</button></form>}
+      {shownStage==='project'&&<FreePlanStep email={session.user.email} name={name} busy={!!busy} saving={busy==='project'} onNameChange={setName} onSubmit={saveProject} onBack={()=>setEditingGoals(true)}/>}
 
       {shownStage==='connect'&&<div className="setup-connect-content">
         {!termsAccepted?<section className="setup-consent-required"><ShieldCheck size={28}/><h2>Review your workspace terms</h2><p>Accept the current terms before creating a key or connecting an agent.</p><button className="button primary" onClick={()=>setConsentOpen(true)}>Review terms<ArrowRight size={15}/></button></section>:<>

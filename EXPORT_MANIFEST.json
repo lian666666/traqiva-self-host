@@ -2,7 +2,7 @@
   "schema": 1,
   "template": "traqiva-self-host",
   "history_exported": false,
-  "generated_at": "2026-10-22T07:59:35.363Z",
+  "generated_at": "2026-10-22T08:57:13.538Z",
   "files": [
     {
       "path": ".gitattributes",
@@ -231,8 +231,8 @@
     },
     {
       "path": "platform/docs/CAPABILITIES.md",
-      "bytes": 20767,
-      "sha256": "9a5533f8b55ff7094bbead406d1cb393aabd3141247cdc2c7465c927448c1ba1"
+      "bytes": 21885,
+      "sha256": "499eae51f060aa9b10698b9c07b36f107534337f85e040f21b78feb1525b778b"
     },
     {
       "path": "platform/docs/GITHUB_AUTH.md",
@@ -4435,6 +4435,11 @@
       "sha256": "55150c26e04a5172a6e3218ea4cb39c25286ef8b2fb86630de14786788a43e83"
     },
     {
+      "path": "platform/src/components/FreePlanStep.tsx",
+      "bytes": 2023,
+      "sha256": "b86f80ddf6223762a656594a98da17540bb874206eb2e4921a144aff47e84a9b"
+    },
+    {
       "path": "platform/src/components/GitHubMark.tsx",
       "bytes": 687,
       "sha256": "933210a31b96c33417756c45dced6b4520223054a55528dbf9fab3de2e3869e2"
@@ -4570,9 +4575,14 @@
       "sha256": "ce6eb7b0e1d38988b67f09732023e96a6748739ec0b35120d7087e00ba84e94f"
     },
     {
+      "path": "platform/src/onboarding-plan.css",
+      "bytes": 3306,
+      "sha256": "5ee40f6e891ebab6deca188dcf53bf0049ffb1dd642f4b8f38f2f096559fc648"
+    },
+    {
       "path": "platform/src/Onboarding.tsx",
-      "bytes": 12519,
-      "sha256": "3df84c7018fa9aa4409d85ff3cd2e2959c585941530ebd11b1241664baeb97ec"
+      "bytes": 12107,
+      "sha256": "0c4f1b43f25f905a450ff506a3ebb999df6c6f2b870bb623dc9952ea1e2cf35f"
     },
     {
       "path": "platform/src/pages/Admin.tsx",
@@ -4768,6 +4778,11 @@
       "path": "platform/tests/onboarding-compact-ui.test.ts",
       "bytes": 5246,
       "sha256": "d5baee260311d9c447f3fc48cbea1ba7f08557f720488f6e037e3598f086aab5"
+    },
+    {
+      "path": "platform/tests/onboarding-free-plan-ui.test.ts",
+      "bytes": 2715,
+      "sha256": "7c7e42f2af4b2957c4d769a0955fed738f198162928fbc6acec3611bb8c3f023"
     },
     {
       "path": "platform/tests/public-demo-state.test.ts",
