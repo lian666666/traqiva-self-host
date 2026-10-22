@@ -3,7 +3,10 @@ import { getCookie, setCookie } from 'hono/cookie';
 import { ApiError, compactJson, hashPassword, hashSecret, id, now, randomSecret, readBodyText, readJson, redactCredential, sameOriginWrite, scrubSecrets, stringField, verifyPassword } from './security';
 import { computeCost, estimateTokens, UsageCollector, type Prices, type Usage } from './usage';
 import type { Env, Execution, Principal, Row } from './types';
-import { askProvider, groundedProjectContext, ProviderError, type AssistantProvider, type AssistantSource } from './assistant';
+import { askProvider, ProviderError, type AssistantProvider } from './assistant';
+import { answerHostedAsk, registerHostedAskStatus } from './hosted-ask';
+import { appendAskExchange, askConversationHistory, registerAskConversations } from './ask-conversations';
+import { askEvidenceDays, buildAskEvidence } from './ask-evidence';
 import { googleAvailable, registerGoogleAuth } from './google';
 import { githubAvailable, registerGithubAuth } from './github';
 import { onboardingFor, registerOnboarding, requireTerms, termsFor } from './onboarding';
@@ -113,6 +116,8 @@ app.get('/api/auth/providers', c => c.json({ google: googleAvailable(c.env, c.re
 registerOnboarding(app, { userRequired, workspaceFor });
 registerDeveloperSessions(app, { userProject });
 registerAgentUsage(app, { userProject });
+registerHostedAskStatus(app, { userProject });
+registerAskConversations(app, { userProject });
 app.get('/api/auto', async c => {
   const { project } = await userProject(c, c.req.query('project'));
   return c.json({ settings: await autoSettings(c.env, project.id), sentinel: AUTO_MODEL, method: 'rules_v1' });
@@ -389,22 +394,27 @@ app.patch('/api/workspace', async c => {
 });
 app.get('/api/inbox', async c => { const { project } = await userProject(c, c.req.query('project')); return c.json({ items: await dbAll(c.env, 'SELECT * FROM inbox WHERE project_id=? ORDER BY created_at DESC LIMIT 100', project.id) }); });
 app.post('/api/ask', async c => {
-  const body = await readJson(c.req.raw), principal = await userProject(c, body.project_id), { project } = principal, question = stringField(body.question, 'question', 2000);
-  const data = await overview(c.env, project.id, 7), s = data.stats;
+  const body = await readJson(c.req.raw, 16_384), principal = await userProject(c, body.project_id), { project } = principal, question = stringField(body.question, 'question', 2000);
+  if (body.mode !== undefined && !['hosted', 'statistics', 'byok'].includes(body.mode)) throw new ApiError(400, 'Choose a supported answer mode.');
+  const days = body.days === undefined && body.mode === undefined ? 7 : askEvidenceDays(body.days);
+  const data = await overview(c.env, project.id, days), s = data.stats;
+  if (body.mode === 'hosted') return answerHostedAsk(c, principal, { ...body, days }, data, insertTrace);
+  const history = await askConversationHistory(c.env, principal, body.conversation_id);
   const authorization = c.req.header('authorization');
+  if (body.mode === 'byok' && !authorization) throw new ApiError(401, 'A provider key is required for your-key mode.');
+  if (body.mode === 'statistics' && authorization) throw new ApiError(400, 'Statistics mode does not use a provider key.');
   if (authorization) {
     const key = /^Bearer\s+([^\s]+)$/i.exec(authorization)?.[1];
     if (!key || key.length > 1024) throw new ApiError(401, 'Provide a valid Bearer provider API key for AI mode.');
     if (!['openai', 'anthropic'].includes(body.provider)) throw new ApiError(400, 'Choose openai or anthropic for AI mode.');
     const provider = body.provider as AssistantProvider, model = stringField(body.model, 'model', 200);
     if (!/^[A-Za-z0-9][A-Za-z0-9:._/-]*$/.test(model) || model.includes(key)) throw new ApiError(400, 'Enter an explicit provider model name.');
-    const context = groundedProjectContext(project.id, data), started = Date.now();
-    const sources: AssistantSource[] = [{ type: 'project_statistics', project_id: project.id, days: 7 }, { type: 'model_breakdown', project_id: project.id, days: 7 }];
-    if (data.traces.length) sources.push({ type: 'trace_metadata', project_id: project.id, trace_ids: data.traces.map(trace => trace.id) });
+    const { context, sources } = buildAskEvidence(project.id, data, days), started = Date.now();
     try {
-      const result = await askProvider({ provider, model, key, question, context });
-      const traceId = await insertTrace(c.env, principal, { provider, model, status: 'success', http_status: 200, ...result.usage, token_basis: result.usage ? 'provider' : 'unavailable', latency_ms: Date.now() - started, input_bytes: result.requestBytes, output_bytes: result.responseBytes, request: { kind: 'project_assistant', question: redactCredential(question, key), sources }, response: { answer: result.answer }, compressed: false }, 'assistant');
-      return c.json({ answer: result.answer, sources, method: 'llm', provider_called: true, provider, model, trace_id: traceId });
+      const result = await askProvider({ provider, model, key, question, context: { ...context, conversation_history: history } });
+      const traceId = await insertTrace(c.env, principal, { provider, model, status: 'success', http_status: 200, ...result.usage, token_basis: result.usage ? 'provider' : 'unavailable', latency_ms: Date.now() - started, input_bytes: result.requestBytes, output_bytes: result.responseBytes, request: { kind: 'project_assistant', body_stored: false, sources }, response: { body_stored: false }, compressed: false }, 'assistant');
+      const conversation = await appendAskExchange(c.env, principal, { conversationId: body.conversation_id, question: redactCredential(question, key), answer: result.answer, sources, model, method: 'llm' });
+      return c.json({ answer: result.answer, sources, method: 'llm', provider_called: true, provider, model, trace_id: traceId, conversation_id: conversation.id, message_id: conversation.message_id });
     } catch (error) {
       if (!(error instanceof ProviderError)) throw error;
       await insertTrace(c.env, principal, { provider, model, status: 'error', http_status: error.upstreamStatus ?? error.status, token_basis: 'unavailable', latency_ms: Date.now() - started, request: { kind: 'project_assistant', sources }, response: { error: error.message }, compressed: false }, 'assistant');
@@ -412,8 +422,10 @@ app.post('/api/ask', async c => {
     }
   }
   const requestWord = s.requests === 1 ? 'request' : 'requests';
-  const answer = !s.requests ? 'This project has no recorded requests in the last 7 days. Connect a client or import trace records to analyze actual usage.' : /error|fail|错误|失败/i.test(question) ? `${s.errors} of ${s.requests} recorded ${requestWord} failed in the last 7 days. Open the failed traces to inspect their recorded responses.` : /cost|price|spend|费用|成本/i.test(question) ? `Supplied pricing covers ${s.priced_requests} of ${s.requests} recorded ${requestWord}. Their estimated cost subtotal is ${s.estimated_cost_usd === null ? 'unavailable' : `$${Number(s.estimated_cost_usd).toFixed(6)}`}. Unknown model prices are not filled in.` : `In the last 7 days this project recorded ${s.requests} ${requestWord}, ${s.input_tokens} input ${s.input_tokens === 1 ? 'token' : 'tokens'}, ${s.output_tokens} output ${s.output_tokens === 1 ? 'token' : 'tokens'} and ${s.errors} ${s.errors === 1 ? 'error' : 'errors'}. ${s.usage_available_requests} ${s.usage_available_requests === 1 ? 'request includes' : 'requests include'} token measurements. This answer is computed from project statistics; no language-model provider was called.`;
-  return c.json({ answer, sources: s.requests ? [{ type: 'project_statistics', project_id: project.id, days: 7 }] : [], method: 'rules', provider_called: false });
+  const answer = !s.requests ? `This project has no recorded requests in the last ${days} days. This does not establish whether you used the dashboard or an unconnected agent. Connect a client or import trace records to analyze actual usage.` : /error|fail|错误|失败/i.test(question) ? `${s.errors} of ${s.requests} recorded ${requestWord} failed in the last ${days} days. Open the failed traces to inspect their recorded responses.` : /cost|price|spend|费用|成本/i.test(question) ? `Supplied pricing covers ${s.priced_requests} of ${s.requests} recorded ${requestWord}. Their estimated cost subtotal is ${s.estimated_cost_usd === null ? 'unavailable' : `$${Number(s.estimated_cost_usd).toFixed(6)}`}. Unknown model prices are not filled in.` : `In the last ${days} days this project recorded ${s.requests} ${requestWord}, ${s.input_tokens} input ${s.input_tokens === 1 ? 'token' : 'tokens'}, ${s.output_tokens} output ${s.output_tokens === 1 ? 'token' : 'tokens'} and ${s.errors} ${s.errors === 1 ? 'error' : 'errors'}. ${s.usage_available_requests} ${s.usage_available_requests === 1 ? 'request includes' : 'requests include'} token measurements. Aggregate tokens can include estimates. This answer is computed from project statistics; no language-model provider was called.`;
+  const { sources } = buildAskEvidence(project.id, data, days);
+  const conversation = await appendAskExchange(c.env, principal, { conversationId: body.conversation_id, question, answer, sources, method: 'rules' });
+  return c.json({ answer, sources, method: 'rules', provider_called: false, conversation_id: conversation.id, message_id: conversation.message_id });
 });
 
 function headerPrices(request: Request): Prices | undefined {

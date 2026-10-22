@@ -1,36 +1,110 @@
-import { useState,type FormEvent } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { ArrowRight, ChevronDown, FileText, KeyRound, MessageCircle, Plus, ShieldCheck, SlidersHorizontal, X } from 'lucide-react';
-import { api,json,useApp } from '../api';
-import { ErrorNotice,Spinner } from '../ui';
-type AskMode='statistics'|'ai';
-type Provider='openai'|'anthropic';
-type Message={role:'user'|'assistant';content:string;sources?:unknown[];method?:'rules'|'llm';model?:string};
-type AskResponse={answer:string;sources:unknown[];method:'rules'|'llm';provider_called:boolean;provider?:string;model?:string};
-export default function Ask(){
-  const {project}=useApp();
-  const [searchParams]=useSearchParams();
-  const [messages,setMessages]=useState<Message[]>([]),[question,setQuestion]=useState(()=>searchParams.get('question')?.slice(0,2000)||''),[busy,setBusy]=useState(false),[error,setError]=useState('');
-  const [mode,setMode]=useState<AskMode>('statistics'),[provider,setProvider]=useState<Provider>('openai'),[model,setModel]=useState(''),[apiKey,setApiKey]=useState(''),[settingsOpen,setSettingsOpen]=useState(false);
-  const aiReady=mode!=='ai'||!!apiKey.trim()&&!!model.trim();
-  function changeMode(next:AskMode){setMode(next);setError('');if(next==='ai')setSettingsOpen(true);else{setSettingsOpen(false);setApiKey('');}}
-  async function send(value:string){
-    if(!value.trim()||busy||!project)return;
-    if(!aiReady){setError('Enter your provider API key and model ID to use AI mode.');setSettingsOpen(true);return;}
-    const requestMode=mode,requestModel=model.trim();
-    setMessages(v=>[...v,{role:'user',content:value.trim()}]);setQuestion('');setBusy(true);setError('');
-    try{
-      const options=json({project_id:project.id,question:value.trim(),...(requestMode==='ai'?{provider,model:requestModel}:{})});
-      if(requestMode==='ai')options.headers={Authorization:`Bearer ${apiKey.trim()}`};
-      const r=await api<AskResponse>('/api/ask',options);
-      setMessages(v=>[...v,{role:'assistant',content:r.answer,sources:r.sources,method:r.method,model:r.method==='llm'?(r.model||requestModel):undefined}]);
-    }catch(e){setError((e as Error).message);}finally{setBusy(false);}
+import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
+import { ArrowUp, ArrowUpRight, Check, ChevronDown, Copy, FileText, Folder, KeyRound, MessageCircle, Plus, RefreshCw, ShieldCheck, SlidersHorizontal, SquareSlash, X } from 'lucide-react';
+import { api, date, json, useApp, useResource } from '../api';
+import { ErrorNotice, Logo, Spinner } from '../ui';
+import { askCanSend, askEvidence, askMoney, askProjectPath, askQuestions, emptyAskConversation, emptyAskConversations, emptyAskStatus, type AskAllowance, type AskConversationDetail, type AskMessage, type AskMode, type AskResponse, type AskStatus } from './askWorkspaceData';
+import './ask-workspace.css';
+
+function AnswerEvidence({ message, projectId }: { message: AskMessage; projectId: string }) {
+  const [copied, setCopied] = useState(false), [copyError, setCopyError] = useState(false);
+  const sources = askEvidence(message.sources, projectId);
+  async function copy() {
+    try { await navigator.clipboard.writeText(message.content); setCopied(true); setCopyError(false); }
+    catch { setCopyError(true); }
   }
-  return <div className={`ask-page ${messages.length?'has-messages':''}`}>
-    <div className="ask-top"><span><MessageCircle size={16}/>Ask about {project?.name||'your project'}</span>{!!messages.length&&<button className="button secondary compact" onClick={()=>{setMessages([]);setError('');}}><Plus size={14}/>New conversation</button>}</div>
-    <div className="ask-mode-row"><div className="ask-mode-switch" aria-label="Answer mode"><button aria-pressed={mode==='statistics'} className={mode==='statistics'?'selected':''} onClick={()=>changeMode('statistics')} disabled={busy}>Project statistics</button><button aria-pressed={mode==='ai'} className={mode==='ai'?'selected':''} onClick={()=>changeMode('ai')} disabled={busy}>AI with your key<KeyRound size={12}/></button></div>{mode==='ai'&&<button className="ask-settings-toggle" onClick={()=>setSettingsOpen(v=>!v)} aria-expanded={settingsOpen}><SlidersHorizontal size={13}/>{apiKey&&model?'Connection settings':'Add your connection'}<ChevronDown size={12} className={settingsOpen?'rotated':''}/></button>}</div>
-    {mode==='ai'&&settingsOpen&&<section className="ask-key-panel" aria-label="Your AI connection"><div className="ask-key-panel-heading"><div><KeyRound size={14}/><strong>Bring your own provider</strong></div><button className="icon-button" aria-label="Collapse connection settings" onClick={()=>setSettingsOpen(false)}><X size={15}/></button></div><div className="ask-key-fields"><label className="field">Provider<select value={provider} onChange={e=>{setProvider(e.target.value as Provider);setApiKey('');setModel('');}} disabled={busy}><option value="openai">OpenAI</option><option value="anthropic">Anthropic</option></select></label><label className="field">Model ID<input autoComplete="off" spellCheck={false} value={model} onChange={e=>setModel(e.target.value)} placeholder="Your provider’s model ID" maxLength={200} disabled={busy}/></label><label className="field">Provider API key<input type="password" autoComplete="off" data-1p-ignore data-lpignore="true" spellCheck={false} value={apiKey} onChange={e=>setApiKey(e.target.value)} placeholder="Paste your own API key" maxLength={512} disabled={busy}/></label></div><div className="ask-key-note"><ShieldCheck size={14}/><p>Your key stays in this page’s memory and is forwarded for each AI request. It is not saved in your workspace or browser storage. Your provider bills the call. The question and project statistics are sent to that provider.</p></div>{apiKey&&<button className="text-button" onClick={()=>setApiKey('')} disabled={busy}>Clear key from this page</button>}</section>}
-    {!messages.length?<div className="ask-intro"><span className="ask-mark"><MessageCircle size={31} strokeWidth={1.4}/></span><h1>A clearer answer<br/>starts with your data.</h1><p>{mode==='ai'?<>Ask an AI model about your project’s statistics.<br/>Use your own provider account, API key, and model.</>:<>Ask about your project’s usage, costs, and traffic.<br/>Answers are computed from recorded workspace statistics.</>}</p><div className="suggested-questions">{['Summarize my project’s traffic','Which models use the most tokens?','How much have my requests cost?','What should I investigate next?'].map(q=><button onClick={()=>void send(q)} key={q} disabled={busy}>{q}<ArrowRight size={15}/></button>)}</div></div>:<div className="chat-messages">{messages.map((m,i)=><article className={`chat-message ${m.role}`} key={i}><span className="chat-avatar">{m.role==='assistant'?<MessageCircle size={17}/>:<span>You</span>}</span><div><strong>{m.role==='assistant'?'Traqiva':'You'}{m.role==='assistant'&&<span className="answer-method">{m.method==='llm'?`AI response${m.model?` · ${m.model}`:''}`:'Project statistics · no model call'}</span>}</strong><p>{m.content}</p>{!!m.sources?.length&&<div className="answer-sources"><FileText size={13}/>{m.sources.length} workspace data {m.sources.length===1?'reference':'references'}</div>}</div></article>)}{busy&&<div className="chat-thinking"><Spinner/><span>{mode==='ai'?'Requesting your selected model…':'Reading project statistics…'}</span></div>}</div>}
-    <div className="ask-composer-wrap"><ErrorNotice message={error}/><form className="ask-composer" onSubmit={(e:FormEvent)=>{e.preventDefault();void send(question);}}><textarea aria-label="Your project question" placeholder={mode==='ai'?'Ask your selected AI model…':'Ask about your project…'} maxLength={2000} rows={2} value={question} onChange={e=>setQuestion(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();void send(question);}}}/><button type="submit" className="send-button" disabled={busy||!question.trim()||!project||!aiReady} aria-label="Send question">{busy?<Spinner/>:<ArrowRight size={18}/>}</button></form><p className="ask-disclaimer">{mode==='ai'?'AI mode calls your selected provider. Responses may be inaccurate; inspect the supporting traces.':'Project statistics mode uses computed summaries and makes no language-model call.'}</p></div>
+  return <div className="ask-answer-evidence">
+    <details><summary>How this was answered <ChevronDown size={12}/></summary><div><p>{message.method === 'llm' ? `Answered with ${message.model || 'the selected model'} using recorded project summaries and recent trace metadata.` : 'Computed from recorded project statistics. No model call.'}</p><p>Review the linked evidence before relying on an answer. Missing traces do not prove that you have never used Traqiva.</p>{sources.length ? <ul>{sources.map((source, index) => <li key={`${source.label}-${index}`}><Link to={source.href}>{source.label}<ArrowUpRight size={12}/></Link>{!!source.traceIds.length && <span>Trace IDs: {source.traceIds.join(', ')}</span>}</li>)}</ul> : <p>No supporting records were attached to this answer.</p>}</div></details>
+    <div className="ask-answer-actions"><button type="button" onClick={() => void copy()} aria-label="Copy answer">{copied ? <Check size={13}/> : <Copy size={13}/>} {copied ? 'Copied' : 'Copy'}</button>{sources.map((source, index) => <Link key={`${source.label}-${index}`} to={source.href}><FileText size={13}/>{source.label}<ArrowUpRight size={12}/></Link>)}</div>
+    {copyError && <small role="status">Clipboard unavailable. Select the answer to copy it.</small>}
   </div>;
+}
+
+function AskProject() {
+  const { project, session, setProject } = useApp();
+  const [params, setParams] = useSearchParams();
+  const selectedId = params.get('chat') || null;
+  const status = useResource<AskStatus>(askProjectPath('/api/ask/status', project?.id), emptyAskStatus);
+  const conversations = useResource(askProjectPath('/api/ask/conversations', project?.id), emptyAskConversations);
+  const detail = useResource<AskConversationDetail>(selectedId && project ? askProjectPath(`/api/ask/conversations/${encodeURIComponent(selectedId)}`, project.id) : null, emptyAskConversation);
+  const [draft, setDraft] = useState<{ id: string | null; messages: AskMessage[] } | null>(null);
+  const [question, setQuestion] = useState(() => params.get('question')?.slice(0, 2000) || '');
+  const [mode, setMode] = useState<AskMode>('hosted'), [provider, setProvider] = useState<'openai' | 'anthropic'>('openai');
+  const [model, setModel] = useState(''), [apiKey, setApiKey] = useState(''), [settingsOpen, setSettingsOpen] = useState(false), [commandsOpen, setCommandsOpen] = useState(false);
+  const [days, setDays] = useState('30');
+  const [busy, setBusy] = useState(false), [error, setError] = useState(''), [latestAllowance, setLatestAllowance] = useState<AskAllowance | null>(null);
+  const composer = useRef<HTMLTextAreaElement>(null), bottom = useRef<HTMLDivElement>(null), requestInFlight = useRef(false);
+  const draftMatches = !!draft && draft.id === selectedId;
+  const messages = project ? draftMatches ? draft.messages : selectedId ? detail.data.messages || [] : [] : [];
+  const threadLoading = !!selectedId && detail.loading && !draftMatches;
+  const threadError = selectedId && !draftMatches ? detail.error : '';
+  const hostedAvailable = !!project && !status.loading && !status.error && status.data.hosted.available;
+  const effectiveMode = mode === 'hosted' && !status.loading && !hostedAvailable ? 'statistics' : mode;
+  const allowance = latestAllowance || (!status.loading && !status.error && project ? status.data.hosted.allowance : undefined);
+  const exhausted = !!allowance && allowance.remaining_usd <= 0;
+  const canSend = !threadLoading && !threadError && askCanSend({ question, busy, projectId: project?.id, mode: effectiveMode, statusLoading: status.loading, hostedAvailable, allowance, key: apiKey, model });
+  const contextMessages = effectiveMode === 'byok' ? 'Your provider bills these calls. Your key stays in this page’s memory.' : effectiveMode === 'statistics' ? 'Computed project statistics · no model call' : '$1 lifetime AI allowance per user · no automatic renewal';
+
+  useEffect(() => { if (messages.length) bottom.current?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }, [messages.length, busy]);
+
+  function selectChat(id: string | null) {
+    if (requestInFlight.current) return;
+    setParams(previous => { const next = new URLSearchParams(previous); if (id) next.set('chat', id); else next.delete('chat'); next.delete('question'); return next; });
+    setDraft(null); setQuestion(''); setError(''); setCommandsOpen(false);
+    requestAnimationFrame(() => composer.current?.focus());
+  }
+  function chooseQuestion(value: string) { setQuestion(value); setCommandsOpen(false); composer.current?.focus(); }
+  async function send() {
+    if (!canSend || !project || requestInFlight.current) return;
+    requestInFlight.current = true;
+    const value = question.trim(), previousMessages = messages, requestedMode = effectiveMode;
+    const pendingMessages: AskMessage[] = [...previousMessages, { role: 'user', content: value }];
+    setDraft({ id: selectedId, messages: pendingMessages }); setQuestion(''); setError(''); setBusy(true); setCommandsOpen(false);
+    try {
+      const options = json({ project_id: project.id, question: value, days: Number(days), mode: requestedMode, ...(selectedId ? { conversation_id: selectedId } : {}), ...(requestedMode === 'byok' ? { provider, model: model.trim() } : {}) });
+      if (requestedMode === 'byok') options.headers = { Authorization: `Bearer ${apiKey.trim()}` };
+      const result = await api<AskResponse>('/api/ask', options);
+      const conversationId = result.conversation_id || selectedId;
+      setDraft({ id: conversationId, messages: [...pendingMessages, { id: result.message_id, role: 'assistant', content: result.answer, sources: result.sources, method: result.method, model: result.provider_called ? result.model : undefined }] });
+      if (conversationId) setParams(previous => { const next = new URLSearchParams(previous); next.set('chat', conversationId); next.delete('question'); return next; }, { replace: !selectedId });
+      if (result.allowance) setLatestAllowance(result.allowance);
+      conversations.refresh(); status.refresh();
+    } catch (problem) {
+      setDraft({ id: selectedId, messages: previousMessages }); setQuestion(value); setError((problem as Error).message); status.refresh();
+    } finally { requestInFlight.current = false; setBusy(false); }
+  }
+
+  return <section className={`ask-workspace ${messages.length ? 'has-conversation' : ''}`} aria-label="Ask Traqiva">
+    <aside className="ask-history" aria-label="Your conversations">
+      <header><span>Your chats</span><button className="icon-button" aria-label="Refresh conversations" onClick={conversations.refresh} disabled={conversations.loading || !project}><RefreshCw size={14} className={conversations.loading ? 'spin' : ''}/></button></header>
+      <button className="ask-new-chat" onClick={() => selectChat(null)} disabled={busy || !project}><Plus size={15}/>New chat</button>
+      {conversations.loading ? <p role="status">Loading chats…</p> : conversations.error ? <ErrorNotice message="Chat history could not be loaded." retry={conversations.refresh}/> : !project ? <p>Choose a project to view chats.</p> : conversations.data.items.length ? <ul>{conversations.data.items.map(item => <li key={item.id}><button onClick={() => selectChat(item.id)} disabled={busy} aria-pressed={selectedId === item.id} title={item.title}><span>{item.title}</span>{item.updated_at && <time dateTime={item.updated_at}>{date(item.updated_at)}</time>}</button></li>)}</ul> : <p>No conversations yet.</p>}
+      {project && !conversations.loading && !conversations.error && conversations.data.has_more && <p>Showing the latest {conversations.data.limit || conversations.data.items.length} chats.</p>}
+      <div className="ask-credit-summary" aria-label="AI allowance"><span>Traqiva AI</span><strong>{status.loading && project ? 'Checking allowance…' : allowance && hostedAvailable ? `${askMoney(allowance.remaining_usd)} left` : allowance ? 'Unavailable until enabled' : 'Allowance unavailable'}</strong>{allowance && <>
+        <progress value={Math.max(0, allowance.used_usd + allowance.reserved_usd)} max={allowance.limit_usd || 1} aria-label="AI allowance used"/>
+        <small>{askMoney(allowance.used_usd)} used of {askMoney(allowance.limit_usd)}{allowance.reserved_usd > 0 ? ` · ${askMoney(allowance.reserved_usd)} reserved` : ''}<br/>Lifetime allowance · does not reset{Number(allowance.conservative_usd) > 0 && <><br/>{askMoney(allowance.conservative_usd!)} conservatively charged for unconfirmed usage.</>}</small>
+        <button className="text-button" onClick={() => { setLatestAllowance(null); status.refresh(); }} disabled={status.loading || busy} aria-label="Refresh AI allowance">Refresh allowance</button>
+      </>}</div>
+    </aside>
+    <div className="ask-conversation-area"><header className="ask-workspace-header"><span><MessageCircle size={16}/>Ask Traqiva</span><button className="button secondary compact" onClick={() => selectChat(null)} disabled={busy || !project}><Plus size={14}/>New chat</button></header>
+      <div className="ask-thread" aria-live="polite" aria-busy={busy || threadLoading}>
+        {!!selectedId && !threadLoading && !threadError && detail.data.has_more && <p className="ask-state-note">Showing the latest {detail.data.limit || 50} messages. Earlier messages are outside this view.</p>}
+        {!project ? <div className="ask-welcome"><Logo compact/><h1>Choose a project to start</h1><p>Your answers use evidence from the selected project.</p></div> : threadLoading ? <div className="ask-thread-loading"><Spinner/>Loading conversation…</div> : threadError ? <ErrorNotice message={threadError} retry={detail.refresh}/> : messages.length ? <div className="ask-message-list">{messages.map((message, index) => <article key={message.id || `${message.role}-${index}`} className={`ask-workspace-message ${message.role}`} aria-label={message.role === 'user' ? 'Your message' : 'Traqiva answer'}><p>{message.content}</p>{message.role === 'assistant' && <AnswerEvidence message={message} projectId={project.id}/>}</article>)}{busy && <div className="ask-working" role="status"><Spinner/><span>{effectiveMode === 'statistics' ? 'Reading recorded statistics…' : 'Requesting an evidence-based answer…'}</span></div>}<div ref={bottom}/></div> : <div className="ask-welcome"><Logo compact/><h1>What should we look into?</h1><p>Ask about your project’s recorded activity, tokens, and costs.</p></div>}
+      </div>
+      <div className="ask-workspace-compose"><ErrorNotice message={error}/>{status.error && <ErrorNotice message="Built-in AI status could not be loaded. Project statistics remain available." retry={status.refresh}/>} {!status.loading && !status.error && project && !hostedAvailable && <p className="ask-state-note" role="status">Built-in AI is unavailable. You can use project statistics.</p>}{hostedAvailable && exhausted && <p className="ask-state-note" role="status">Your $1 lifetime AI allowance has been used or reserved. <button type="button" onClick={() => setMode('statistics')} disabled={busy}>Use project statistics</button></p>}{hostedAvailable && allowance && allowance.remaining_usd > 0 && allowance.remaining_usd < .02 && <p className="ask-state-note">Less than {askMoney(.02)} remains. A request may require more than the remaining allowance.</p>}
+        {commandsOpen && <div className="ask-command-menu" aria-label="Analysis questions"><header>Explore your evidence<button className="icon-button" aria-label="Close analysis questions" onClick={() => setCommandsOpen(false)}><X size={13}/></button></header>{askQuestions.map(item => <button key={item.command} onClick={() => chooseQuestion(item.question)} disabled={busy}><span>{item.label}</span><code>{item.command}</code></button>)}</div>}
+        <form className="ask-workspace-composer" onSubmit={(event: FormEvent) => { event.preventDefault(); void send(); }}><textarea ref={composer} aria-label="Your project question" placeholder={messages.length ? 'Reply…' : `Ask about ${project?.name || 'your project'}…`} maxLength={2000} rows={3} value={question} disabled={busy || !project || threadLoading || !!threadError} onChange={event => { setQuestion(event.target.value); if (event.target.value === '/') setCommandsOpen(true); }} onKeyDown={event => { if (event.key === 'Escape') setCommandsOpen(false); if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing) { event.preventDefault(); void send(); } }}/><div className="ask-compose-tools"><div><button className="icon-button" type="button" aria-label="Analysis questions" aria-expanded={commandsOpen} onClick={() => setCommandsOpen(open => !open)} disabled={busy || !project}><SquareSlash size={17}/></button><button className="icon-button" type="button" aria-label="Connection settings" aria-expanded={settingsOpen} onClick={() => setSettingsOpen(open => !open)} disabled={busy}><SlidersHorizontal size={16}/></button></div><div><label className="ask-answer-mode"><span className="sr-only">Answer mode</span><select aria-label="Answer mode" value={effectiveMode} onChange={event => { const next = event.target.value as AskMode; setMode(next); if (next === 'byok') setSettingsOpen(true); else setApiKey(''); setError(''); }} disabled={busy}><option value="hosted" disabled={!hostedAvailable}>GPT-6 Luna{!hostedAvailable && !status.loading ? ' · unavailable' : ''}</option><option value="statistics">Project statistics</option>{settingsOpen && <option value="byok">My provider connection</option>}</select><ChevronDown size={13}/></label><button type="submit" className="ask-workspace-send" disabled={!canSend} aria-label="Send question">{busy ? <Spinner/> : <ArrowUp size={18}/>}</button></div></div></form>
+        <div className="ask-compose-context"><label><Folder size={14}/><select aria-label="Ask project" value={project?.id || ''} disabled={busy || !project} onChange={event => { const next = session?.projects.find(item => item.id === event.target.value); if (next) { setParams(previous => { const value = new URLSearchParams(previous); value.delete('chat'); value.delete('question'); return value; }); setProject(next); } }}>{!project && <option value="">Choose project</option>}{session?.projects.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label><label className="ask-period"><select aria-label="Ask evidence period" value={days} disabled={busy} onChange={event => setDays(event.target.value)}><option value="7">Last 7 days</option><option value="30">Last 30 days</option><option value="90">Last 90 days</option></select></label></div>
+        {settingsOpen && <section className="ask-advanced-settings" aria-label="Advanced connection settings"><header><strong>Connection settings</strong><button className="icon-button" aria-label="Close connection settings" onClick={() => { setSettingsOpen(false); if (mode === 'byok') { setMode('hosted'); setApiKey(''); } }} disabled={busy}><X size={15}/></button></header><label className="ask-own-provider-toggle"><input type="checkbox" checked={mode === 'byok'} disabled={busy} onChange={event => { setMode(event.target.checked ? 'byok' : 'hosted'); setApiKey(''); }}/><KeyRound size={14}/>Use my own provider account</label>{mode === 'byok' && <><div className="ask-advanced-fields"><label className="field">Provider<select value={provider} onChange={event => { setProvider(event.target.value as 'openai' | 'anthropic'); setApiKey(''); setModel(''); }} disabled={busy}><option value="openai">OpenAI</option><option value="anthropic">Anthropic</option></select></label><label className="field">Model ID<input autoComplete="off" spellCheck={false} value={model} onChange={event => setModel(event.target.value)} placeholder="Your model ID" maxLength={200} disabled={busy}/></label><label className="field">Provider API key<input type="password" autoComplete="off" data-1p-ignore data-lpignore="true" spellCheck={false} value={apiKey} onChange={event => setApiKey(event.target.value)} placeholder="Your API key" maxLength={512} disabled={busy}/></label></div><p><ShieldCheck size={13}/>Your key is held in this page’s memory and sent only with your request. Your provider bills these calls separately.</p>{apiKey && <button className="text-button" onClick={() => setApiKey('')} disabled={busy}>Clear key</button>}</>}</section>}
+        {effectiveMode === 'hosted' && <p className="ask-privacy-note">Uses OpenAI with your question, recent chat and selected project metadata. Raw trace bodies are not sent.</p>}
+        <p className="ask-allowance-note">{contextMessages}</p>{effectiveMode === 'hosted' && <p className="ask-accounting-note">Costs use provider-reported tokens. Interrupted or unconfirmed calls may retain a conservative reservation.</p>}
+        {!messages.length && project && <div className="ask-starter-questions">{askQuestions.slice(0, 2).map(item => <button key={item.command} onClick={() => chooseQuestion(item.question)} disabled={busy}>{item.question}</button>)}</div>}
+      </div>
+    </div>
+  </section>;
+}
+
+export default function Ask() {
+  const { project } = useApp();
+  return <AskProject key={project?.id || 'no-project'}/>;
 }

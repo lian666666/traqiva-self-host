@@ -27,12 +27,13 @@ describe('Stage two free workspace', () => {
     expect(html).toContain('100K events');
     expect(html).toContain('600 minutes of agent runs');
     expect(html).toContain('25K routing decisions');
-    expect(html).toContain('$10 of Traqiva AI');
+    expect(html).toContain('$1 per user in total');
+    expect(html).toContain('Lifetime allowance; no automatic reset');
     expect(html).toContain('at most $50 a month per product');
     expect(html).toContain('one event per started 64 KB');
     expect(html).toContain('One person.');
-    expect(html).toContain('Plan preview.');
-    expect(html).toContain('not active yet');
+    expect(html).toContain('Monthly traffic allowances, paid upgrades and Team trials are not active yet.');
+    expect(html).toContain('does not renew monthly');
     expect(html).toMatch(/<button[^>]*disabled[^>]*>Try Team free for 7 days/);
     expect(html).not.toContain('Caveman');
     expect(html).not.toContain('quality checks');

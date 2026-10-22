@@ -17,7 +17,9 @@ describe('Public pricing policy preview', () => {
     const html = renderPricing();
     const text = html.replace(/<[^>]*>/g, ' ');
     expect(text).toMatch(/Free\s*\$0/);
-    for (const value of ['No card', '100K', '600', '25K', '$10', '$50', '64 KB']) expect(text).toContain(value);
+    for (const value of ['No card', '100K', '600', '25K', '$1 per user in total', '$50', '64 KB']) expect(text).toContain(value);
+    expect(text).not.toContain('$10');
+    expect(text).toContain('Lifetime allowance; no automatic reset');
     expect(text).toMatch(/one person/i);
     expect(text).toMatch(/next month/i);
     expect(text).toMatch(/per product/i);
@@ -26,14 +28,14 @@ describe('Public pricing policy preview', () => {
     expect(html).not.toMatch(/agents you build|evaluations|CLOUD WORKSPACE/i);
   });
 
-  it('identifies unimplemented allowances, credits, payments and trials as a preview', () => {
+  it('separates the hosted lifetime allowance from the monthly traffic preview', () => {
     const html = renderPricing();
-    expect(html).toContain('Plan preview. Monthly allowances, AI credits, paid upgrades and Team trials are not active yet.');
-    expect(html.match(/Plan preview\./g)).toHaveLength(1);
+    expect(html).toContain('Monthly traffic allowances, paid upgrades and Team trials are not active yet.');
+    expect(html).toContain('built-in Ask allowance is separate and does not renew monthly');
     const text = html.replace(/<[^>]*>/g, ' ');
     expect(text).toMatch(/Each month\s*(?:·\s*)?Planned/i);
     expect(text).toMatch(/Past that\s*(?:·\s*)?Planned/i);
-    expect(html).toContain('billed separately');
+    expect(html).toContain('Gateway and your-key model calls are billed separately by your provider');
   });
 
   it('keeps the Team trial unavailable and offers no payment or credit-grant action', () => {

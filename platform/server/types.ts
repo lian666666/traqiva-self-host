@@ -17,6 +17,8 @@ export interface Env {
   GITHUB_CLIENT_ID?: string;
   GITHUB_CLIENT_SECRET?: string;
   GITHUB_REDIRECT_URI?: string;
+  HOSTED_OPENAI_API_KEY?: string;
+  HOSTED_ASK_ENABLED?: string;
 }
 export interface Execution {
   waitUntil(promise: Promise<unknown>): void;
