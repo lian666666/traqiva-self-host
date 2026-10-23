@@ -10,20 +10,24 @@ Detect the operating system, architecture, current assistant and Node/npm. Node.
 npm install --prefix <USER_TOOLS_DIRECTORY> <SERVICE_URL>/cli.tgz
 ```
 
-Replace and quote the paths for the actual shell. Locate the installed absolute `node_modules/traqiva-cli-local/bin/traqiva.mjs` path; check the installed package metadata rather than assuming its location. Below, `T` means the actual Node executable invoking that absolute CLI script, not a literal executable named T. Verify `T --version` and `T --help`. Do not invent an npm registry package or install another product.
+Replace and quote the paths for the actual shell. Locate the installed absolute `node_modules/traqiva-cli-local/bin/traqiva.mjs` path; check the installed package metadata rather than assuming its location. Below, `T` means the actual Node executable invoking that absolute CLI script, not a literal executable named T. Verify `T --version` and `T --help`; the help must list `--key-prompt`. If it does not, update the client from this service before connecting. Do not invent an npm registry package or install another product.
 
 ## 2. Connect this project privately
 
 If already connected to the correct service/project, reuse that connection. Otherwise the user can create a scoped key with the **Project key** button on Stage 3. The prompt contains no secret; no model-provider API key is needed. Local native compression and MCP can work without a project key; cloud connection adds project identity and dashboard metadata. Continue local setup if that connection remains pending.
 
-Let the user enter the key in a masked, local interactive terminal. Do not ask them to paste it into an AI chat. Use a short-lived shell variable with history protection; never echo the key or include it in source, logs or Git. If a private terminal is unavailable, stop this credential step and give the user a private handoff while continuing non-secret work.
+Use the CLI's built-in private key prompt in a local interactive terminal. It hides the entered key and keeps it out of command arguments and shell history. Never ask for the key in an AI chat, echo it, or put it in source, logs or Git.
 
 ```text
-T connect --url <SERVICE_URL> --project <PROJECT_ID> --key <PRIVATE_PROJECT_KEY>
+T connect --url <SERVICE_URL> --project <PROJECT_ID> --key-prompt
 T status
 ```
 
-The CLI has no key-stdin option: the key briefly appears in process arguments. Its local connection file `~/.traqiva/config.json` stores the scoped key (0600 where supported; Windows user-profile ACLs apply). Keep that directory private and outside Git, and clear the temporary variable. Verify the service/project returned by `status`; a health check alone does not prove the project is connected. If `TRAQIVA_HOME` selects a custom directory, keep that same value in the MCP server's environment.
+Replace `T` with the verified absolute Node executable and installed CLI script. On Windows, invoke these paths directly with PowerShell's call operator; no helper script is needed. Do not invent or launch a `connect-project.ps1` path. If a helper is necessary, save it first and verify its actual absolute path with `Test-Path -LiteralPath` before launching `powershell -File`; a command that refers to a file does not create that file.
+
+`--key-prompt` requires a real interactive TTY and refuses piped or noninteractive input. If the assistant's terminal is noninteractive, give the user the resolved non-secret command to run in their own private terminal; leave connection pending and continue non-secret work. Never fall back to visible input. The older `--key VALUE` option remains for compatible automation, where the value can appear in process arguments; do not use it for this interactive setup.
+
+The local connection file `~/.traqiva/config.json` stores the scoped key (0600 where supported; Windows user-profile ACLs apply). Keep that directory private and outside Git. Verify the service/project returned by `status`; a health check alone does not prove the project is connected. If `TRAQIVA_HOME` selects a custom directory, keep that same value in the MCP server's environment.
 
 ## 3. Install and verify the native engine
 

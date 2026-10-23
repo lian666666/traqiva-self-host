@@ -1,4 +1,4 @@
-# Traqiva CLI 0.2.0
+# Traqiva CLI 0.2.1
 
 A small, independently implemented Node.js client for your Traqiva deployment and optional native compression runtime. Node.js 22.13 or newer; no package dependencies. The package name is `traqiva-cli-local`, and the installed command is `traqiva`.
 
@@ -16,16 +16,16 @@ In an interactive terminal, choose **Codex**, **Claude Code**, or **Local files*
 npx --yes --no-audit https://YOUR-TRAQIVA.workers.dev/cli.tgz init --url https://YOUR-TRAQIVA.workers.dev
 ```
 
-The wizard installs the checksum-verified native engine and a persistent, allowlisted client under `~/.traqiva/client/0.2.0/`. MCP settings reference this stable client, not the disposable `npx` cache. Automatic registration uses `codex mcp add` or `claude mcp add --scope user`. On Windows it prefers native `.exe` clients or resolves known official npm wrappers to their JavaScript entry points through Node, without executing a command shell. `TRAQIVA_CODEX_BIN` and `TRAQIVA_CLAUDE_BIN` can explicitly select a native executable or `.js`/`.mjs` entry. Existing `traqiva` MCP entries are preserved. If the assistant is missing, settings cannot be checked, registration fails, or you choose manual setup, the wizard prints a configuration and says that action is required. It does not claim an agent or cloud project is connected. Restart your assistant or open a new session after registration; tools act when called.
+The wizard installs the checksum-verified native engine and a persistent, allowlisted client under `~/.traqiva/client/0.2.1/`. MCP settings reference this stable client, not the disposable `npx` cache. Automatic registration uses `codex mcp add` or `claude mcp add --scope user`. On Windows it prefers native `.exe` clients or resolves known official npm wrappers to their JavaScript entry points through Node, without executing a command shell. `TRAQIVA_CODEX_BIN` and `TRAQIVA_CLAUDE_BIN` can explicitly select a native executable or `.js`/`.mjs` entry. Existing `traqiva` MCP entries are preserved. If the assistant is missing, settings cannot be checked, registration fails, or you choose manual setup, the wizard prints a configuration and says that action is required. It does not claim an agent or cloud project is connected. Restart your assistant or open a new session after registration; tools act when called.
 
 No-argument execution with piped input prints help and writes nothing. `traqiva init` requires an interactive terminal, does not accept a noninteractive yes flag, and makes no installation or MCP changes if confirmation is declined. It does not launch a model, change providers, select cheaper models, or take over an existing desktop chat. To explicitly repeat the wizard after installation, run `traqiva init [--url ORIGIN]`.
 
 ## Install the deployment's package
 
-Download `traqiva-cli-0.2.0.tgz` from your deployment's `/downloads/` page, then:
+Download `traqiva-cli-0.2.1.tgz` from your deployment's `/downloads/` page, then:
 
 ```sh
-npm install --global ./traqiva-cli-0.2.0.tgz
+npm install --global ./traqiva-cli-0.2.1.tgz
 traqiva --help
 ```
 
@@ -39,14 +39,16 @@ This package has not been published to the public npm registry. Do not assume `n
 
 ## Connect
 
-Create a project and project ingest key in the Traqiva web app. Replace the placeholders:
+Create a project and project ingest key in the Traqiva web app. Replace the non-secret URL and project ID, then run in your private interactive terminal:
 
 ```sh
-traqiva connect --url https://YOUR-TRAQIVA.workers.dev --project PROJECT_ID --key PROJECT_INGEST_KEY
+traqiva connect --url https://YOUR-TRAQIVA.workers.dev --project PROJECT_ID --key-prompt
 traqiva status
 ```
 
-`connect` checks `/api/connection` and the returned project ID before saving anything. It prints project/workspace identity, never the key. The saved file is `~/.traqiva/config.json`; `TRAQIVA_HOME` selects an isolated directory. The key is stored in this file, not in source code. File mode is set to `0600` on systems that enforce Unix permissions; Windows uses the enclosing user profile's ACLs. Keep this private directory out of Git. Arguments typed directly into a shell can enter that shell's history; for a private shell session, read the key into a temporary shell variable before invoking the command.
+`--key-prompt` hides the entered key and keeps it out of command arguments and shell history. It requires a real interactive TTY; piped or noninteractive terminals are refused. If your AI assistant cannot provide a private interactive terminal, run the non-secret command above in your own terminal. No PowerShell helper script is needed. Do not paste the key into an AI chat or fall back to visible input. The older `--key VALUE` option remains compatible with existing automation, but exposes the value in process arguments and potentially shell history; use `--key-prompt` for interactive setup.
+
+`connect` checks `/api/connection` and the returned project ID before saving anything. It prints project/workspace identity, never the key. The saved file is `~/.traqiva/config.json`; `TRAQIVA_HOME` selects an isolated directory. The key is stored in this file, not in source code. File mode is set to `0600` on systems that enforce Unix permissions; Windows uses the enclosing user profile's ACLs. Keep this private directory out of Git.
 
 Only HTTPS origins are accepted, except loopback HTTP for local development. Paths, embedded credentials, query strings and fragments are refused. Redirects are not followed with the project credential.
 
@@ -217,6 +219,6 @@ cd platform/cli
 npm pack --pack-destination ../public/downloads
 ```
 
-The generated name is `traqiva-cli-local-0.2.0.tgz`; the web distribution renames it to `traqiva-cli-0.2.0.tgz` and supplies the short `/cli.tgz` URL. The tarball includes only `bin/`, `lib/`, README and license/notice files, not local settings, test fixtures or credentials. Test fixtures use temporary `TRAQIVA_HOME` directories, fake assistant subprocesses and a loopback mock service; they make no model-provider calls and do not change host agent configuration. Automatic MCP registration was exercised with isolated fake assistant CLIs; real Codex/Claude registration was not executed for this release. The native installation and compression tests are recorded separately. Browse tests additionally exercise the real Windows engine against an isolated HTTP fixture, exact source/byte recovery, public-address/redirect checks, size/content-type/time limits and tamper rejection. A separate public HTTPS extraction probe succeeded against `example.com`; it is not evidence of model billing savings.
+The generated name is `traqiva-cli-local-0.2.1.tgz`; the web distribution renames it to `traqiva-cli-0.2.1.tgz` and supplies the short `/cli.tgz` URL. The tarball includes only `bin/`, `lib/`, README and license/notice files, not local settings, test fixtures or credentials. Test fixtures use temporary `TRAQIVA_HOME` directories, fake assistant subprocesses and a loopback mock service; they make no model-provider calls and do not change host agent configuration. Automatic MCP registration was exercised with isolated fake assistant CLIs; real Codex/Claude registration was not executed for this release. The native installation and compression tests are recorded separately. Browse tests additionally exercise the real Windows engine against an isolated HTTP fixture, exact source/byte recovery, public-address/redirect checks, size/content-type/time limits and tamper rejection. A separate public HTTPS extraction probe succeeded against `example.com`; it is not evidence of model billing savings.
 
 The CLI source is independent implementation under Apache-2.0. The accompanying platform research distinguishes the reusable Apache-licensed Caveman local core from its separate proprietary Cloud service. No Caveman brand assets or binary runtime are bundled in this npm tarball; the optional native downloads carry their source provenance and all required license texts.

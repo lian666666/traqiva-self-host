@@ -2,7 +2,7 @@
   "schema": 1,
   "template": "traqiva-self-host",
   "history_exported": false,
-  "generated_at": "2026-10-22T17:57:14.189Z",
+  "generated_at": "2026-10-23T07:47:53.068Z",
   "files": [
     {
       "path": ".gitattributes",
@@ -51,8 +51,8 @@
     },
     {
       "path": "platform/cli/bin/traqiva.mjs",
-      "bytes": 11901,
-      "sha256": "5b3999d1e44990017cdb9afe071d20b9e6b706ed8a14a712f3f073c65906099d"
+      "bytes": 12520,
+      "sha256": "f1bbe6ea6d76a92f305fe933059e6e54772c5ddce9725c4a2825aff0384bec5c"
     },
     {
       "path": "platform/cli/lib/agent.mjs",
@@ -71,8 +71,8 @@
     },
     {
       "path": "platform/cli/lib/client.mjs",
-      "bytes": 6566,
-      "sha256": "83a807ef2fd97034429702df0709730b57fa03aca5e12452935243c8a6d1af3b"
+      "bytes": 6595,
+      "sha256": "13c5b97c54c68dc2a5dbdb8386947e976b4c21d5985e85869016200f2c7fef33"
     },
     {
       "path": "platform/cli/lib/commands.mjs",
@@ -110,6 +110,11 @@
       "sha256": "dd0770912f36a4a13b01f8b8f0d1b7317243d33f9c66da1b4ea97647f23637a2"
     },
     {
+      "path": "platform/cli/lib/private-input.mjs",
+      "bytes": 4801,
+      "sha256": "ac09b8c77e85f6b74eff2c484bc2cd35f87d2fe495ada9d00ab8b9b060b823bb"
+    },
+    {
       "path": "platform/cli/lib/proxy-native.mjs",
       "bytes": 3170,
       "sha256": "6c49ef5db2b503574a52080239e24f932a2d951b3fb82a730428b5d3a7d8ee2c"
@@ -142,12 +147,12 @@
     {
       "path": "platform/cli/package.json",
       "bytes": 983,
-      "sha256": "2cefc5b64ec02f0cc91e33b5600df76fce646b8078b6e878adb00f7a6fb227dc"
+      "sha256": "02d6bd4b5a960a0f370752066d3680fe7784d714300c2e0b9cd06f586dba8b8e"
     },
     {
       "path": "platform/cli/README.md",
-      "bytes": 20952,
-      "sha256": "69b1461a09234d99f7035570208a6666fc2dcf9333300eda39bfffd0a9bb340b"
+      "bytes": 21431,
+      "sha256": "b4fd4537959846263e25492c896c6e24c4bd9965969b21b35143a9bb1fdb4ed5"
     },
     {
       "path": "platform/cli/tests/agent.test.mjs",
@@ -166,8 +171,8 @@
     },
     {
       "path": "platform/cli/tests/cli.test.mjs",
-      "bytes": 12727,
-      "sha256": "6f2b3325bd0c9201cc44feb8cee7566a64bceb5124849ad979ac330de804b312"
+      "bytes": 13800,
+      "sha256": "b9a7dff7ed17f0338520d5a4d0a0e2160b1916cc8e2e0100441affc38558cb7e"
     },
     {
       "path": "platform/cli/tests/codex-mock-smoke.mjs",
@@ -195,6 +200,11 @@
       "sha256": "19a7bba7ec80b28479685e964f9ba8e6c535e151b963f1cbcba41a226ea22bb2"
     },
     {
+      "path": "platform/cli/tests/private-input.test.mjs",
+      "bytes": 3477,
+      "sha256": "d611f30119c40406559b4ec7802b88dc05e25143de5f3a39a3323abf1e237ca6"
+    },
+    {
       "path": "platform/cli/tests/proxy-integration.test.mjs",
       "bytes": 5545,
       "sha256": "718d1c1bd1d72d983cf34a82140d3c94a3c1644f5dfcbcc93759f7f2d600b88b"
@@ -202,7 +212,7 @@
     {
       "path": "platform/cli/tests/quickstart.test.mjs",
       "bytes": 11106,
-      "sha256": "f3d5b502554645fb9b22420362686327cb7a5b8401af45ad0e17208e44ec850f"
+      "sha256": "2cfd434dbdc27c1c4dab19059b0d37b1e16e6ff2efaffe893101a6ecc9d325bb"
     },
     {
       "path": "platform/cli/tests/say-less-proxy.test.mjs",
@@ -231,8 +241,8 @@
     },
     {
       "path": "platform/docs/CAPABILITIES.md",
-      "bytes": 35718,
-      "sha256": "fc2470d1354727c0658c9257f640c4e27cf9f6090e29f33e6dd867cb75f0f6d4"
+      "bytes": 35851,
+      "sha256": "2c4a74d2594e6da0f06c66f36b5cbdab1157c5f1297df168d7fd2e497174b62a"
     },
     {
       "path": "platform/docs/GITHUB_AUTH.md",
@@ -366,13 +376,13 @@
     },
     {
       "path": "platform/public/agent-setup.md",
-      "bytes": 6254,
-      "sha256": "88459ca607902b45e3bec41eae8b518e7539c9d1afa2acf7f83561a1ae20c7f0"
+      "bytes": 7014,
+      "sha256": "b9b72e0393106874d62194dadae260331bd6902bc9a3b4d1a2f3e67adb0422d1"
     },
     {
       "path": "platform/public/cli.tgz",
-      "bytes": 41453,
-      "sha256": "85850fda7366b46f0be8e9ec1e6cc1156dd5af5de21f7d8a72c50c7a53d2046b"
+      "bytes": 43250,
+      "sha256": "63f0feb187f4c821fd10a040667ef2cbdaa0b6c9af91ac904620094661c43e54"
     },
     {
       "path": "platform/public/downloads/engine-manifest.json",
@@ -408,6 +418,11 @@
       "path": "platform/public/downloads/traqiva-cli-0.2.0.tgz",
       "bytes": 41453,
       "sha256": "85850fda7366b46f0be8e9ec1e6cc1156dd5af5de21f7d8a72c50c7a53d2046b"
+    },
+    {
+      "path": "platform/public/downloads/traqiva-cli-0.2.1.tgz",
+      "bytes": 43250,
+      "sha256": "63f0feb187f4c821fd10a040667ef2cbdaa0b6c9af91ac904620094661c43e54"
     },
     {
       "path": "platform/public/downloads/traqiva-engine-0.1.0-darwin-arm64.gz",
@@ -4501,8 +4516,8 @@
     },
     {
       "path": "platform/src/components/CompactAgentSetup.tsx",
-      "bytes": 1066,
-      "sha256": "55150c26e04a5172a6e3218ea4cb39c25286ef8b2fb86630de14786788a43e83"
+      "bytes": 1059,
+      "sha256": "933f08dc875a761a92040e38bfc51af08920d49372e60ddc10083f4342854ae6"
     },
     {
       "path": "platform/src/components/FreePlanStep.tsx",
@@ -4766,8 +4781,8 @@
     },
     {
       "path": "platform/src/pages/Connect.tsx",
-      "bytes": 6670,
-      "sha256": "1d780bc5c53d626e2cf52ac638a4a2def952aac47a3f50a75bcee5409d4ddc67"
+      "bytes": 6701,
+      "sha256": "3ad294d5429972b3e87f39835b988ba3da8ddcff940d7892c8c0411a9fec3aae"
     },
     {
       "path": "platform/src/pages/controls.css",
@@ -4861,8 +4876,8 @@
     },
     {
       "path": "platform/src/setupPrompt.ts",
-      "bytes": 4642,
-      "sha256": "578f7f46984ba6c64f209a3979b6cae9519e888bfcae136f36bfc6e44a83c0d0"
+      "bytes": 5038,
+      "sha256": "376378f5bb0654abaae0a55b94399044d3d35379638aa6aa95d0dc31524ccf3d"
     },
     {
       "path": "platform/src/setupState.ts",
@@ -5126,8 +5141,8 @@
     },
     {
       "path": "platform/tests/universal-setup-prompt.test.ts",
-      "bytes": 2098,
-      "sha256": "d6f91a5c22a8cc224a7e8d454820e89d550fe102f742786f2e6e6b6622aefbf6"
+      "bytes": 2142,
+      "sha256": "9b56a7f2f847870c1c708139f693c230c362930395b66554f255f39fdd8ba5d3"
     },
     {
       "path": "platform/tests/workspace-usage.test.ts",

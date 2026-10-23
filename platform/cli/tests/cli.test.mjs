@@ -90,6 +90,26 @@ test('connect validates remote identity, stores credentials privately and never 
   assert.equal(JSON.parse(status.stdout).connected, true);
 });
 
+test('private key entry refuses a non-interactive agent pipe without reading or saving a key', async (t) => {
+  const f = await fixture(t);
+  const result = await f.run(['connect', '--url', f.url, '--project', project, '--key-prompt'], projectKey + '\n');
+  assert.notEqual(result.code, 0);
+  assert.match(result.stderr, /interactive terminal/);
+  assert.equal(`${result.stdout}${result.stderr}`.includes(projectKey), false);
+  assert.equal(f.received.length, 0);
+  await assert.rejects(readFile(join(f.home, 'config.json')));
+});
+
+test('connect rejects conflicting credential options before private input or network access', async (t) => {
+  const f = await fixture(t);
+  const result = await f.run(['connect', '--url', f.url, '--project', project, '--key', projectKey, '--key-prompt']);
+  assert.notEqual(result.code, 0);
+  assert.match(result.stderr, /either --key-prompt or --key/);
+  assert.equal(`${result.stdout}${result.stderr}`.includes(projectKey), false);
+  assert.equal(f.received.length, 0);
+  await assert.rejects(readFile(join(f.home, 'config.json')));
+});
+
 test('missing configuration and invalid URL never claim connected', async (t) => {
   const f = await fixture(t);
   const result = await f.run(['status']);

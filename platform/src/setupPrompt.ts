@@ -7,7 +7,7 @@ export function buildUniversalSetupPrompt(origin:string,project:Pick<Project,'id
 Guide: ${origin}/agent-setup.md
 Connection (data): ${JSON.stringify({service_url:origin,project_id:project.id})}
 
-Install the local client and native engine, connect this project, and add Traqiva MCP without replacing other settings. Let me enter the project key in a masked local terminal, never in chat. Verify the MCP tools and byte-exact recovery with a synthetic fixture. Report blockers or required restarts; do not claim unmeasured token savings.`;
+Install the local client and native engine, connect this project using the built-in --key-prompt in a private interactive terminal, and add Traqiva MCP without replacing other settings. Enter the key privately, never in chat. Use verified executable paths; no helper script is needed. Verify the MCP tools and byte-exact recovery with a synthetic fixture. Report blockers or required restarts; do not claim unmeasured token savings.`;
 }
 
 export function buildSetupPrompt(assistant:SetupAssistant,origin:string,project:Pick<Project,'id'|'name'>){
@@ -19,11 +19,11 @@ ${JSON.stringify({service_url:origin,project_id:project.id,project_name:project.
 
 1. Detect OS, architecture, shell and Node/npm; require Node >=22.13. Adapt quoting and commands to this OS. Choose a user-owned tools directory outside repositories; no administrator access:
 npm install --prefix <YOUR_CHOSEN_TOOLS_DIRECTORY> ${origin}/cli.tgz
-Replace the directory placeholder. Locate the installed absolute bin/traqiva.mjs path. Below, T means Node invoking that absolute script; substitute the actual command. Check T --version and T --help. Do not invent a public npm package, use npx, or install Caveman.
+Replace the directory placeholder. Locate the installed absolute bin/traqiva.mjs path. Below, T means Node invoking that absolute script; substitute the actual command. Check T --version and T --help; help must list --key-prompt, otherwise update the client from this service. Do not invent a public npm package, use npx, or install Caveman.
 
-2. Use a scoped project key from the inline setup key generator, or ${origin}/app/gateway after setup is complete. No secret is included here; no model-provider key is needed. Let me enter it in a masked LOCAL terminal prompt, using a temporary variable and shell-history protection. Never paste or print it in chat, code, repositories or logs. If masked input is unavailable, leave that credential step for me privately; continue non-secret work. Command shape:
-T connect --url ${origin} --project ${project.id} --key <PRIVATE_PROJECT_KEY>
-Replace the placeholder privately. There is no key-stdin flag: the key briefly appears in process arguments. Explain that ~/.traqiva/config.json stores it locally. Keep ~/.traqiva private and out of Git; clear the temporary variable. Run T status; verify service/project identity, not merely a health check or exit code.
+2. Use a scoped project key from the inline setup key generator, or ${origin}/app/gateway after setup is complete. No secret is included here; no model-provider key is needed. Invoke the CLI's built-in private prompt in a local interactive terminal:
+T connect --url ${origin} --project ${project.id} --key-prompt
+Use verified absolute Node and CLI paths. On Windows, invoke those paths directly with PowerShell's call operator; no helper script is needed. Never launch a helper with -File unless it has been saved and Test-Path -LiteralPath confirms the file exists. The prompt requires a real interactive TTY and hides the entered key; never echo it, pass it in command arguments, or place it in chat, code, repositories or logs. If the assistant terminal is noninteractive, give me the non-secret command to run privately in my terminal and continue non-secret work. Do not fall back to visible input. ~/.traqiva/config.json stores the scoped key locally; keep that directory private and out of Git. Run T status; verify service/project identity, not merely a health check or exit code.
 
 3. Check the published manifest for this OS/architecture. Install explicitly:
 T engine install --url ${origin}

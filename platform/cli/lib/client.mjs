@@ -5,7 +5,7 @@ import { randomUUID } from 'node:crypto';
 import { isUtf8 } from 'node:buffer';
 
 export const MAX_BYTES = 1024 * 1024;
-export const VERSION = '0.2.0';
+export const VERSION = '0.2.1';
 export const configHome = () => resolve(process.env.TRAQIVA_HOME || join(homedir(), '.traqiva'));
 
 export function publicError(error, secrets = []) {
@@ -27,7 +27,7 @@ export function normalizeOrigin(value) {
 export async function loadConfig() {
   let config;
   try { config = JSON.parse(await readFile(join(configHome(), 'config.json'), 'utf8')); }
-  catch { throw new Error('Not connected. Run traqiva connect --url ORIGIN --project PROJECT_ID --key PROJECT_KEY.'); }
+  catch { throw new Error('Not connected. Run traqiva connect --url ORIGIN --project PROJECT_ID --key-prompt in a private interactive terminal.'); }
   config.url = normalizeOrigin(config.url);
   if (typeof config.project !== 'string' || !config.project || typeof config.key !== 'string' || config.key.length < 8 || /[\r\n]/.test(config.key)) {
     throw new Error('Invalid local connection file. Connect again.');

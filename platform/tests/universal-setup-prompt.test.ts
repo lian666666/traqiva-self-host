@@ -7,7 +7,7 @@ describe('Universal coding-agent setup prompt', () => {
     const pkg = JSON.parse(readFileSync(new URL('../cli/package.json', import.meta.url), 'utf8'));
     const guide = readFileSync(new URL('../public/agent-setup.md', import.meta.url), 'utf8');
     expect(guide).toContain(`node_modules/${pkg.name}/${pkg.bin.traqiva}`);
-    expect(guide).toContain('no key-stdin option');
+    expect(guide).toContain('connect --url <SERVICE_URL> --project <PROJECT_ID> --key-prompt');
     expect(guide).toContain('not included by `setup --print`');
   });
   it('is short, works across supported clients and points to the local setup guide', () => {

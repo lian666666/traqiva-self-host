@@ -71,9 +71,9 @@ test('manual MCP setup points at a persistent allowlisted package and preserves 
   const result = await quickstart.runQuickstart(f.options, f.io);
   assert.equal(result.status, 'manual');
   assert.equal(f.installs(), 1);
-  assert.equal(result.cliPath, join(f.home, 'client', '0.2.0', 'bin', 'traqiva.mjs'));
+  assert.equal(result.cliPath, join(f.home, 'client', '0.2.1', 'bin', 'traqiva.mjs'));
   assert.equal(await readFile(result.cliPath, 'utf8'), await readFile(bin, 'utf8'));
-  assert.deepEqual((await readdir(join(f.home, 'client', '0.2.0'))).sort(), ['LICENSE', 'NOTICE', 'README.md', 'bin', 'lib', 'package.json']);
+  assert.deepEqual((await readdir(join(f.home, 'client', '0.2.1'))).sort(), ['LICENSE', 'NOTICE', 'README.md', 'bin', 'lib', 'package.json']);
   assert.equal(await readFile(join(f.home, 'config.json'), 'utf8'), '{"private":"do-not-copy-or-change"}\n');
   assert.match(f.output.join(''), /mcp_servers\.traqiva/);
   assert.match(f.output.join(''), /TRAQIVA_HOME/);

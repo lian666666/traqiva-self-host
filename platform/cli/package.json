@@ -1,6 +1,6 @@
 {
   "name": "traqiva-cli-local",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Traqiva recoverable compression, reusable code Blocks, public-web Browse, MCP tools and explicit API/agent bridges.",
   "type": "module",
   "license": "Apache-2.0",

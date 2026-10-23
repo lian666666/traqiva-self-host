@@ -11,6 +11,7 @@ import { runQuickstart } from '../lib/quickstart.mjs';
 import { readControls,setControl,requireControl } from '../lib/controls.mjs';
 import { saveBlock,getBlock,listBlocks,deleteBlock } from '../lib/blocks.mjs';
 import { browsePage,recoverBrowse } from '../lib/browse.mjs';
+import { readProjectKey } from '../lib/private-input.mjs';
 
 const help = `Traqiva ${VERSION} — API-key gateway bridge and recoverable artifact compression
 
@@ -24,6 +25,7 @@ traqiva blocks delete ID
 traqiva browse PUBLIC_URL
 traqiva browse recover HANDLE
 traqiva connect --url ORIGIN --project ID --key PROJECT_INGEST_KEY
+traqiva connect --url ORIGIN --project ID --key-prompt
 traqiva status
 traqiva record TRACE.json
 traqiva compress FILE
@@ -57,7 +59,7 @@ function parse(args, allowed = []) {
     if (!value.startsWith('--')) { positional.push(value); continue; }
     const flag = value.slice(2);
     if (!allowed.includes(flag) || Object.hasOwn(flags, flag)) throw new Error('Unknown or repeated command option. Use traqiva --help.');
-    if (flag === 'print') flags[flag] = true;
+    if (flag === 'print' || flag === 'key-prompt') flags[flag] = true;
     else {
       if (!args[i + 1] || args[i + 1].startsWith('--')) throw new Error(`Option --${flag} requires a value.`);
       flags[flag] = args[++i];
@@ -101,13 +103,19 @@ async function main() {
     return;
   }
   if (command === 'connect') {
-    const { flags, positional } = parse(args, ['url', 'project', 'key']);
-    if (positional.length || !flags.url || !flags.project || !flags.key) throw new Error('connect requires --url ORIGIN --project ID --key PROJECT_INGEST_KEY.');
-    const config = { url: normalizeOrigin(flags.url), project: flags.project, key: flags.key };
-    if (config.key.length < 8 || /[\r\n]/.test(config.key)) throw new Error('Use a valid project ingest key.');
-    const state = await identity(config);
-    await saveConfig(config);
-    output({ ...state, credential_stored: true, provider_credentials_stored: false });
+    const { flags, positional } = parse(args, ['url', 'project', 'key', 'key-prompt']);
+    if (flags.key && flags['key-prompt']) throw new Error('Use either --key-prompt or --key, not both.');
+    if (positional.length || !flags.url || !flags.project || !(flags.key || flags['key-prompt'])) throw new Error('connect requires --url ORIGIN --project ID and either --key-prompt or --key PROJECT_INGEST_KEY.');
+    const config = { url: normalizeOrigin(flags.url), project: flags.project, key: '' };
+    if (config.project.length > 200 || /[\r\n]/.test(config.project)) throw new Error('Use a valid project ID.');
+    config.key = flags['key-prompt'] ? await readProjectKey() : flags.key;
+    try {
+      if (config.key.length < 8 || /[\r\n]/.test(config.key)) throw new Error('Use a valid project ingest key.');
+      const state = await identity(config);
+      await saveConfig(config);
+      output({ ...state, credential_stored: true, provider_credentials_stored: false });
+    } catch (error) { throw new Error(publicError(error, [config.key])); }
+    finally { config.key = ''; }
     return;
   }
   let config;
