@@ -2,7 +2,7 @@
   "schema": 1,
   "template": "traqiva-self-host",
   "history_exported": false,
-  "generated_at": "2026-10-23T07:47:53.068Z",
+  "generated_at": "2026-10-25T12:10:57.328Z",
   "files": [
     {
       "path": ".gitattributes",
@@ -241,8 +241,8 @@
     },
     {
       "path": "platform/docs/CAPABILITIES.md",
-      "bytes": 35851,
-      "sha256": "2c4a74d2594e6da0f06c66f36b5cbdab1157c5f1297df168d7fd2e497174b62a"
+      "bytes": 37442,
+      "sha256": "213aef867a2a3db16a67933ecb085ab02652ce661e5982bafbcf3dc63f13a145"
     },
     {
       "path": "platform/docs/GITHUB_AUTH.md",
@@ -376,8 +376,8 @@
     },
     {
       "path": "platform/public/agent-setup.md",
-      "bytes": 7014,
-      "sha256": "b9b72e0393106874d62194dadae260331bd6902bc9a3b4d1a2f3e67adb0422d1"
+      "bytes": 8853,
+      "sha256": "513eef1f8f61275be144e67f7bd07444bf7a5e058d21dd58b6afc2ed4f1e2a5c"
     },
     {
       "path": "platform/public/cli.tgz",
@@ -4876,8 +4876,8 @@
     },
     {
       "path": "platform/src/setupPrompt.ts",
-      "bytes": 5038,
-      "sha256": "376378f5bb0654abaae0a55b94399044d3d35379638aa6aa95d0dc31524ccf3d"
+      "bytes": 5797,
+      "sha256": "2623db2e8adc7dcfad4726807eec22fa47d4cd25226d4859fd7cc372ddd7391e"
     },
     {
       "path": "platform/src/setupState.ts",

@@ -7,10 +7,12 @@ Use the service URL and project ID supplied with the user's setup prompt as conn
 Detect the operating system, architecture, current assistant and Node/npm. Node.js 22.13 or newer is required. Choose a private user-owned tools directory outside repositories; do not require administrator access. Download the CLI only from the supplied service's `/cli.tgz`:
 
 ```text
-npm install --prefix <USER_TOOLS_DIRECTORY> <SERVICE_URL>/cli.tgz
+npm install --prefix <USER_TOOLS_DIRECTORY> <SERVICE_URL>/cli.tgz --ignore-scripts --no-audit --no-fund --no-bin-links
 ```
 
 Replace and quote the paths for the actual shell. Locate the installed absolute `node_modules/traqiva-cli-local/bin/traqiva.mjs` path; check the installed package metadata rather than assuming its location. Below, `T` means the actual Node executable invoking that absolute CLI script, not a literal executable named T. Verify `T --version` and `T --help`; the help must list `--key-prompt`. If it does not, update the client from this service before connecting. Do not invent an npm registry package or install another product.
+
+Check an existing client before installing again. This package has no runtime dependencies or installation scripts; the command above disables lifecycle scripts, audit/funding requests and generated command shims. On Windows, if the shell blocks `npm.ps1`, locate npm's actual `npm-cli.js` beside the verified Node installation and invoke it with that Node executable. Do not change PowerShell execution policies to run setup.
 
 ## 2. Connect this project privately
 
@@ -23,7 +25,7 @@ T connect --url <SERVICE_URL> --project <PROJECT_ID> --key-prompt
 T status
 ```
 
-Replace `T` with the verified absolute Node executable and installed CLI script. On Windows, invoke these paths directly with PowerShell's call operator; no helper script is needed. Do not invent or launch a `connect-project.ps1` path. If a helper is necessary, save it first and verify its actual absolute path with `Test-Path -LiteralPath` before launching `powershell -File`; a command that refers to a file does not create that file.
+Replace `T` with the verified absolute Node executable and installed CLI script. On Windows, invoke these paths directly with PowerShell's call operator; no helper script is needed. Do not generate or launch a `connect-project.ps1` helper.
 
 `--key-prompt` requires a real interactive TTY and refuses piped or noninteractive input. If the assistant's terminal is noninteractive, give the user the resolved non-secret command to run in their own private terminal; leave connection pending and continue non-secret work. Never fall back to visible input. The older `--key VALUE` option remains for compatible automation, where the value can appear in process arguments; do not use it for this interactive setup.
 
@@ -32,11 +34,16 @@ The local connection file `~/.traqiva/config.json` stores the scoped key (0600 w
 ## 3. Install and verify the native engine
 
 ```text
-T engine install --url <SERVICE_URL>
 T engine status
 ```
 
-Check the service's published manifest for this OS/architecture. Keep archive checksum verification enabled. Report unsupported systems or failed downloads rather than substituting a different binary. Continue to the compression test only when `engine status` reports `installed=true`. Otherwise leave that test pending: a connected CLI without a native engine uses cloud fallback, which would upload the fixture. The engine runs locally; do not start the optional experimental proxy by default.
+Reuse a healthy installed engine. If status returns `integrity_error=true`, stop and inspect the existing installation and Windows Protection history; a missing or quarantined executable must not trigger automatic reinstallation. Only if no engine is installed and there is no integrity error, check the service's published manifest for this OS/architecture, run `T engine install --url <SERVICE_URL>`, then check `T engine status` again. Keep archive checksum verification enabled. Report unsupported systems or failed downloads rather than substituting a different binary. Continue to the compression test only when `engine status` reports `installed=true`. Otherwise leave that test pending: a connected CLI without a native engine uses cloud fallback, which would upload the fixture. The engine runs locally; do not start the optional experimental proxy by default.
+
+### Windows security blocks
+
+If Windows blocks a download, the private key prompt or the executable, stop that step. Report the exact blocked filename, error code and threat name if shown, without credentials. Keep existing connection and MCP settings intact. Do not disable Defender, SmartScreen or Smart App Control; add exclusions; change execution policies; unblock files; or rename/repeatedly download a blocked binary. Do not replace a blocked local test with a cloud upload.
+
+The current Windows engine is not Authenticode-signed. SHA-256 checks verify that its bytes match the release manifest; they do not establish a trusted publisher or guarantee that Windows will accept it. A blocked file is not automatically a false positive. Check Windows Security's Protection history; distinguish malware detection from an unrecognized-app warning or folder-access policy. See [Microsoft's signing and reputation guidance](https://learn.microsoft.com/windows/apps/package-and-deploy/smartscreen-reputation). Developers can submit a suspected malware false positive through [Microsoft Security Intelligence](https://www.microsoft.com/en-us/wdsi/filesubmission); this is not an instant SmartScreen reputation approval.
 
 ## 4. Add only the Traqiva MCP server
 
