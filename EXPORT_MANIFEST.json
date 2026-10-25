@@ -2,7 +2,7 @@
   "schema": 1,
   "template": "traqiva-self-host",
   "history_exported": false,
-  "generated_at": "2026-10-25T12:10:57.328Z",
+  "generated_at": "2026-10-25T21:55:20.503Z",
   "files": [
     {
       "path": ".gitattributes",
@@ -241,8 +241,8 @@
     },
     {
       "path": "platform/docs/CAPABILITIES.md",
-      "bytes": 37442,
-      "sha256": "213aef867a2a3db16a67933ecb085ab02652ce661e5982bafbcf3dc63f13a145"
+      "bytes": 38521,
+      "sha256": "c6e340959ac8d46002737ef5c217315ebf86d3ee73bbf7a4e22cc993ce22dbf3"
     },
     {
       "path": "platform/docs/GITHUB_AUTH.md",
@@ -4506,8 +4506,8 @@
     },
     {
       "path": "platform/src/components/AgentSetupPrompt.tsx",
-      "bytes": 1345,
-      "sha256": "ee3bd6b32e9101dcb572ad4298420bca96949a626525bf4a4fe18bf1a9de93ca"
+      "bytes": 3100,
+      "sha256": "8ab7a7a0481cde5494abc2e46eaaa75033e8399cfbdbf82443091dea101ae4a6"
     },
     {
       "path": "platform/src/components/AssistantSetupCard.tsx",
@@ -4516,8 +4516,8 @@
     },
     {
       "path": "platform/src/components/CompactAgentSetup.tsx",
-      "bytes": 1059,
-      "sha256": "933f08dc875a761a92040e38bfc51af08920d49372e60ddc10083f4342854ae6"
+      "bytes": 1435,
+      "sha256": "7987f4991522b5b794aa3d17e383f636cb427288b385a11e58932ef43035fb84"
     },
     {
       "path": "platform/src/components/FreePlanStep.tsx",
@@ -4721,8 +4721,8 @@
     },
     {
       "path": "platform/src/onboarding-compact.css",
-      "bytes": 3618,
-      "sha256": "b42d0bb84b51ce8fb84478b3580e5117f1d0fa7dbf37d235258162c72776339b"
+      "bytes": 6659,
+      "sha256": "1d872e947c4d1c8af10901b7800829e3232670cf4aa079755770eb321606b0b3"
     },
     {
       "path": "platform/src/onboarding-plan.css",
@@ -4876,8 +4876,8 @@
     },
     {
       "path": "platform/src/setupPrompt.ts",
-      "bytes": 5797,
-      "sha256": "2623db2e8adc7dcfad4726807eec22fa47d4cd25226d4859fd7cc372ddd7391e"
+      "bytes": 6366,
+      "sha256": "f3882e5607b879d8d6bfa19ab33da7b55e9dd207bbf3546f2bed9ec3edabc654"
     },
     {
       "path": "platform/src/setupState.ts",
@@ -5081,8 +5081,8 @@
     },
     {
       "path": "platform/tests/onboarding-compact-ui.test.ts",
-      "bytes": 5215,
-      "sha256": "aa9a35df470114e69803bbfe257dca6881072c700bb98d90bbaa794d93621ccd"
+      "bytes": 5465,
+      "sha256": "d2408b250947c22b4a733428cc3e6a88021edc76460f2d3976f8ce92589ec6c1"
     },
     {
       "path": "platform/tests/onboarding-free-plan-ui.test.ts",

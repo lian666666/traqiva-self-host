@@ -1,6 +1,16 @@
 import type { Project } from './types';
 
 export type SetupAssistant='codex'|'claude';
+export type TerminalShell='windows'|'posix';
+
+export function buildTerminalSetupSteps(origin:string,projectId:string,shell:TerminalShell){
+  const quote=(value:string)=>shell==='windows'?`'${value.replaceAll("'","''")}'`:`'${value.replaceAll("'","'\\''")}'`;
+  const runner=`${shell==='windows'?'npx.cmd':'npx'} --yes --ignore-scripts --no-audit --package ${quote(`${origin}/cli.tgz`)} -- traqiva`;
+  return {
+    install:`${runner} init --url ${quote(origin)}`,
+    connect:`${runner} connect --url ${quote(origin)} --project ${quote(projectId)} --key-prompt`,
+  };
+}
 
 export function buildUniversalSetupPrompt(origin:string,project:Pick<Project,'id'|'name'>){
   return `Set up Traqiva for this agent: Codex, Claude Code, or a supported desktop client.

@@ -30,6 +30,9 @@ describe('Compact coding-agent onboarding',()=>{
     expect(html).toContain('Codex');
     expect(html).toContain('Claude Code');
     expect(html).toContain('Copy setup prompt');
+    expect(html).toContain('aria-label="Setup method"');
+    expect(html).toMatch(/role="tab"[^>]*aria-selected="true"[^>]*>[\s\S]*?Ask AI<\/button>/);
+    expect(html).toMatch(/role="tab"[^>]*aria-selected="false"[^>]*>[\s\S]*?Terminal<\/button>/);
     expect(html).toMatch(/<button[^>]*>[\s\S]*?Project key<\/button>/);
     expect(html).not.toContain('Create a project key');
     expect(html).not.toContain('<details');

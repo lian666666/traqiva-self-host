@@ -49,7 +49,7 @@
   line-height: 1.7;
 }
 .setup-wizard.setup-compact .setup-prompt-intro strong { color: var(--text); font-weight: 500; }
-.setup-wizard.setup-compact .setup-agent-prompt > pre {
+.setup-wizard.setup-compact .setup-prompt-code {
   margin: 0 0 13px;
   padding: 18px;
   border: 1px solid var(--border);
@@ -77,6 +77,26 @@
   line-height: 1.7;
 }
 .setup-wizard.setup-compact .setup-agent-prompt .modal .setup-key-section { margin-bottom: 0; }
+.setup-method-tabs { display: flex; justify-content: center; gap: 4px; width: fit-content; margin: 0 auto 19px; padding: 4px; border: 1px solid var(--border); border-radius: 24px; background: var(--subtle); }
+.setup-method-tabs > button { display: flex; align-items: center; justify-content: center; gap: 7px; min-width: 114px; min-height: 34px; padding: 7px 17px; border: 1px solid transparent; border-radius: 20px; background: transparent; color: var(--muted); font-size: 12px; cursor: pointer; }
+.setup-method-tabs > button[aria-selected="true"] { color: var(--text); background: var(--surface); border-color: var(--border); box-shadow: 0 1px 3px #00000007; }
+.setup-method-tabs > button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.setup-terminal-heading { display: flex; justify-content: space-between; align-items: center; gap: 14px; margin-bottom: 16px; }
+.setup-terminal-heading > p { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.6; }
+.setup-terminal-heading .select-wrap { flex-shrink: 0; }
+.setup-terminal-heading select { min-height: 33px; font-size: 11px; padding: 7px 31px 7px 11px; }
+.setup-terminal-commands { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: var(--subtle); }
+.setup-terminal-step { padding: 15px 17px; min-width: 0; }
+.setup-terminal-step + .setup-terminal-step { border-top: 1px solid var(--border); }
+.setup-terminal-step h3 { display: flex; align-items: center; gap: 9px; margin: 0 0 10px; font-size: 12px; font-weight: 500; }
+.setup-terminal-step h3 > span { display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; border: 1px solid var(--border); border-radius: 50%; font-size: 10px; color: var(--muted); }
+.setup-terminal-step .code-block { margin: 0; border: 0; background: transparent; border-radius: 0; }
+.setup-terminal-step .code-block > pre { font-family: 'Geist Mono Variable', monospace; color: var(--text); padding: 0 70px 0 0; font-size: 11px; line-height: 1.8; white-space: pre-wrap; overflow-wrap: anywhere; }
+.setup-terminal-step .code-block > .button { top: 0; right: 0; bottom: auto; min-height: 30px; padding: 5px 8px; font-size: 10px; }
+.setup-terminal-method .setup-quick-notes { padding: 0; margin: 14px 0; list-style: none; border: 1px solid var(--border); border-radius: 10px; background: var(--subtle); }
+.setup-terminal-method .setup-quick-notes > li { display: flex; align-items: flex-start; gap: 12px; padding: 13px 17px; font-size: 11px; line-height: 1.7; }
+.setup-terminal-method .setup-quick-notes > li + li { border-top: 1px solid var(--border); }
+.setup-terminal-method .setup-quick-notes svg { flex-shrink: 0; margin-top: 2px; color: var(--muted); }
 .setup-wizard.setup-compact .setup-finish { max-width: 430px; margin-top: 23px; }
 .setup-wizard.setup-compact .setup-finish > .button { min-height: 42px; border-radius: 23px; }
 .setup-wizard.setup-compact .setup-finish > .text-button { margin-top: 13px; }
@@ -86,10 +106,14 @@
   .setup-wizard.setup-compact > .setup-connect-main { margin-top: 12px !important; padding: 10px 20px 28px; }
   .setup-wizard.setup-compact .setup-connect-main > h1 { font-size: 28px; }
   .setup-wizard.setup-compact .setup-prompt-intro { font-size: 11px; }
-  .setup-wizard.setup-compact .setup-agent-prompt > pre { font-size: 10px; padding: 15px; line-height: 1.8; }
+  .setup-wizard.setup-compact .setup-prompt-code { font-size: 10px; padding: 15px; line-height: 1.8; }
   .setup-wizard.setup-compact .setup-prompt-actions { gap: 10px; }
   .setup-wizard.setup-compact .setup-prompt-actions > .button,
   .setup-wizard.setup-compact .setup-prompt-actions > .text-button { font-size: 10px; }
   .setup-wizard.setup-compact .setup-prompt-note { font-size: 9px; }
   .setup-wizard.setup-compact .setup-user > span { max-width: 180px; overflow-wrap: anywhere; }
+  .setup-terminal-heading { flex-direction: column; align-items: center; gap: 10px; text-align: center; }
+  .setup-terminal-step { padding: 13px; }
+  .setup-terminal-step .code-block > pre { font-size: 10px; padding-right: 56px; }
+  .setup-terminal-method .setup-quick-notes > li { font-size: 10px; padding: 12px 13px; }
 }
